@@ -10,5 +10,9 @@ class ClientController{
 
   public function getAllClients(){}
   
-  public function setNewClient(){}
+  public function setNewClient(array $data){}
+
+  public function updateDataClient(array $data){}
+  
+  public function deleteClient(int $id){}
 }
