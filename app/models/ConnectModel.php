@@ -3,6 +3,7 @@
 namespace app\models;
 
 use \PDO;
+use \PDOException;
 
 class ConnectModel{
 
@@ -25,7 +26,7 @@ class ConnectModel{
       $sql->execute();
 
     }catch(PDOException $pe){
-      die( $pe->getMessage() );
+      throw new PDOException ( $pe->getMessage() );
     }
   }
 
