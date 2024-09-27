@@ -1,8 +1,9 @@
 <?php
 
-namespance core;
+namespace core;
 
 use app\classes\Uri;
+use \Exception;
 
 class Method{
 
@@ -14,19 +15,21 @@ class Method{
 
   public function load($controller){
     $method = $this->getMethod();
-
+    
     if(!method_exists($controller, $method)){
       throw new Exception('Method Not Found');
     }
+
+    return $method;
   }
 
-  private funstion getMethod(){
-    if(subsrt_count($this->uri, '/') > 1){
-        list($controller,method) = array_values(array_filter(explode('/', $this->uri)));
+  private function getMethod(){
+    if(substr_count($this->uri, '/') > 1 ){
+        list($controller,$method) = array_values(array_filter(explode('/', $this->uri)));
 
         return $method;
     }
 
-    throw new Exception('Method Not Found');
+    return 'index';
   }
 }

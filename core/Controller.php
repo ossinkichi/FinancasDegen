@@ -3,13 +3,14 @@
 namespace core;
 
 use app\classes\Uri;
+use \Exception;
 
 class Controller{
 
   private $uri;
   private $controller;
   private $namespace;
-  privete $folder = "app/controllers";
+  private $folder = "\app\controllers";
 
   public function __construct(){
     $this->uri = Uri::getUri();
@@ -23,11 +24,11 @@ class Controller{
   }
 
   private function home(){
-    if(!controllerExist('HomeController')){
+    if(!$this->controllerExist('HomeController')){
       throw new Exception('Controller Not Found');
     }
 
-    $this->instantiate();
+    return $this->instantiate();
   }
 
   private function notHome(){
@@ -42,9 +43,9 @@ class Controller{
 
   private function getController(){
     if(subsrt_count($this->uri, '/') >= 1){
-      list(controller) = array_values(array_filter(explode('/', $this->uri)))
+      list($controller) = array_values(array_filter(explode('/', $this->uri)));
 
-      return ucfirts(controller).'Controller';
+      return ucfirts($controller).'Controller';
     }
 
     return ucfirst(ltrim($this->uri, '/')).'Controller';
@@ -52,6 +53,7 @@ class Controller{
   
   private function controllerExist($controller){
     $controllerExist = false;
+    
     if(class_exists($this->folder.'\\'.$controller)){
       $controllerExist = true;
 

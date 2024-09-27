@@ -2,13 +2,15 @@
 
 namespace app\models;
 
+use app\models\ConnectModel;
+
 class ClientModel extends ConnectModel{
 
   private $dbConnect;
   
   public function __construct(){
     $this->dbConnect = $this->connect();
-    $this->clientsTable();
+    $this->clientsTable($this->dbConect);
   }
 
   public static function getClient(){
@@ -19,8 +21,9 @@ class ClientModel extends ConnectModel{
     }
   }
 
-  public static function getAllClients(){
-
+  public function getAllClients(){
+    $clients = [];
+    
     try{
 
       $sql = $this->dbConnect->prepare('SELECT * FROM clients');
@@ -30,7 +33,7 @@ class ClientModel extends ConnectModel{
       return $clients;
       
     }catch(PDOException $pe){
-      return throw new PDOException("Erro ao buscar os clientes $pe->getMessage()");
+      return throw new PDOException("Erro ao buscar os clientes". $pe->getMessage());
     }
     
   }

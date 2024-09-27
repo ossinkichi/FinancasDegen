@@ -6,12 +6,12 @@ require __DIR__.'/../app/functions/helpers.php';
 use core\Controller;
 use core\Method;
 use core\Paramethers;
+use app\models\UsersModel;
 
 try{
-  
   $controller = new Controller();
   $controller = $controller->load();
-
+  
   $method = new Method();
   $method = $method->load($controller);
 
@@ -19,7 +19,7 @@ try{
   $paramethers = $paramethers->load();
 
   $controller->$method($paramethers);
-  
+
 }catch(Exception $e){
   dd($e->getMessage());
 }

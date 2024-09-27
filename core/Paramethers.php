@@ -17,7 +17,7 @@ class Paramethers{
   }
 
   private function getParam(){
-    if(subsrt_count($this->uri, '/') > 2){
+    if(substr_count($this->uri, '/') > 2){
       $param = array_values(array_filter(explode('/', $this->uri)));
 
       return (object) [
