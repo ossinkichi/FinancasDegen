@@ -16,16 +16,28 @@ class UsersModel extends ConnectModel{
     $this->usersTable($this->connect());
   } 
   
-  public function getUser(object|array $user){
-    $data = [];
+  public function getAllUser():array{
+    try{
+      $sql = $this->db->prepare('SELECT * FROM users');
+      $sql->execute();
 
+      $data = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+      return $data;
+
+    }catch(PDOException $pe){
+      throw new PDOException("Erro ao buscar o usuário ". $pe->getMessage());
+    }
+  }
+
+  public function getUser(object|array $user):array{
     try{
       $sql = $this->db->prepare('SELECT * FROM users WHERE userhash = :userhash AND password = :password');
       $sql->bindValue(':userhash', $user['userhash']);
       $sql->bindValue(':password', $user['password']);
       $sql->execute();
 
-      $data = $sql->fetch(PDO::FETCH_ASSOC);
+      $data = $sql->fetchAll(PDO::FETCH_ASSOC);
 
       return $data;
 
@@ -38,7 +50,7 @@ class UsersModel extends ConnectModel{
     $data = [];
 
     try{
-      $sql = $this->$db->prepare('SELECT active FROM users WHERE userhash = :hash');
+      $sql = $this->db->prepare('SELECT active FROM users WHERE userhash = :hash');
       $sql->bindValue(':hash', $hash);
       $sql->execute();
       

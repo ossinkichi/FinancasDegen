@@ -7,16 +7,18 @@ use \PDOException;
 
 class ConnectModel{
 
-  protected function connect(){
+  public function connect(){
     try{
-      define( 'DATABASE','\db\finance.db' );
+      define( 'DATABASE', __DIR__.'/database/finance.sqlite');
+
+      // dd(file_exists(DATABASE));
 
       $db = new PDO( 'sqlite:' . DATABASE );
       $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
       return $db;
     }catch(PDOException $pe){
-      throw new PDOException('Error ao conectar: '. $pe->getMessage().' code: '. $pe->getCode() .' line'. $pe->getLine());
+      throw new PDOException('Error ao conectar: '. $pe->getMessage());
     }
   }    
 

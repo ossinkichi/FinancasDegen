@@ -6,9 +6,12 @@ require __DIR__.'/../app/functions/helpers.php';
 use core\Controller;
 use core\Method;
 use core\Paramethers;
-use app\models\UsersModel;
+use app\controllers\UserController;
 
 try{
+  $test = new UserController;
+  dd($test->getAllUser());
+
   $controller = new Controller();
   $controller = $controller->load();
   
