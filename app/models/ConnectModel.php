@@ -26,15 +26,35 @@ class ConnectModel{
     try{
       $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, userhash INTEGER UNIQUE NOT NULL, name VARCHAR(340) NOT NULL, email VARCHAR(220) UNIQUE NOT NULL, password VARCHAR(130) NOT NULL, identification VARCHAR(25) ,active BOOL DEFAULT true, createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, dateofbirth DATE, gender VARCHAR(10), phone VARCHAR(20));');
 
-      return $sql->execute();
+      $sql->execute();
 
     }catch(PDOException $pe){
       throw new PDOException ("Users Error: ". $pe->getMessage() );
     }
   }
 
-  protected function clientsTable(){}
+  protected function clientsTable($database){
+    try{
+
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS clients(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(350) NOT NULL);');
+
+      $sql->execute();
+
+    }catch(PDOException $pe){
+      throw new PDOException('ClientsTable error: '.$pe->getMessage());
+    }
+  }
   
-  protected function transactionsTable(){}
+  protected function companyTable($database){
+    try{
+
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS company(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, companyhash INTEGER UNIQUE NOT NULL, companyname VACHAR(200) NOT NULL, userconected INTEGER NOT NULL DEFAULT 1)');
+
+      $sql->execute();
+
+    }catch(PDOException $pe){
+      throw new PDOException('CompanyTable error: '.$pe->getMessage());
+    }
+  }
   
 }

@@ -46,12 +46,12 @@ class UsersModel extends ConnectModel{
     }
   }
   
-  public function getHashUser(int $hash):object|array {
+  public function activeUser(int $user):object|array {
     $data = [];
 
     try{
-      $sql = $this->db->prepare('SELECT active FROM users WHERE userhash = :hash');
-      $sql->bindValue(':hash', $hash);
+      $sql = $this->db->prepare('SELECT active FROM users WHERE userhash = :user OUR email = :user');
+      $sql->bindValue(':user', $user);
       $sql->execute();
       
       $data = $sql->fetch(PDO::FETCH_ASSOC);
@@ -100,7 +100,7 @@ class UsersModel extends ConnectModel{
   public function updateDataUser(object|array $data){
     try{
 
-      $sql = $this->db->prepare('UPDATE users SET name = :name, email = :email, password = :password, identification = :identification, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE');
+      $sql = $this->db->prepare('UPDATE users SET name = :name, email = :email, password = :password, identification = :identification, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE userhash = :hash');
       
       $sql->bindValue(':name', $data['name']);
       $sql->bindValue(':email', $data['email']);
@@ -109,6 +109,7 @@ class UsersModel extends ConnectModel{
       $sql->bindValue(':dateofbirth', $data['dateofbirth']);
       $sql->bindValue(':gender', $data['gender']);
       $sql->bindValue(':phone', $data['phone']);
+      $sql->bindValue(':hash', $data['hash']);
 
       if($sql->execute()){
         return true;
@@ -117,22 +118,34 @@ class UsersModel extends ConnectModel{
       }
       
     }catch(PDOException $pe){
-      throw new PDOException("Erro ao atualizar o usuário: ". $pe->getMessage());
+      throw new PDOException("Erro ao atualizar usuário: ". $pe->getMessage());
     }
   }
 
-  public function deleteUser(int $hash):bool{
+  public function desactivateAccount(int $hash){
+    try{
+
+      $sql = $this->db->prepare('UPDATE users set active = :value WHERE userhash = :hash');
+      $sql->bindValue(':value',false);
+      $sql->bindValue(':hash',$hash);
+
+      $sql->execute();
+
+    }catch(PDOException $pe){
+      throw new PDOException("Erro ao desativar usuário: ". $pe->getMessage());
+    }
+  }
+
+  public function deleteUser(int $hash){
     try{
       $sql = $this->db->prepare('DELETE FROM users WHERE userhash = :hash');
       $sql->bindValue(':hash', $hash);
       
-      if($sql->execute()){
-        return true;
-      }else{
-        return false;
-      }
+      $sql->execute();
     }catch(PDOException $pe){
       throw new PDOException("Erro ao deletar o usuário: ". $pe->getMessage());
     }
   }
+
+
 }
