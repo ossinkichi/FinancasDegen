@@ -32,9 +32,8 @@ class UsersModel extends ConnectModel{
 
   public function getUser(object|array $user):array{
     try{
-      $sql = $this->db->prepare('SELECT * FROM users WHERE userhash = :userhash AND password = :password');
-      $sql->bindValue(':userhash', $user['userhash']);
-      $sql->bindValue(':password', $user['password']);
+      $sql = $this->db->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
+      $sql->bindValue(':user', $user['user']);
       $sql->execute();
 
       $data = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -42,55 +41,22 @@ class UsersModel extends ConnectModel{
       return $data;
 
     }catch(PDOException $pe){
-      throw new PDOException("Erro ao buscar o usuário ". $pe->getMessage());
-    }
-  }
-  
-  public function activeUser(int $user):object|array {
-    $data = [];
-
-    try{
-      $sql = $this->db->prepare('SELECT active FROM users WHERE userhash = :user OUR email = :user');
-      $sql->bindValue(':user', $user);
-      $sql->execute();
-      
-      $data = $sql->fetch(PDO::FETCH_ASSOC);
-
-      return $data;
-      
-    }catch(PDOException $pe){
-      return throw new PDOException("Erro ao buscar o usuário ". $pe->getMessage());
+      throw new PDOException("Erro ao buscar usuário ". $pe->getMessage());
     }
   }
   
   public function setNewUser(object|array $data):bool{
     try{
-      $sql = $this->db->prepare('INSERT INTO users(userhash, name, email, password, identification, dateofbirth, gender, phone) VALUES(:userhash, :name, :email, :password, :identification, :dateofbirth, :gender, :phone);');
-      
-      $sql->bindValue(':userhash', $data['userhash']);
-      $sql->bindValue(':name', $data['name']);
-      $sql->bindValue(':email', $data['email']);
-      $sql->bindValue(':password', $data['password']);
-      $sql->bindValue(':identification', $data['identification']);
-      $sql->bindValue(':dateofbirth', $data['dateofbirth']);
-      $sql->bindValue(':gender', $data['gender']);
-      $sql->bindValue(':phone', $data['phone']);
-      
-      if($sql->execute()) {
-        
-        if($sql->rowCount() > 0){
-          
-          return true;
-          
-        } else{ 
-          
-          return false;
+      $sql = $this->db->prepare('INSERT INTO users(name, email, password, identification, dateofbirth, gender, phone) VALUES(:name, :email, :password, :identification, :dateofbirth, :gender, :phone);');
+
+      foreach ($data as $key => $value){
+        if($key == 'password'){
+          $data[$key] = password_hash($value, PASSWORD_DEFAULT);
         }
-        
-      }else { 
-        
-        return false;
+        $sql->bindValue(':'.$key, $data[$key]]);
       }
+      
+      $sql->execute()
       
     }catch(PDOException $pe){
       throw new PDOException("Erro ao criar o usuário: ". $pe->getMessage());
@@ -100,16 +66,17 @@ class UsersModel extends ConnectModel{
   public function updateDataUser(object|array $data){
     try{
 
-      $sql = $this->db->prepare('UPDATE users SET name = :name, email = :email, password = :password, identification = :identification, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE userhash = :hash');
+      $sql = $this->db->prepare('UPDATE users SET hash = :hash name = :name, email = :email, password = :password, identification = :identification, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE id = :id OR userhash = :userhash');
       
       $sql->bindValue(':name', $data['name']);
       $sql->bindValue(':email', $data['email']);
-      $sql->bindValue(':password', $data['password']);
+      $sql->bindValue(':password', password_hash($data['password'], PASSWORD_DEFAULT));
       $sql->bindValue(':identification', $data['identification']);
       $sql->bindValue(':dateofbirth', $data['dateofbirth']);
       $sql->bindValue(':gender', $data['gender']);
       $sql->bindValue(':phone', $data['phone']);
       $sql->bindValue(':hash', $data['hash']);
+      $sql->bindValue(':id', $data['id']);
 
       if($sql->execute()){
         return true;
@@ -146,6 +113,5 @@ class UsersModel extends ConnectModel{
       throw new PDOException("Erro ao deletar o usuário: ". $pe->getMessage());
     }
   }
-
 
 }
