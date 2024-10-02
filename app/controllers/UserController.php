@@ -26,7 +26,7 @@ class UserController {
       }
     }
 
-    if(empty($field)){
+    if(!empty($field)){
       http_response_code(400);
       echo json_encode(['error' => 'O campo obrigatorio não preenchido ','filds' => $field.]);
       return;
@@ -77,7 +77,7 @@ class UserController {
     $this->users->setNewUser($user);    
   }
 
-  private function createHash(string $hash):string {
+  private function createHash(string|int $hash):string {
     return hash( 'sha256', $hash )
   }
 
@@ -93,12 +93,12 @@ class UserController {
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     $user = [
-      'userhash' =>, $filter_var($data['userhash'], FILTER_SANITIZE_INT),
+      'userhash' => $filter_var($data['userhash'], FILTER_SANITIZE_STRING),
       'name' => filter_var($data['name'], FILTER_SANITIZE_STRING), 
       'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL), 
       'password' => filter_var($data['password'], FILTER_SANITIZE_STRING), 
-      'identification' => '', 
-      'dateofbirth' => '', 
+      'identification' => $data['identification'], 
+      'dateofbirth' => $data['dateofbirth'], 
       'gender' => filter_var($data['gender'], FILTER_SANITIZE_STRING), 
       'phone' => filter_var($data['name'], FILTER_SANITIZE_STRING)
     ];

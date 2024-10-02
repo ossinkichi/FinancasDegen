@@ -10,10 +10,10 @@ class ClientModel extends ConnectModel{
   
   public function __construct(){
     $this->dbConnect = $this->connect();
-    $this->clientsTable($this->dbConect);
+    $this->dbConnect($this->dbConect);
   }
 
-  public static function getClient(){
+  public static function getClient($id,$userHash){
     try{
       
     }catch(PDOException $pe){

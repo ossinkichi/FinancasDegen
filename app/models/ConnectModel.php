@@ -11,8 +11,6 @@ class ConnectModel{
     try{
       define( 'DATABASE', __DIR__.'/database/finance.sqlite');
 
-      // dd(file_exists(DATABASE));
-
       $db = new PDO( 'sqlite:' . DATABASE );
       $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
