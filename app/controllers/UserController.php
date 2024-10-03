@@ -16,11 +16,11 @@ class UserController {
     return $this->users->getAllUser();
   }
 
-  public function getUser(object $data):int {
+  public function login(object $data) {
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     foreach($data as $key => $value){
-      htmlspecialschars($value);
+      $data[$key] = htmlspecialschars($value);
       if(empty($value)){
         $field[] = $key;
       }
@@ -42,12 +42,16 @@ class UserController {
 
     if(!password_verify($data['password'],$userData['password'])){
       http_response_code(401);
-      echo jsone_encode(['error' => 'Senha ou usuário incorreta']);
+      echo json_encode(['error' => 'Senha ou usuário incorreta']);
       return;
     }
+
+    htpp_response_code(200);
+    echo json_encode(['user' => $userData['userhash'],'message' => 'Login efetuado com sucesso']]);
+    return;
   }
 
-  public function setNewUser(array $data){
+  public function register(array $data){
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
     
     $user = [
@@ -77,19 +81,28 @@ class UserController {
     $this->users->setNewUser($user);    
   }
 
-  private function createHash(string|int $hash):string {
-    return hash( 'sha256', $hash )
-  }
+  public function getDataUser(string $hash) {
+    $this->verifyMethod('GET','Não é possível enviar os dados por POST');
 
-  private function verifyMethod($method,$message){
-    if($_SERVER['REQUEST_METHOD'] != $method){
-      header('Content-Type: application/json');
-      http_response_code(405);
-      echo json_encode(['Error' => $message]);
+    if(empty($hash)){
+      http_response_code(400);
+      echo json_encode(['error' => 'É necessario passar o hash para que a busca seja feita']);
+      return;
     }
+
+    $userData = $this->users->getUser($data);
+
+    if(!$userData['active']){
+      http_response_code(403);
+      echo json_encode(['error' => 'Usuário está com a conta inativa, para acessar novamente nossa aplcacao é necessário que ative a sua conta']);
+      return;
+    };
+
+    echo json_encode(['user' => $userData]);
+    return;
   }
 
-  public function userUpdated(array $data){
+  public function update(array $data){
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     $user = [
@@ -116,5 +129,21 @@ class UserController {
     }
   }
   
-  public function desactivateAccount(int $hash)
+  public function delete(string $hash){} 
+  
+  public function desactivateAccount(int $hash){
+    $this->verifyMethod('GET','Não é possível enviar os dados por POST');
+  }
+
+  private function createHash(string|int $hash):string {
+    return hash( 'sha256', $hash )
+  }
+
+  private function verifyMethod($method,$message){
+    if($_SERVER['REQUEST_METHOD'] != $method){
+      header('Content-Type: application/json');
+      http_response_code(405);
+      echo json_encode(['Error' => $message]);
+    }
+  }
 }
