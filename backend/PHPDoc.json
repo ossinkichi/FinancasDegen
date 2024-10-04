@@ -43,7 +43,7 @@
 	},
 
 	"getAllUsers": {
-		"path": "urlDaPagina/user/getAllUser",
+		"path": "urlDaPagina/user",
 		"method": "GET|POST",
 		"description": "Busca todos os usuário do banco"
 	}
