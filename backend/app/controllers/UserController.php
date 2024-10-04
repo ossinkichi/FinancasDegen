@@ -52,14 +52,14 @@ class UserController {
   }
 
   public function register(array $data){
-    $this->verifyMethod('POST','Não é possível enviar os dados por GET');
+    // $this->verifyMethod('POST','Não é possível enviar os dados por GET');
     
     $user = [
       'name' => filter_var($data['name'], FILTER_SANITIZE_STRING), 
       'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL), 
       'password' => filter_var($data['password'], FILTER_SANITIZE_STRING), 
-      'identification' => '', 
-      'dateofbirth' => '', 
+      'identification' => $data['identification'], 
+      'dateofbirth' => $data['dateofbirth'], 
       'gender' => filter_var($data['gender'], FILTER_SANITIZE_STRING), 
       'phone' => filter_var($data['name'], FILTER_SANITIZE_STRING)
     ];

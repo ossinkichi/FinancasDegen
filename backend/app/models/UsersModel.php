@@ -47,7 +47,9 @@ class UsersModel extends ConnectModel{
   
   public function setNewUser(object|array $data){
     try{
-      $sql = $this->db->prepare('INSERT INTO users(name, email, password, identification, dateofbirth, gender, phone) VALUES(:name, :email, :password, :identification, :dateofbirth, :gender, :phone);');
+
+      // dd($data);;
+      $sql = $this->db->prepare('INSERT INTO users(userhash,name, email, password, identification, dateofbirth, gender, phone) VALUES(:userhash,:name, :email, :password, :identification, :dateofbirth, :gender, :phone);');
 
       foreach ($data as $key => $value){
         if($key == 'password'){
