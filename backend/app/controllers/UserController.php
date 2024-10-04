@@ -13,11 +13,12 @@ class UserController {
   }
 
   public function getAllUser() {
-    return $this->users->getAllUser();
+    echo json_encode($this->users->getAllUser());
+    return;
   }
 
   public function login(array $data) {
-    $this->verifyMethod('POST','Não é possível enviar os dados por GET');
+    // $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     foreach($data as $key => $value){
       $data[$key] = htmlspecialchars($value);
@@ -33,7 +34,7 @@ class UserController {
     }
     
     $userData = $this->users->getUser($data);
-    
+
     if(!$userData['active']){
       http_response_code(403);
       echo json_encode(['error' => 'Usuário está com a conta inativa, para acessar novamente nossa aplcacao é necessário que ative a sua conta']);
@@ -52,7 +53,7 @@ class UserController {
   }
 
   public function register(array $data){
-    // $this->verifyMethod('POST','Não é possível enviar os dados por GET');
+    $this->verifyMethod('POST','Não é possível enviar os dados por GET');
     
     $user = [
       'name' => filter_var($data['name'], FILTER_SANITIZE_STRING), 
@@ -90,11 +91,11 @@ class UserController {
       return;
     }
 
-    $userData = $this->users->getUser($hash);
+    $userData = $this->users->getUser(['user' => $hash]);
 
     if(!$userData['active']){
       http_response_code(403);
-      echo json_encode(['error' => 'Usuário está com a conta inativa, para acessar novamente nossa aplcacao é necessário que ative a sua conta']);
+      echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
       return;
     };
 

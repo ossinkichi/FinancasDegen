@@ -1,44 +1,50 @@
 {
-    "register" : {
-        "path": "urlDaPagina/user/register",
-        "method": "POST",
-        "descripton": "Registra um novo usuário",
-        "data": {
-            "name" : ,
-            "email" : ,
-            "password" : ,
-            "identification" : ,
-            "dateofbirth" : ,
-            "gender" : ,
-            "phone" : 
-        }
-    },
+	"register": {
+		"path": "urlDaPagina/user/register",
+		"method": "POST",
+		"descripton": "Registra um novo usuário",
+		"data": {
+			"name": "",
+			"email": "",
+			"password": "",
+			"identification": "",
+			"dateofbirth": "",
+			"gender": "",
+			"phone": ""
+		}
+	},
 
-    "login" : {
-        "path" : "urlDaPagina/user/login",
-        "method" : "POST",
-        "description" : "Realiza o login de um usuário",
-        "data" : {
-            "user": ,
-            "password": 
-        }
-    },
+	"login": {
+		"path": "urlDaPagina/user/login",
+		"method": "POST",
+		"description": "Realiza o login de um usuário",
+		"data": {
+			"user": "",
+			"password": ""
+		}
+	},
 
-    "dataUser" : {
-        "path" : "urlDaPagina/user/getDataUser/hashdousuario",
-        "method" : "GET",
-        "descripton" : "Retorna os dados de um usuário","
-    },
-    
-    "update" :{
-        "path" : "urlDaPagina/user/update",
-        "method" : "POST",
-        "description" : "Atualizar dados do usuário",
-    },
+	"dataUser": {
+		"path": "urlDaPagina/user/getDataUser/hashdousuario",
+		"method": "GET",
+		"descripton": "Retorna os dados de um usuário"
+	},
 
-    "desactivate" : {
-        "path" : "urlDaPagina/user/desactivateAccount/hashdousuario",
-        "method" : "GET",
-        "description" : "Desativa a conta do usuário",
-    }
+	"update": {
+		"path": "urlDaPagina/user/update",
+		"method": "POST",
+		"description": "Atualizar dados do usuário"
+	},
+
+	"desactivate": {
+		"path": "urlDaPagina/user/desactivateAccount/hashdousuario",
+		"method": "GET",
+		"description": "Desativa a conta do usuário"
+	},
+
+	"getAllUsers": {
+		"path": "urlDaPagina/user/getAllUser",
+		"method": "GET|POST",
+		"description": "Busca todos os usuário do banco"
+	}
 }

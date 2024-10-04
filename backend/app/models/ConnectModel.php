@@ -20,8 +20,10 @@ class ConnectModel{
     }
   }    
 
-  protected function usersTable($database){
+  protected function usersTable(){
     try{
+      $database = $this->connect();
+
       $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, userhash VARCHAR(64) UNIQUE, name VARCHAR(340) NOT NULL, email VARCHAR(220) UNIQUE NOT NULL, password VARCHAR(130) NOT NULL, identification VARCHAR(25) ,active BOOL DEFAULT true, createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, dateofbirth DATE, gender VARCHAR(10), phone VARCHAR(20));');
 
       $sql->execute();
