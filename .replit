@@ -14,3 +14,4 @@ exposeLocalhost = true
 
 [deployment]
 run = ["sh", "-c", "php -S localhost:8000 -t backend/public"]
+

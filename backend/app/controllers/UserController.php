@@ -12,13 +12,13 @@ class UserController {
     $this->users = new UsersModel;
   }
 
-  public function getAllUser() {
+  public function index() {
     echo json_encode($this->users->getAllUser());
     return;
   }
 
   public function login(array $data) {
-    // $this->verifyMethod('POST','Não é possível enviar os dados por GET');
+    $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     foreach($data as $key => $value){
       $data[$key] = htmlspecialchars($value);
