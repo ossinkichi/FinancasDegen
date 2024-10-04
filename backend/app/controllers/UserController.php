@@ -16,11 +16,11 @@ class UserController {
     return $this->users->getAllUser();
   }
 
-  public function login(object $data) {
+  public function login(array $data) {
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     foreach($data as $key => $value){
-      $data[$key] = htmlspecialschars($value);
+      $data[$key] = htmlspecialchars($value);
       if(empty($value)){
         $field[] = $key;
       }
@@ -28,7 +28,7 @@ class UserController {
 
     if(!empty($field)){
       http_response_code(400);
-      echo json_encode(['error' => 'O campo obrigatorio não preenchido ','filds' => $field.]);
+      echo json_encode(['error' => 'O campo obrigatorio não preenchido ','filds' => $field]);
       return;
     }
     
@@ -46,8 +46,8 @@ class UserController {
       return;
     }
 
-    htpp_response_code(200);
-    echo json_encode(['user' => $userData['userhash'],'message' => 'Login efetuado com sucesso']]);
+    http_response_code(200);
+    echo json_encode(['user' => $userData['userhash'],'message' => 'Login efetuado com sucesso']);
     return;
   }
 
@@ -76,7 +76,7 @@ class UserController {
       return;
     }
 
-    $user['userhash'] => $this->createHash($user['identification']);
+    $user['userhash'] = $this->createHash($user['identification']);
     
     $this->users->setNewUser($user);    
   }
@@ -90,7 +90,7 @@ class UserController {
       return;
     }
 
-    $userData = $this->users->getUser($data);
+    $userData = $this->users->getUser($hash);
 
     if(!$userData['active']){
       http_response_code(403);
@@ -106,7 +106,7 @@ class UserController {
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
     $user = [
-      'userhash' => $filter_var($data['userhash'], FILTER_SANITIZE_STRING),
+      'userhash' => filter_var($data['userhash'], FILTER_SANITIZE_STRING),
       'name' => filter_var($data['name'], FILTER_SANITIZE_STRING), 
       'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL), 
       'password' => filter_var($data['password'], FILTER_SANITIZE_STRING), 
@@ -136,7 +136,7 @@ class UserController {
   }
 
   private function createHash(string|int $hash):string {
-    return hash( 'sha256', $hash )
+    return hash( 'sha256', $hash );
   }
 
   private function verifyMethod($method,$message){

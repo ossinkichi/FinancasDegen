@@ -30,7 +30,7 @@ class UsersModel extends ConnectModel{
     }
   }
 
-  public function getUser(object|array $user):array{
+  public function getUser(string|array $user):array{
     try{
       $sql = $this->db->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
       $sql->bindValue(':user', $user['user']);
@@ -45,7 +45,7 @@ class UsersModel extends ConnectModel{
     }
   }
   
-  public function setNewUser(object|array $data):bool{
+  public function setNewUser(object|array $data){
     try{
       $sql = $this->db->prepare('INSERT INTO users(name, email, password, identification, dateofbirth, gender, phone) VALUES(:name, :email, :password, :identification, :dateofbirth, :gender, :phone);');
 
@@ -53,10 +53,10 @@ class UsersModel extends ConnectModel{
         if($key == 'password'){
           $data[$key] = password_hash($value, PASSWORD_DEFAULT);
         }
-        $sql->bindValue(':'.$key, $data[$key]]);
+        $sql->bindValue(':'.$key, $data[$key]);
       }
       
-      $sql->execute()
+      $sql->execute();
       
     }catch(PDOException $pe){
       throw new PDOException("Erro ao criar o usuário: ". $pe->getMessage());

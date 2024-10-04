@@ -6,11 +6,10 @@ require __DIR__.'/../app/functions/helpers.php';
 use core\Controller;
 use core\Method;
 use core\Paramethers;
-use app\controllers\UserController;
 
 try{
-  $test = new UserController;
-  dd($test->getAllUser());
+
+  dd(123);
 
   $controller = new Controller();
   $controller = $controller->load();
