@@ -1,6 +1,11 @@
 run = "php -S localhost:8000 -t backend/public"
+modules = ["php-8.2", "nix", "nodejs-22"]
 [nix]
 channel = "stable-24_05"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
 
 [[ports]]
 localPort = 8000
