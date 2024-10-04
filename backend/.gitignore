@@ -1,0 +1,3 @@
+/vendor/
+/app/models/database/finance.sqlite
+/.env/

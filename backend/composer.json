@@ -16,5 +16,7 @@
             "email": "exampleEmail123@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
 }

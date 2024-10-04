@@ -4,16 +4,22 @@ namespace app\models;
 
 use \PDO;
 use \PDOException;
+use Dotenv\Dotenv;
 
 class ConnectModel{
 
   public function connect(){
     try{
-      define( 'DATABASE', __DIR__.'/database/finance.sqlite');
+      
+      $dotenv = Dotenv::createImmutable(__DIR__.'/../../');
+      $dotenv->load();
+      
+      if(!defined('DATABASE')) define( 'DATABASE', __DIR__.'/'.$_ENV['DATABASE']);
 
       $db = new PDO( 'sqlite:' . DATABASE );
       $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+      $db->exec('PRAGMA foreign_keys = ON;');
       return $db;
     }catch(PDOException $pe){
       throw new PDOException('Error ao conectar: '. $pe->getMessage());
@@ -33,9 +39,10 @@ class ConnectModel{
     }
   }
 
-  protected function clientsTable($database){
+  protected function clientsTable(){
     try{
-
+      $database = $this->connect();
+      
       $sql = $database->prepare('CREATE TABLE IF NOT EXISTS clients(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(350) NOT NULL);');
 
       $sql->execute();
