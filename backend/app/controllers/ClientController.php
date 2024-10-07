@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\ClientModel;
+
 class ClientController{
 
   private $clients;

@@ -7,10 +7,8 @@ use core\Controller;
 use core\Method;
 use core\Paramethers;
 
-
 try{
 
-  
   $controller = new Controller();
   $controller = $controller->load();
   

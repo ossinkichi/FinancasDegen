@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use \app\models\UsersModel;
-use \Exception;
 
 class UserController {
   private $users;
@@ -28,28 +27,23 @@ class UserController {
     }
 
     if(!empty($field)){
-      http_response_code(400);
-      echo json_encode(['error' => 'O campo obrigatorio não preenchido ','filds' => $field]);
+      $this->handlerError('O campo obrigatorio não preenchido', $field, 400);
       return;
     }
     
     $userData = $this->users->getUser($data);
 
-    if(!$userData['active']){
-      http_response_code(403);
-      echo json_encode(['error' => 'Usuário está com a conta inativa, para acessar novamente nossa aplcacao é necessário que ative a sua conta']);
+    if(!$userData['active'] || !userData){
+      $this->message(['error' => 'Usuário está com a conta inativa ou inexistente'],403);
       return;
     };
 
     if(!password_verify($data['password'],$userData['password'])){
-      http_response_code(401);
-      echo json_encode(['error' => 'Senha ou usuário incorreta']);
+      $this->message(['message' => 'Senha ou usuário incorreta'],401);
       return;
     }
 
-    http_response_code(200);
-    echo json_encode(['user' => $userData['userhash'],'message' => 'Login efetuado com sucesso']);
-    return;
+    $this->message(['user' => $userData['userhash'],'message' => 'Login efetuado com sucesso'],200);
   }
 
   public function register(array $data){
@@ -146,5 +140,15 @@ class UserController {
       http_response_code(405);
       echo json_encode(['Error' => $message]);
     }
+  }
+
+  private function handlerError(array $message, array $fields, int $code){
+    http_response_code($code);
+    echo json_encode(['error' => $message,'filds' => $fields]);
+  }
+
+  private function message(string $message, int $code = 200){
+    http_response_code($code);
+    echo json_encode($message);
   }
 }

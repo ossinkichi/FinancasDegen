@@ -2,7 +2,6 @@
 
 namespace app\models;
 
-use \PDO;
 use \PDOException;
 use app\models\ConnectModel;
 
@@ -13,7 +12,7 @@ class UsersModel extends ConnectModel{
 
   public function __construct(){
     $this->db = $this->connect();
-    $this->usersTable();
+    $this->db->usersTable();
   } 
   
   public function getAllUser():array{
