@@ -26,11 +26,11 @@ class ConnectModel{
     }
   }    
 
-  protected function usersTable(){
+  public function usersTable(){
     try{
       $database = $this->connect();
 
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, userhash VARCHAR(64) UNIQUE, name VARCHAR(340) NOT NULL, email VARCHAR(220) UNIQUE NOT NULL, emailverify BOOL DEFAULT false,password VARCHAR(130) NOT NULL, identification VARCHAR(25) ,active BOOL DEFAULT false, createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, dateofbirth DATE, gender VARCHAR(10), phone VARCHAR(20), FOREIGN KEY (idcompany)  REFERENCES company(id) ON DELETE CASCADE);');
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, userhash VARCHAR(64) UNIQUE, name VARCHAR(340) NOT NULL, email VARCHAR(220) UNIQUE NOT NULL, emailverify BOOL DEFAULT false,password VARCHAR(130) NOT NULL, cpf VARCHAR(11) ,active BOOL DEFAULT false, createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, dateofbirth DATE, gender VARCHAR(10), phone VARCHAR(20), FOREIGN KEY (idcompany)  REFERENCES company(id) ON DELETE CASCADE);');
 
       $sql->execute();
 
@@ -39,7 +39,7 @@ class ConnectModel{
     }
   }
 
-  protected function clientsTable(){
+  public function clientsTable(){
     try{
       $database = $this->connect();
       
@@ -52,11 +52,11 @@ class ConnectModel{
     }
   }
   
-  protected function companyTable(){
+  public function companyTable(){
     try{
       $database = $this->connect();
       
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS company(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, companyhash INTEGER UNIQUE NOT NULL, companyname VACHAR(200) NOT NULL, userconected INTEGER NOT NULL DEFAULT 1)');
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS company(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, companyname VACHAR(200) NOT NULL, cnpj VARCHAR(14), FOREIGN KEY (idUser) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY (idClient) REFERENCES clients(id) ON DELETE CASCADE);');
 
       $sql->execute();
 
@@ -65,11 +65,11 @@ class ConnectModel{
     }
   }
 
-  protected function accountClientTable(){
+  public function accountClientTable(){
     try{
       $database = $this->connect();
 
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS accountclient(id INTEGER PRIMARY UNIQUE AUTOINCREMENT NOT NULL, FOREIGN KEY (clientid) REFERENCES clients(id);');
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS accountclient(id INTEGER PRIMARY UNIQUE AUTOINCREMENT NOT NULL, cost VARCHAR(10), FOREIGN KEY (idclient) REFERENCES clients(id);');
 
       $sql->execute();
     }catch(PDOException $pe){

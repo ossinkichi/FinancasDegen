@@ -7,7 +7,7 @@
 			"name": "",
 			"email": "",
 			"password": "",
-			"identification": "",
+			"cpf": "",
 			"dateofbirth": "",
 			"gender": "",
 			"phone": ""
@@ -19,7 +19,7 @@
 		"method": "POST",
 		"description": "Realiza o login de um usuário",
 		"data": {
-			"user": "",
+			"email": "",
 			"password": ""
 		}
 	},

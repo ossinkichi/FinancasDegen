@@ -1,13 +1,21 @@
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
-require __DIR__.'/../app/functions/helpers.php';
+include __DIR__.'/../app/functions/helpers.php';
 
 use core\Controller;
 use core\Method;
 use core\Paramethers;
+use app\models\ConnectModel;
 
 try{
+  $db = new ConnectModel;
+  $db->connect();
+  $db->usersTable();
+  $db->companyTable();
+  $db->clientsTable();
+  $db->accountClientTable();
+  dd('success');
 
   $controller = new Controller();
   $controller = $controller->load();

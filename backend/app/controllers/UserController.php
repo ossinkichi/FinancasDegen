@@ -53,7 +53,7 @@ class UserController {
       'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS), 
       'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL), 
       'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS), 
-      'identification' => $data['identification'], 
+      'cpf' => $data['cpf'], 
       'dateofbirth' => $data['dateofbirth'], 
       'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS), 
       'phone' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS)

@@ -1,3 +1,2 @@
-/vendor/
-/app/models/database/finance.sqlite/
+/vendor
 /.env/
