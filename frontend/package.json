@@ -1,7 +1,6 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "proxy": "https://174bef48-1d86-4312-8eac-ede07fbd236e-00-o3f3t4j7n7tx.picard.replit.dev:8000",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
