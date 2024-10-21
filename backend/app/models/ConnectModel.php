@@ -6,75 +6,133 @@ use \PDO;
 use \PDOException;
 use Dotenv\Dotenv;
 
-class ConnectModel{
+class ConnectModel
+{
 
-  public function connect(){
-    try{
-      
-      $dotenv = Dotenv::createImmutable(__DIR__.'/../../');
+  public function connect()
+  {
+    try {
+
+      $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
       $dotenv->load();
-      
-      if(!defined('DATABASE')) define( 'DATABASE', __DIR__.'/'.$_ENV['DATABASE']);
 
-      $db = new PDO( 'sqlite:' . DATABASE );
+      if (!defined('DATABASE')) define('DATABASE', __DIR__ . '/' . $_ENV['DATABASE']);
+
+      $db = new PDO('sqlite:' . DATABASE);
       $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
       $db->exec('PRAGMA foreign_keys = ON;');
       return $db;
-    }catch(PDOException $pe){
-      throw new PDOException('Error ao conectar: '. $pe->getMessage());
-    }
-  }    
-
-  public function usersTable(){
-    try{
-      $database = $this->connect();
-
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, userhash VARCHAR(64) UNIQUE, name VARCHAR(340) NOT NULL, email VARCHAR(220) UNIQUE NOT NULL, emailverify BOOL DEFAULT false,password VARCHAR(130) NOT NULL, cpf VARCHAR(11) ,active BOOL DEFAULT false, createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, dateofbirth DATE, gender VARCHAR(10), phone VARCHAR(20), FOREIGN KEY (idcompany)  REFERENCES company(id) ON DELETE CASCADE);');
-
-      $sql->execute();
-
-    }catch(PDOException $pe){
-      throw new PDOException ("Users Error: ". $pe->getMessage() );
+    } catch (PDOException $pe) {
+      throw new PDOException('Error ao conectar: ' . $pe->getMessage());
     }
   }
 
-  public function clientsTable(){
-    try{
+  protected function usersTable()
+  {
+    try {
       $database = $this->connect();
-      
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS clients(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(350) NOT NULL, phone INTEGER(11) NOT NULL, email VARCHAR(220) NOT NULL, shippingaddress VARCHAR(220), billingaddress VARCHAR(220), FOREIGN KEY (companyid) REFERENCES company(id) ON DELETE CASCADE);');
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(
+      id INTEGER PRIMARY KEY AUTOINCREMENT, 
+      userhash VARCHAR(64) UNIQUE, 
+      type VARCHAR(14) CHECK(type IN(\'administrador\', \'funcionario\')) DEFAULT \'funcionario\',
+      name VARCHAR(340) NOT NULL, 
+      email VARCHAR(220) UNIQUE NOT NULL, 
+      emailverify BOOL DEFAULT false, 
+      password VARCHAR(130) NOT NULL, 
+      cpf VARCHAR(11) UNIQUE NOT NULL, 
+      active BOOL DEFAULT false, 
+      createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, 
+      dateofbirth DATE, 
+      gender VARCHAR(10), 
+      phone VARCHAR(20), 
+      company INTEGER,
+      FOREIGN KEY (company)  REFERENCES companies(id) ON DELETE CASCADE
+      );');
 
       $sql->execute();
-
-    }catch(PDOException $pe){
-      throw new PDOException('ClientsTable error: '.$pe->getMessage());
+    } catch (PDOException $pe) {
+      throw new PDOException("Users Error: " . $pe->getMessage());
     }
   }
-  
-  public function companyTable(){
-    try{
+
+  protected function companyTable()
+  {
+    try {
       $database = $this->connect();
-      
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS company(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, companyname VACHAR(200) NOT NULL, cnpj VARCHAR(14), FOREIGN KEY (idUser) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY (idClient) REFERENCES clients(id) ON DELETE CASCADE);');
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS companies(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+      companyname VARCHAR(200) NOT NULL, 
+      companydescribe TEXT,
+      cnpj VARCHAR(14) UNIQUE NOT NULL, 
+      plan INTEGER,
+      FOREIGN KEY (plan) REFERENCES plans(id)
+      );');
+      $sql->execute();
+    } catch (PDOException $pe) {
+      throw new PDOException('CompanyTable error: ' . $pe->getMessage());
+    }
+  }
+
+  protected function clientsTable()
+  {
+    try {
+      $database = $this->connect();
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS clients(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+      name VARCHAR(350) NOT NULL, 
+      email VARCHAR(220) NOT NULL, 
+      phone INTEGER(11) NOT NULL, 
+      shippingaddress VARCHAR(220), 
+      billingaddress VARCHAR(220), 
+      company INTEGER,
+      FOREIGN KEY (company) REFERENCES company(id) ON DELETE CASCADE);');
 
       $sql->execute();
-
-    }catch(PDOException $pe){
-      throw new PDOException('CompanyTable error: '.$pe->getMessage());
+    } catch (PDOException $pe) {
+      throw new PDOException('ClientsTable error: ' . $pe->getMessage());
     }
   }
 
-  public function accountClientTable(){
-    try{
+  protected function plainsTable()
+  {
+    try {
       $database = $this->connect();
-
-      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS accountclient(id INTEGER PRIMARY UNIQUE AUTOINCREMENT NOT NULL, cost VARCHAR(10), FOREIGN KEY (idclient) REFERENCES clients(id);');
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+      planname VACHAR(200) NOT NULL, 
+      plandescribe TEXT, 
+      numberofusers INTEGER DEFAULT 5,
+      numberofclients INTEGER DEFAULT 25,
+      cost VARCHAR(10),
+      type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
+      users INTEGER DEFAULT 5,
+      clients INTEGER DEFAULT 25,
+      promotioncost VARCHAR(10)
+      );');
 
       $sql->execute();
-    }catch(PDOException $pe){
-      throw new PDOException('AccountClientTable error: '.$pe->getMessage());
+    } catch (PDOException $pe) {
+      throw new PDOException('PlainsTable error: ' . $pe->getMessage());
     }
   }
-  
+
+  protected function accountClientTable()
+  {
+    try {
+      $database = $this->connect();
+      $sql = $database->prepare('CREATE TABLE IF NOT EXISTS accountclient(
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+      cost VARCHAR(10), 
+      numberofinstallments INTEGER DEFAULT 0,
+      installmentspaid INTEGER DEFAULT 0,
+      client INTEGER,
+      FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
+      );');
+
+      $sql->execute();
+    } catch (PDOException $pe) {
+      throw new PDOException('AccountClientTable error: ' . $pe->getMessage());
+    }
+  }
 }

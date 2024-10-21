@@ -1,2 +1,5 @@
-/vendor
+# Ignorar diretórios
+/vendor/
+
+# Ignorar arquivos de configuração
 /.env/
