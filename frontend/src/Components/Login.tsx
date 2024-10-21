@@ -1,0 +1,11 @@
+import react, { useState } from "react";
+import "../css/Login.css";
+
+const Login = () => {
+  return (
+    <div>
+      <h1>Login</h1>
+    </div>
+  )
+}
+export default Login

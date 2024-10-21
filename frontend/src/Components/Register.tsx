@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./css/Register.css";
 
-const Register: React.FC = () => {
+const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
