@@ -34,7 +34,7 @@ const Header: React.FC = () => {
 
       <div className="container">
         <div className="button">
-          <i className="bi bi-person"></i>
+          <i onClick={ () => window.location.href = "/auth" } className="bi bi-person"></i>
         </div>
 
         <div className="menu-icon button" onClick={toggleMenu}>

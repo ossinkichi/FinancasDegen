@@ -1,10 +1,13 @@
 import react, { useState } from "react";
+import "../Components/css/LoginOurRegister.css";
 
 import Register from "../Components/Register";
 import Login from "../Components/Login";
 
 import Footer from "../Components/template/Footer";
 import Header from "../Components/template/Header";
+
+
 
 const LoginOurRegister = () => {
   
@@ -16,10 +19,12 @@ const LoginOurRegister = () => {
   return (
     <>
       <Header />
-      {isRegister ? <Register /> : <Login />}
-      <button onClick={toggleForm}>
-        {isRegister ? "Já tem uma conta? Faça login" : "Já tem uma conta? Faça login'"}
-      </button>
+      <section>
+        {isRegister ? <Register /> : <Login />}
+        <button onClick={toggleForm}>
+          {isRegister ? "Já tem uma conta? Faça login" : "Já tem uma conta? Faça login'"}
+        </button>
+      </section>
       <Footer />
     </>
   )

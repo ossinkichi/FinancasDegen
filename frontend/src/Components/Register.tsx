@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import "./css/Register.css";
 
 const Register = () => {
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    identification: "",
+    cpf: "",
     dateOfBirth: "",
     gender: "",
     phone: "",
@@ -78,12 +79,12 @@ const Register = () => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="identification">Identificação:</label>
+          <label htmlFor="cpf">CPF:</label>
           <input
             type="text"
-            id="identification"
-            name="identification"
-            value={formData.identification}
+            id="cpf"
+            name="cpf"
+            value={formData.cpf}
             onChange={handleChange}
           />
         </div>
