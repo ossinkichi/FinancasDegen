@@ -6,11 +6,12 @@ include __DIR__ . '/../app/functions/helpers.php';
 use core\Controller;
 use core\Method;
 use core\Paramethers;
-use app\classes\Ultils;
+// use app\classes\Ultils;
 
 try {
-  $ultils = new Ultils;
-  dd($ultils::createTables());
+
+  // $ultils = new Ultils;
+  // $ultils->createTables();
 
   $controller = new Controller();
   $controller = $controller->load();

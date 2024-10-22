@@ -104,11 +104,12 @@ class ConnectModel
       plandescribe TEXT, 
       numberofusers INTEGER DEFAULT 5,
       numberofclients INTEGER DEFAULT 25,
-      cost VARCHAR(10),
+      price VARCHAR(10),
       type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
       users INTEGER DEFAULT 5,
       clients INTEGER DEFAULT 25,
-      promotioncost VARCHAR(10)
+      promotionprice VARCHAR(10),
+      promotiontype VARCHAR(10) CHECK(type IN (\'porcent\', \'gross\')),
       );');
 
       $sql->execute();

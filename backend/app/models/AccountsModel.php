@@ -13,6 +13,13 @@ class AccountsModel extends ConnectModel
   public function __construct()
   {
     $this->db = $this->connect();
-    $this->accountClientTable();
   }
+
+  protected function getClientAccount(int $client):array{}
+
+  protected function setNewClientAccount(array $accountData):void{}
+
+  protected function updateClientAccount(array $accountData):void{}
+
+  protected function deleteClientAccount(int $client):void{}
 }

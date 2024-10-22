@@ -1,50 +1,66 @@
 {
-	"register": {
-		"path": "urlDaPagina/user/register",
-		"method": "POST",
-		"descripton": "Registra um novo usuário",
-		"data": {
-			"name": "",
-			"email": "",
-			"password": "",
-			"cpf": "",
-			"dateofbirth": "",
-			"gender": "",
-			"phone": ""
+	"usuers": {
+		"register": {
+			"path": "urlDaPagina/user/register",
+			"method": "POST",
+			"descripton": "Registra um novo usuário",
+			"type": "array|object",
+			"data": {
+				"name": "",
+				"email": "",
+				"password": "",
+				"cpf": "",
+				"dateofbirth": "",
+				"gender": "",
+				"phone": ""
+			}
+		},
+
+		"login": {
+			"path": "urlDaPagina/user/login",
+			"method": "POST",
+			"description": "Realiza o login de um usuário",
+			"type": "array|object",
+			"data": {
+				"email": "",
+				"password": ""
+			}
+		},
+
+		"dataUser": {
+			"path": "urlDaPagina/user/getDataUser/hashdousuario",
+			"method": "GET",
+			"descripton": "Retorna os dados de um usuário",
+			"type": "string"
+		},
+
+		"update": {
+			"path": "urlDaPagina/user/update",
+			"method": "POST",
+			"description": "Atualizar dados do usuário",
+			"type": "array|object"
+		},
+
+		"desactivate": {
+			"path": "urlDaPagina/user/desactivateAccount/hashdousuario",
+			"method": "GET",
+			"description": "Desativa a conta do usuário",
+			"type": "string"
+		},
+
+		"getAllUsers": {
+			"path": "urlDaPagina/user",
+			"method": "GET|POST",
+			"description": "Busca todos os usuário do banco",
+			"type": ""
 		}
 	},
 
-	"login": {
-		"path": "urlDaPagina/user/login",
-		"method": "POST",
-		"description": "Realiza o login de um usuário",
-		"data": {
-			"email": "",
-			"password": ""
-		}
-	},
+	"companies": {},
 
-	"dataUser": {
-		"path": "urlDaPagina/user/getDataUser/hashdousuario",
-		"method": "GET",
-		"descripton": "Retorna os dados de um usuário"
-	},
+	"plans": {},
 
-	"update": {
-		"path": "urlDaPagina/user/update",
-		"method": "POST",
-		"description": "Atualizar dados do usuário"
-	},
+	"clients": {},
 
-	"desactivate": {
-		"path": "urlDaPagina/user/desactivateAccount/hashdousuario",
-		"method": "GET",
-		"description": "Desativa a conta do usuário"
-	},
-
-	"getAllUsers": {
-		"path": "urlDaPagina/user",
-		"method": "GET|POST",
-		"description": "Busca todos os usuário do banco"
-	}
+	"accounts": {}
 }

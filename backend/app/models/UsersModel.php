@@ -15,10 +15,9 @@ class UsersModel extends ConnectModel
   public function __construct()
   {
     $this->db = $this->connect();
-    $this->usersTable();
   }
 
-  public function getAllUser(): array
+  protected function getAllUser(): array
   {
     try {
       $sql = $this->db->prepare('SELECT * FROM users');
@@ -32,7 +31,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  public function getUser(string|array $user): array
+  protected function getUser(string|array $user): array
   {
     try {
       $sql = $this->db->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
@@ -47,7 +46,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  public function setNewUser(object|array $data)
+  protected function setNewUser(object|array $data)
   {
     try {
 
@@ -68,7 +67,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  public function updateDataUser(object|array $data)
+  protected function updateDataUser(object|array $data)
   {
     try {
 
@@ -94,7 +93,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  public function desactivateAccount(int $hash)
+  protected function desactivateAccount(int $hash)
   {
     try {
 
@@ -108,7 +107,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  public function deleteUser(int $hash)
+  protected function deleteUser(int $hash)
   {
     try {
       $sql = $this->db->prepare('DELETE FROM users WHERE userhash = :hash');
