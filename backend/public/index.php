@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../app/functions/config.php';
 include __DIR__ . '/../app/functions/helpers.php';
 
 use core\Controller;
@@ -13,6 +14,8 @@ try {
   // $ultils = new Ultils;
   // $ultils->createTables();
 
+  cors();  
+
   $controller = new Controller();
   $controller = $controller->load();
 
@@ -21,7 +24,7 @@ try {
 
   $paramethers = new Paramethers();
   $paramethers = $paramethers->load();
-
+  
   $controller->$method($paramethers);
 } catch (Exception $e) {
   dd($e->getMessage());

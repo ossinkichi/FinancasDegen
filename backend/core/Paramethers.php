@@ -14,15 +14,15 @@ class Paramethers{
 
   public function load(){
     $param = $this->getParam();
+    return $param;
   }
 
   private function getParam(){
     if(substr_count($this->uri, '/') > 2){
       $param = array_values(array_filter(explode('/', $this->uri)));
-
       return (object) [
         'paramether' => $param[2],
-        'outher' => $param[3],
+        'outher' => $param[3] ?? '',
       ];
     }
   }

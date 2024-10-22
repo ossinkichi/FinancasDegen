@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use \app\models\UsersModel;
 
-class UserController
+class UserController extends UsersModel
 {
   private $users;
 
@@ -13,13 +13,13 @@ class UserController
     $this->users = new UsersModel;
   }
 
-  public function index()
+  public function index():void
   {
-    echo json_encode($this->users->getAllUser());
-    return;
+    $data = $this->users->getAllUser();
+    echo json_encode($data);
   }
 
-  public function login(array $data)
+  public function login(array $data):void
   {
     $this->verifyMethod('POST', 'Não é possível enviar os dados por GET');
 
@@ -50,7 +50,7 @@ class UserController
     $this->message(['user' => $userData['userhash'], 'message' => 'Login efetuado com sucesso'], 200);
   }
 
-  public function register(array $data)
+  public function register(array $data):void
   {
     $this->verifyMethod('POST','Não é possível enviar os dados por GET');
 
@@ -81,7 +81,7 @@ class UserController
     $this->users->setNewUser($user);
   }
 
-  public function getDataUser(string $hash)
+  public function getDataUser(object $hash):void
   {
     $this->verifyMethod('GET', 'Não é possível enviar os dados por POST');
 
@@ -91,7 +91,7 @@ class UserController
       return;
     }
 
-    $userData = $this->users->getUser(['user' => $hash]);
+    $userData = $this->users->getUser(['user' => $hash->paramether]);
 
     if (!$userData['active']) {
       http_response_code(403);
@@ -100,7 +100,6 @@ class UserController
     };
 
     echo json_encode(['user' => $userData]);
-    return;
   }
 
   public function update(array $data)
@@ -131,7 +130,7 @@ class UserController
     }
   }
 
-  public function delete(string $hash) {}
+  public function delete(object $hash) {}
 
   public function desactivateAccount(int $hash)
   {
