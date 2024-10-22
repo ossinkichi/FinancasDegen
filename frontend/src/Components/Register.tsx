@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./css/Register.css";
+import "./css/AuthForms.css";
+import axios from "axios"
 
 const Register = () => {
   
@@ -13,8 +14,6 @@ const Register = () => {
     phone: "",
   });
 
-  const [error, setError] = useState("");
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -25,26 +24,40 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-  
-    if (!formData.name || !formData.email || !formData.password) {
-      setError("Por favor, preencha todos os campos obrigatórios.");
-      return;
+    showError(Error)
+    try{
+      const response = await axios.post("https://9d94eeed-7f95-4391-8e5f-05bf8a64252a-00-1wguqr9pw5ev4.worf.replit.dev:8000/user/register")
+      if(response.data.status === "success"){
+        console.log(response)
+      }
+    }catch(error: any){
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      }
+      showError(error.messasge)
     }
-
     
-    setError("");
-
-    console.log("Dados do Usuário:", formData);
   };
+
+  function showError(message: string): void {
+    const errorElement = document.querySelector(".error");
+    if (errorElement) {
+      errorElement.textContent = message;
+      setTimeout(() => {
+        errorElement.textContent = "";
+      }, 5000);
+    }
+  }
 
   return (
     <div className="register-container">
-      <h2>Registrar</h2>
-      {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
+        <h2>Registre-se</h2>
+        <p className="error"></p>
         <div className="form-group">
           <label htmlFor="name">Nome:</label>
           <input
@@ -86,6 +99,7 @@ const Register = () => {
             name="cpf"
             value={formData.cpf}
             onChange={handleChange}
+            required
           />
         </div>
         <div className="form-group">
@@ -96,6 +110,7 @@ const Register = () => {
             name="dateOfBirth"
             value={formData.dateOfBirth}
             onChange={handleChange}
+            required
           />
         </div>
         <div className="form-group">
@@ -105,6 +120,7 @@ const Register = () => {
             name="gender"
             value={formData.gender}
             onChange={handleChange}
+            required
           >
             <option value="">Selecione...</option>
             <option value="male">Masculino</option>
@@ -125,9 +141,10 @@ const Register = () => {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
+            required
           />
         </div>
-        <button type="submit">Registrar</button>
+        <button type="submit">Confirmar</button>
       </form>
     </div>
   );

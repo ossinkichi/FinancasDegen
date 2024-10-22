@@ -16,7 +16,7 @@ const Header: React.FC = () => {
       <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
         <ul>
           <li>
-            <a href="#home">Inicio</a>
+            <a href="/">Inicio</a>
           </li>
           <li>
             <a href="#services">Planos</a>

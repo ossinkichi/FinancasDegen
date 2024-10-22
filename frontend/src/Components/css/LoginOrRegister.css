@@ -1,0 +1,13 @@
+.page-container{
+  position: relative;
+  min-height: 100vh;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 200px;
+  position: relative;
+}

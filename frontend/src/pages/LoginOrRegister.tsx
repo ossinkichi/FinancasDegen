@@ -1,5 +1,5 @@
 import react, { useState } from "react";
-import "../Components/css/LoginOurRegister.css";
+import "../Components/css/LoginOrRegister.css";
 
 import Register from "../Components/Register";
 import Login from "../Components/Login";
@@ -7,9 +7,7 @@ import Login from "../Components/Login";
 import Footer from "../Components/template/Footer";
 import Header from "../Components/template/Header";
 
-
-
-const LoginOurRegister = () => {
+const LoginOrRegister = () => {
   
   const [isRegister, setIsRegister] = useState(false);
   const toggleForm = () => {
@@ -17,17 +15,17 @@ const LoginOurRegister = () => {
   };
   
   return (
-    <>
+    <div className="page-container">
       <Header />
       <section>
         {isRegister ? <Register /> : <Login />}
         <button onClick={toggleForm}>
-          {isRegister ? "Já tem uma conta? Faça login" : "Já tem uma conta? Faça login'"}
+          {isRegister ? "Já possui uma conta? Faça login" : "Novo aqui? Cadastre-se"}
         </button>
       </section>
       <Footer />
-    </>
+    </div>
   )
 }
 
-export default LoginOurRegister;
+export default LoginOrRegister;
