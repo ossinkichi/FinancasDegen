@@ -13,13 +13,13 @@ class UserController extends UsersModel
     $this->users = new UsersModel;
   }
 
-  public function index():void
+  public function index(): void
   {
     $data = $this->users->getAllUser();
     echo json_encode($data);
   }
 
-  public function login(array $data):void
+  public function login(array $data): void
   {
     $this->verifyMethod('POST', 'Não é possível enviar os dados por GET');
 
@@ -50,9 +50,9 @@ class UserController extends UsersModel
     $this->message(['user' => $userData['userhash'], 'message' => 'Login efetuado com sucesso'], 200);
   }
 
-  public function register(array $data):void
+  public function register(array $data): void
   {
-    $this->verifyMethod('POST','Não é possível enviar os dados por GET');
+    $this->verifyMethod('POST', 'Não é possível enviar os dados por GET');
 
     $user = [
       'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
@@ -81,7 +81,7 @@ class UserController extends UsersModel
     $this->users->setNewUser($user);
   }
 
-  public function getDataUser(object $hash):void
+  public function getDataUser(object $hash): void
   {
     $this->verifyMethod('GET', 'Não é possível enviar os dados por POST');
 
@@ -111,7 +111,7 @@ class UserController extends UsersModel
       'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
       'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
       'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'cpf' => $data['cpf'],
+      'cpf' => filter_var($data['cpf'], FILTER_SANITIZE_SPECIAL_CHARS),
       'dateofbirth' => $data['dateofbirth'],
       'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
       'phone' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS)

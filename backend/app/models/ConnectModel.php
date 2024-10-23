@@ -99,17 +99,17 @@ class ConnectModel
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
-      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-      planname VACHAR(200) NOT NULL, 
-      plandescribe TEXT, 
-      numberofusers INTEGER DEFAULT 5,
-      numberofclients INTEGER DEFAULT 25,
-      price VARCHAR(10),
-      type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
-      users INTEGER DEFAULT 5,
-      clients INTEGER DEFAULT 25,
-      promotionprice VARCHAR(10),
-      );');
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+            planname VACHAR(200) NOT NULL, 
+            plandescribe TEXT, 
+            numberofusers INTEGER DEFAULT 5,
+            numberofclients INTEGER DEFAULT 25,
+            price VARCHAR(10),
+            type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
+            users INTEGER DEFAULT 5,
+            clients INTEGER DEFAULT 25,
+            promotionprice VARCHAR(10),
+            );');
 
             $sql->execute();
         } catch (PDOException $pe) {

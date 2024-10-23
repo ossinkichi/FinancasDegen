@@ -15,11 +15,11 @@ class AccountsModel extends ConnectModel
     $this->db = $this->connect();
   }
 
-  protected function getClientAccount(int $client):array{}
+  protected function getClientAccount(int $client): void {}
 
-  protected function setNewClientAccount(array $accountData):void{}
+  protected function setNewClientAccount(array $accountData): void {}
 
-  protected function updateClientAccount(array $accountData):void{}
+  protected function updateClientAccount(array $accountData): void {}
 
-  protected function deleteClientAccount(int $client):void{}
+  protected function deleteClientAccount(int $client): void {}
 }
