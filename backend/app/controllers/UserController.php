@@ -3,87 +3,87 @@
 namespace app\controllers;
 
 use \app\models\UsersModel;
+use app\classes\Helper;
 
 class UserController extends UsersModel
 {
-  private $users;
+  private object $helper;
 
   public function __construct()
   {
-    $this->users = new UsersModel;
+    $this->helper =  new Helper;
   }
 
   public function index(): void
   {
-    $data = $this->users->getAllUser();
-    echo json_encode($data);
+    $data = $this->getAllUser();
+    $this->helper->message(['data' => $data]);
   }
 
-  public function login(array $data): void
+  public function login(string $email, string $password): void
   {
-    $this->verifyMethod('POST', 'Não é possível enviar os dados por GET');
+    $this->helper->verifyMethod('POST');
 
-    foreach ($data as $key => $value) {
-      $data[$key] = htmlspecialchars($value);
-      if (empty($value)) {
-        $field[] = $key;
-      }
-    }
+    $data = [
+      'user' => filter_var($email . FILTER_SANITIZE_EMAIL),
+      'password' => filter_var($password, FILTER_SANITIZE_SPECIAL_CHARS)
+    ];
 
     if (!empty($field)) {
-      $this->handlerError(['message' => 'O campo obrigatorio não preenchido'], $field, 400);
+      $this->helper->message(['message' => 'O campo obrigatorio não preenchido'], 400);
       return;
     }
 
-    $userData = $this->users->getUser($data);
+    $userData = $this->getUser($data);
 
-    if (!$userData['active'] || !$userData) {
-      $this->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
+    if (!isset($userData['active']) || empty($userData)) {
+      $this->helper->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
       return;
     };
 
     if (!password_verify($data['password'], $userData['password'])) {
-      $this->message(['message' => 'Senha ou usuário incorreta'], 401);
+      $this->helper->message(['message' => 'Senha ou usuário incorreta'], 401);
       return;
     }
 
-    $this->message(['user' => $userData['userhash'], 'message' => 'Login efetuado com sucesso'], 200);
+    $this->helper->message(['user' => $userData['userhash'], 'message' => 'Login efetuado com sucesso'], 200);
   }
 
-  public function register(array $data): void
-  {
-    $this->verifyMethod('POST', 'Não é possível enviar os dados por GET');
+  public function register(
+    string $name,
+    string $email,
+    string $password,
+    string $cpf,
+    $dateofbirth,
+    string $gender,
+    int $phone
+  ): void {
+    $this->helper->verifyMethod('POST');
 
     $user = [
-      'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-      'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'cpf' => $data['cpf'],
-      'dateofbirth' => $data['dateofbirth'],
-      'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'phone' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS)
+      'name' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
+      'email' => filter_var($email, FILTER_SANITIZE_EMAIL),
+      'password' => filter_var($password, FILTER_SANITIZE_SPECIAL_CHARS),
+      'cpf' => filter_var($cpf, FILTER_SANITIZE_SPECIAL_CHARS),
+      'dateofbirth' => $dateofbirth,
+      'gender' => filter_var($gender, FILTER_SANITIZE_SPECIAL_CHARS),
+      'phone' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS)
     ];
 
-    foreach ($user as $key => $value) {
-      if (empty($value)) {
-        $error[] = $key;
-      }
-    }
-
-    if (!empty($error)) {
-      http_response_code(400);
-      echo json_encode(['error' => $error]);
+    if (empty($user)) {
+      $this->helper->message(['error' => 'Campo obrigatorio não informado'], 400);
       return;
     }
 
     $user['userhash'] = $this->createHash($user['cpf']);
 
-    $this->users->setNewUser($user);
+    $this->setNewUser($user);
+    $this->helper->message(['message' => 'success']);
   }
 
   public function getDataUser(object $hash): void
   {
-    $this->verifyMethod('GET', 'Não é possível enviar os dados por POST');
+    $this->helper->verifyMethod('GET');
 
     if (empty($hash)) {
       http_response_code(400);
@@ -91,7 +91,7 @@ class UserController extends UsersModel
       return;
     }
 
-    $userData = $this->users->getUser(['user' => $hash->paramether]);
+    $userData = $this->getUser(['user' => $hash->paramether]);
 
     if (!$userData['active']) {
       http_response_code(403);
@@ -102,64 +102,47 @@ class UserController extends UsersModel
     echo json_encode(['user' => $userData]);
   }
 
-  public function update(array $data)
-  {
-    $this->verifyMethod('POST', 'Não é possível enviar os dados por GET');
+  public function update(
+    string $hash,
+    string $name,
+    string $email,
+    string $password,
+    string $cpf,
+    $dateofbirth,
+    string $gender,
+    int $phone
+  ) {
+    $this->helper->verifyMethod('POST');
 
     $user = [
-      'userhash' => filter_var($data['userhash'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-      'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'cpf' => filter_var($data['cpf'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'dateofbirth' => $data['dateofbirth'],
-      'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
-      'phone' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS)
+      'userhash' => filter_var($hash, FILTER_SANITIZE_SPECIAL_CHARS),
+      'name' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
+      'email' => filter_var($email, FILTER_SANITIZE_EMAIL),
+      'password' => filter_var($password, FILTER_SANITIZE_SPECIAL_CHARS),
+      'cpf' => filter_var($cpf, FILTER_SANITIZE_SPECIAL_CHARS),
+      'dateofbirth' => $dateofbirth,
+      'gender' => filter_var($gender, FILTER_SANITIZE_SPECIAL_CHARS),
+      'phone' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS)
     ];
 
-    foreach ($user as $key => $value) {
-      if (empty($value)) {
-        $error[] = $key;
-      }
-    }
-
-    if (!empty($error)) {
-      http_response_code(400);
-      echo json_encode(['error' => $error]);
+    if (empty($user)) {
+      $this->helper->message(['error' => 'campo obrigatorio não informado'], 400);
       return;
     }
+
+    $this->updateDataUser($user);
+    $this->helper->message(['message' => 'success']);
   }
 
   public function delete(object $hash) {}
 
-  public function desactivateAccount(int $hash)
+  public function desactivateAccount(object|int $hash)
   {
-    $this->verifyMethod('GET', 'Não é possível enviar os dados por POST');
+    $this->helper->verifyMethod('GET');
   }
 
   private function createHash(string $hash): string
   {
     return hash('sha256', $hash);
-  }
-
-  private function verifyMethod($method, $message)
-  {
-    if ($_SERVER['REQUEST_METHOD'] != $method) {
-      header('Content-Type: application/json');
-      http_response_code(405);
-      echo json_encode(['Error' => $message]);
-    }
-  }
-
-  private function handlerError(array $message, array $fields, int $code)
-  {
-    http_response_code($code);
-    echo json_encode(['error' => $message, 'filds' => $fields]);
-  }
-
-  private function message(array $message, int $code = 200)
-  {
-    http_response_code($code);
-    echo json_encode($message);
   }
 }

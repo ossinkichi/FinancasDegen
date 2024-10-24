@@ -26,21 +26,46 @@ class CompanyController extends CompanyModel
 
             if (!$company) {
                 $this->helper->message(['error' => 'Empresa não informada']);
+                return;
             }
 
             $data = $this->getCompany($company);
             if (!$data) {
                 $this->helper->message(['message' => 'Sem dados dessa empresa']);
+                return;
             }
 
             $this->helper->message(['data' => $data]);
+            return;
         } catch (Exception $e) {
         } {
             throw new Exception("company error: " . $e->getMessage());
         }
     }
 
-    public function register(array $companyData): void {}
+    public function register(string $name, string $describe, string $cnpj, int $plan): void
+    {
+        try {
+            $this->helper->verifyMethod('POST');
+
+            $companyData = [
+                'companyname' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
+                'companydescribe' => filter_var($describe, FILTER_SANITIZE_SPECIAL_CHARS),
+                'cnpj' => filter_var($cnpj, FILTER_SANITIZE_SPECIAL_CHARS),
+                'plan' => filter_var($plan, FILTER_SANITIZE_SPECIAL_CHARS)
+            ];
+
+            if (empty($companyData)) {
+                $this->helper->message(['error' => 'Data not found'], 405);
+                return;
+            }
+
+            $this->setNewCompany($companyData);
+            $this->helper->message(['message' => 'success new register']);
+        } catch (Exception $e) {
+            throw new Exception('register of company error' . $e->getMessage());
+        }
+    }
 
     public function delete(object $company): void {}
 }

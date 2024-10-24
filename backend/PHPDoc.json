@@ -4,7 +4,6 @@
 			"path": "urlDaPagina/user/register",
 			"method": "POST",
 			"descripton": "Registra um novo usuário",
-			"type": "array|object",
 			"data": {
 				"name": "",
 				"email": "",
@@ -20,7 +19,6 @@
 			"path": "urlDaPagina/user/login",
 			"method": "POST",
 			"description": "Realiza o login de um usuário",
-			"type": "array|object",
 			"data": {
 				"email": "",
 				"password": ""
@@ -30,29 +28,25 @@
 		"dataUser": {
 			"path": "urlDaPagina/user/getDataUser/hashdousuario",
 			"method": "GET",
-			"descripton": "Retorna os dados de um usuário",
-			"type": "string"
+			"descripton": "Retorna os dados de um usuário"
 		},
 
 		"update": {
 			"path": "urlDaPagina/user/update",
 			"method": "POST",
-			"description": "Atualizar dados do usuário",
-			"type": "array|object"
+			"description": "Atualizar dados do usuário"
 		},
 
 		"desactivate": {
 			"path": "urlDaPagina/user/desactivateAccount/hashdousuario",
 			"method": "GET",
-			"description": "Desativa a conta do usuário",
-			"type": "string"
+			"description": "Desativa a conta do usuário"
 		},
 
 		"getAllUsers": {
 			"path": "urlDaPagina/user",
 			"method": "GET|POST",
-			"description": "Busca todos os usuário do banco",
-			"type": ""
+			"description": "Busca todos os usuário do banco"
 		}
 	},
 
