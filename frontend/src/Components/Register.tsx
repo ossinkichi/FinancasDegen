@@ -26,7 +26,6 @@ const Register = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    showError(Error)
     try{
       const response = await axios.post("https://9d94eeed-7f95-4391-8e5f-05bf8a64252a-00-1wguqr9pw5ev4.worf.replit.dev:8000/user/register")
       if(response.data.status === "success"){
@@ -91,7 +90,7 @@ const Register = () => {
             required
           />
         </div>
-        <div className="form-group">
+        <div className="form-gropup">
           <label htmlFor="cpf">CPF:</label>
           <input
             type="text"
