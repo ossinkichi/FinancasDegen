@@ -17,7 +17,7 @@ class PlansController extends PlansModel
         $this->helper = new Helper;
     }
 
-    public function index()
+    public function index(): void
     {
         $this->helper->verifyMethod('GET');
         try {
@@ -46,6 +46,21 @@ class PlansController extends PlansModel
             'price' => filter_var($numberofclients, FILTER_SANITIZE_SPECIAL_CHARS),
             'type' => filter_var($type, FILTER_SANITIZE_SPECIAL_CHARS),
         ];
+
+        foreach($plan as $key => $value){
+            if(empty($value)){
+                $this->helper->message(['error' => 'Campo obrigatorio não informado'], 400);
+                return;
+            }
+        }
+
+        if($plan['typer'] != 'anual' || $plan['typer'] != 'mensal'){
+            $this->helper->message(['error' => 'Tipo de plano invalido'], 400);
+            return;
+        }
+
+        $this->setNewPlan($plan);
+        $this->helper->message(['message' => 'success']);
     }
 
     public function promotion(string $type, string $price) {}

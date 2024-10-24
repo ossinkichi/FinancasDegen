@@ -56,7 +56,7 @@ class UserController extends UsersModel
     string $cpf,
     $dateofbirth,
     string $gender,
-    int $phone
+    string $phone
   ): void {
     $this->helper->verifyMethod('POST');
 
