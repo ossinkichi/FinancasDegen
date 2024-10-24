@@ -1,5 +1,5 @@
 run = "php -S localhost:8000 -t backend/public"
-modules = ["php-8.2", "web", "nodejs-20", "nix"]
+modules = ["php-8.2", "nodejs-20", "web", "nix"]
 
 [nix]
 channel = "stable-24_05"

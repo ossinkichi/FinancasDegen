@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "name": "degen/financas-degen",
     "autoload": {
         "psr-4": {
@@ -7,7 +6,7 @@
             "core\\": "core/"
         }
     },
-    "authors": [
+    "authors":[
         {
             "name": "Carlos Junior",
             "email": "carlosandrerfjunior@gmail.com"
@@ -16,22 +15,4 @@
     "require": {
         "vlucas/phpdotenv": "^5.6"
     }
-=======
-	"name": "degen/financas-degen",
-	"autoload": {
-		"psr-4": {
-			"app\\": "app/",
-			"core\\": "core/"
-		}
-	},
-	"authors": [
-		{
-			"name": "Carlos Junior",
-			"email": "carlosandrerfjunior@gmail.com"
-		}
-	],
-	"require": {
-		"vlucas/phpdotenv": "^5.6"
-	}
->>>>>>> 5639a2ca2b3525c3a4b1c3726a6b997f872d5f46
 }
