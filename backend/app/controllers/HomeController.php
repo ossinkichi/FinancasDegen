@@ -3,10 +3,11 @@
 namespace app\controllers;
 
 
-class HomeController{
+class HomeController
+{
 
-  public function index(){    
-
+  public function index()
+  {
+    dd('HOME');
   }
-  
 }

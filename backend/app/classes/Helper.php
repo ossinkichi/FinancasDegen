@@ -6,7 +6,7 @@ class Helper
 {
     public function verifyMethod(string $method)
     {
-        if ($_SERVER['REQUEST_METHOD'] != $method) {
+        if ($_SERVER['REQUEST_METHOD'] != strtoupper($method)) {
             header('Content-Type: application/json');
             $this->message(['error' => 'Método não permitido'], 405);
         }

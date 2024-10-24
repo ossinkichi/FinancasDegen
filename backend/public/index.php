@@ -14,7 +14,7 @@ try {
   // $ultils = new Ultils;
   // $ultils->createTables();
 
-  cors();  
+  cors();
 
   $controller = new Controller();
   $controller = $controller->load();
@@ -24,7 +24,7 @@ try {
 
   $paramethers = new Paramethers();
   $paramethers = $paramethers->load();
-  
+
   $controller->$method($paramethers);
 } catch (Exception $e) {
   dd($e->getMessage());

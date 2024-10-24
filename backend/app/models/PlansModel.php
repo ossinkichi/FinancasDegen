@@ -42,7 +42,7 @@ class PlansModel extends ConnectModel
     }
   }
 
-  protected function updatePlan() {}
+  protected function updatePlan(): void {}
 
-  protected function deletePlan() {}
+  protected function deletePlan(): void {}
 }
