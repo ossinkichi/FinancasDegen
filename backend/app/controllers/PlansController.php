@@ -28,7 +28,7 @@ class PlansController extends PlansModel
                 return;
             }
 
-            $this->helper->message(['data' => $plans]);
+            $this->helper->message(['message' => 'success', 'data' => $plans]);
         } catch (Exception $e) {
             throw new Exception('Planos não encontrados: ' . $e->getMessage(), 404);
         }
@@ -47,14 +47,14 @@ class PlansController extends PlansModel
             'type' => filter_var($type, FILTER_SANITIZE_SPECIAL_CHARS),
         ];
 
-        foreach($plan as $key => $value){
-            if(empty($value)){
+        foreach ($plan as $key => $value) {
+            if (empty($value)) {
                 $this->helper->message(['error' => 'Campo obrigatorio não informado'], 400);
                 return;
             }
         }
 
-        if($plan['typer'] != 'anual' || $plan['typer'] != 'mensal'){
+        if ($plan['typer'] != 'anual' || $plan['typer'] != 'mensal') {
             $this->helper->message(['error' => 'Tipo de plano invalido'], 400);
             return;
         }

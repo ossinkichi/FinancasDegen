@@ -101,7 +101,7 @@ class ConnectModel
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-            planname VACHAR(200) NOT NULL, 
+            planname VARCHAR(200) NOT NULL, 
             plandescribe TEXT, 
             numberofusers INTEGER DEFAULT 5,
             numberofclients INTEGER DEFAULT 25,
@@ -112,23 +112,7 @@ class ConnectModel
 
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('PlainsTable error: ' . $pe->getMessage());
-        }
-    }
-
-    protected function accountClientTable()
-    {
-        try {
-            $database = $this->connect();
-            $sql = $database->prepare('CREATE TABLE IF NOT EXISTS accountclient(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-            cost VARCHAR(10), 
-            client INTEGER,
-            FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
-            );');
-            $sql->execute();
-        } catch (PDOException $pe) {
-            throw new PDOException('AccountClientTable error: ' . $pe->getMessage());
+            throw new PDOException('PlainsTable error ' . $pe->getMessage());
         }
     }
 

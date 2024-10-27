@@ -12,16 +12,15 @@ class Ultils extends ConnectModel
     {
         $db = new ConnectModel;
         $db->connect();
-        $db->plainsTable();
+        $db->plansTable();
         $db->companyTable();
         $db->usersTable();
         $db->clientsTable();
-        $db->accountClientTable();
     }
 
     public static function seedUsersTable(array $user)
     {
         $users = new UserController;
-        $users->register($user);
+        // $users->register($user);
     }
 }

@@ -52,7 +52,26 @@
 
 	"companies": {},
 
-	"plans": {},
+	"plans": {
+		"push": {
+			"path": "urlDaPagina/plans/",
+			"method": "GET",
+			"descripton": "Resgata todos os planos"
+		},
+		"register": {
+			"path": "urlDaPagina/plans/register",
+			"method": "POST",
+			"descripton": "Registra um novo plano",
+			"data": {
+				"name": "",
+				"describe": "",
+				"price": "",
+				"numberofusers": "",
+				"numberofclients": "",
+				"type": ""
+			}
+		}
+	},
 
 	"clients": {},
 
