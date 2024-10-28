@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import "./css/AuthForms.css";
-import axios from "axios"
+import axios from "axios";
 
 const Register = () => {
-  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,20 +25,21 @@ const Register = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    try{
-      const response = await axios.post("https://9d94eeed-7f95-4391-8e5f-05bf8a64252a-00-1wguqr9pw5ev4.worf.replit.dev:8000/user/register")
-      if(response.data.status === "success"){
-        console.log(response)
+    try {
+      const response = await axios.post(
+        "https://174bef48-1d86-4312-8eac-ede07fbd236e-00-o3f3t4j7n7tx.picard.replit.dev:8000/user/register",
+      );
+      if (response.data.status === "success") {
+        console.log(response);
       }
-    }catch(error: any){
+    } catch (error: any) {
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
       }
-      showError(error.messasge)
+      showError(error.messasge);
     }
-    
   };
 
   function showError(message: string): void {
@@ -90,7 +90,7 @@ const Register = () => {
             required
           />
         </div>
-        <div className="form-gropup">
+        <div className="form-group">
           <label htmlFor="cpf">CPF:</label>
           <input
             type="text"
