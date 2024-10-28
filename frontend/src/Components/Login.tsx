@@ -12,7 +12,7 @@ const Login = () => {
     event.preventDefault();
     try {
       const response = await axios.post(
-        "https://9d94eeed-7f95-4391-8e5f-05bf8a64252a-00-1wguqr9pw5ev4.worf.replit.dev:8000/user/login",
+        "https://174bef48-1d86-4312-8eac-ede07fbd236e-00-o3f3t4j7n7tx.picard.replit.dev:8000/user/login",
         { email, password },
       );
       if(response.data.status === "success"){

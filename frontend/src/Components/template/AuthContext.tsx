@@ -2,7 +2,8 @@
 
 interface AuthContextProps {
     isAuthenticated: Boolean;
-    login: () => void;
+    isAssociated: Boolean;
+    login: (company: number) => void;
     logout: () => void;
 }
 
@@ -19,12 +20,16 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAssociated, setIsAssociated] = useState(false)
   
-    const login = () => setIsAuthenticated(true);
+    const login = (company: number) => {
+      setIsAssociated(!!company)
+      setIsAuthenticated(true)
+    };
     const logout = () => setIsAuthenticated(false);
   
     return (
-      <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+      <AuthContext.Provider value={{ isAuthenticated, login, isAssociated ,logout }}>
         {children}
       </AuthContext.Provider>
     );
