@@ -39,12 +39,11 @@ class JwtHelper
         }
     }
 
-    public function validate($jwt)
+    public function validate(string $jwt)
     {
         try {
             if (isset($jwt)) {
-                $decoded = JWT::decode($jwt, new Key($this->key, 'HS256'));
-                return;
+                return JWT::decode($jwt, new Key($this->key, 'HS256'));
             }
 
             $this->helper->message(['message' => 'acesso negado'], 403);

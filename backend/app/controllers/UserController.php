@@ -92,25 +92,30 @@ class UserController extends UsersModel
         }
     }
 
-    public function getDataUser(object $hash): void
+    public function getDataUser($data): void
     {
-        $this->helper->verifyMethod('GET');
+        try {
+            $this->helper->verifyMethod('GET');
+            $this->jwt->validate($data->outher);
 
-        if (empty($hash)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'É necessario passar o hash para que a busca seja feita']);
-            return;
+            if (empty($hash)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'É necessario passar o hash para que a busca seja feita']);
+                return;
+            }
+
+            $userData = $this->getUser(['user' => $hash->paramether]);
+
+            if (!$userData['active']) {
+                http_response_code(403);
+                echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
+                return;
+            };
+
+            echo json_encode(['user' => $userData]);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
-
-        $userData = $this->getUser(['user' => $hash->paramether]);
-
-        if (!$userData['active']) {
-            http_response_code(403);
-            echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
-            return;
-        };
-
-        echo json_encode(['user' => $userData]);
     }
 
     public function update(
