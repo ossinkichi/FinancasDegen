@@ -26,9 +26,9 @@ class UserController extends UsersModel
         $this->helper->message(['data' => $data ?? '']);
     }
 
-    public function login(): void
-    {
-        // $this->helper->verifyMethod('POST');
+    public function login(): void{
+        
+        $this->helper->verifyMethod('POST');
         $data = get_object_vars(json_decode(file_get_contents("php://input")));
 
         $user = [

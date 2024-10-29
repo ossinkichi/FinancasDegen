@@ -13,8 +13,6 @@ try {
   $ultils = new Ultils;
   $ultils->createTables();
 
-  cors();
-
   $controller = new Controller();
   $controller = $controller->load();
 

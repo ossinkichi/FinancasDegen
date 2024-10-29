@@ -2,7 +2,7 @@
 
 use Dotenv\Dotenv;
 
-function cors(){
+function cors(string $method){
     
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
     $dotenv->load();
@@ -12,7 +12,7 @@ function cors(){
     header("Access-Control-Allow-Origin:".DOMAIN);
 
     // Permitir métodos específicos
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Methods: $method OPTIONS");
 
     // Permitir cabeçalhos específicos
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
