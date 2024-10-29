@@ -124,12 +124,12 @@ const Register = () => {
             <option value="">Selecione...</option>
             <option value="male">Masculino</option>
             <option value="female">Feminino</option>
-            <option value="transformer">Transformer</option>
+            {/* <option value="transformer">Transformer</option>
             <option value="travesti">Kirito do GGO</option>
             <option value="airplane">Helicóptero de Combate</option>
             <option value="goku">Goku</option>
             <option value="robot">RobôCop Gay</option>
-            <option value="NoHomo">No Homo</option>
+            <option value="NoHomo">No Homo</option> */}
           </select>
         </div>
         <div className="form-group">

@@ -26,11 +26,10 @@ class UserController extends UsersModel
         $this->helper->message(['data' => $data ?? '']);
     }
 
-    public function login($param): void
+    public function login(): void
     {
-        $this->helper->verifyMethod('POST');
-
-        $data = $_POST;
+        // $this->helper->verifyMethod('POST');
+        $data = get_object_vars(json_decode(file_get_contents("php://input")));
 
         $user = [
             'user' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
@@ -43,6 +42,11 @@ class UserController extends UsersModel
         }
 
         $userData = $this->getUser($user['user']);
+
+        if(empty($userData)){
+            $this->helper->message(['message' => 'Usuário não encontrado'], 404);
+            return;
+        }
 
         // if (!isset($userData['active']) || empty($userData)) {
         //     $this->helper->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
@@ -59,7 +63,7 @@ class UserController extends UsersModel
 
     public function register(): void
     {
-        $this->helper->verifyMethod('POST');
+        // $this->helper->verifyMethod('POST');
         try {
             $data = $_POST;
             $user = [
