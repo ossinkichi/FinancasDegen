@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
+// Autenticação e restrições de acesso
 import PrivateRoutes from "./Components/template/PrivateRoutes"
 import {AuthProvider} from "./Components/template/AuthContext"
 
@@ -8,6 +9,7 @@ import {AuthProvider} from "./Components/template/AuthContext"
 import Home from "./pages/Home";
 import LoginOrRegister from "./pages/LoginOrRegister";
 import Dashboard from "./pages/Dashboard"
+import NotFound from "./pages/NotFound";
 
 
 function App() {
@@ -17,9 +19,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<LoginOrRegister />} />
-          <Route element={<PrivateRoutes />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-          </Route>
+        <Route element={<PrivateRoutes />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
       </Router>
     </AuthProvider>

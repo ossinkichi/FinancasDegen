@@ -107,7 +107,7 @@ class ConnectModel
             numberofclients INTEGER DEFAULT 25,
             price VARCHAR(10),
             type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
-            promotionprice VARCHAR(10),
+            promotionprice VARCHAR(10)
             );');
 
             $sql->execute();

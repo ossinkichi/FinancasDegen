@@ -4,15 +4,14 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/functions/config.php';
 include __DIR__ . '/../app/functions/helpers.php';
 
-use app\models\UsersModel;
 use core\Controller;
 use core\Method;
 use core\Paramethers;
-// use app\classes\Ultils;
+use app\classes\Ultils;
 
 try {
-  // $ultils = new Ultils;
-  // $ultils->createTables();
+  $ultils = new Ultils;
+  $ultils->createTables();
 
   cors();
 
