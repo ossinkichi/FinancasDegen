@@ -22,33 +22,34 @@ class UserController extends UsersModel
     public function get()
     {
         $this->helper->verifyMethod('GET');
-        dd($this->getAllUser());
         $data = $this->getAllUser();
         $this->helper->message(['data' => $data ?? '']);
     }
 
-    public function login(string $email, string $password): void
+    public function login($param): void
     {
-        // $this->helper->verifyMethod('POST');
+        $this->helper->verifyMethod('POST');
 
-        $data = [
-            'user' => filter_var($email, FILTER_SANITIZE_EMAIL),
-            'password' => filter_var($password, FILTER_SANITIZE_SPECIAL_CHARS)
+        $data = $_POST;
+
+        $user = [
+            'user' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
+            'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
 
-        if (!empty($field)) {
+        if (empty($user)) {
             $this->helper->message(['message' => 'O campo obrigatorio não preenchido'], 400);
             return;
         }
 
-        $userData = $this->getUser($data);
+        $userData = $this->getUser($user['user']);
 
         // if (!isset($userData['active']) || empty($userData)) {
         //     $this->helper->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
         //     return;
         // };
 
-        if (!password_verify($data['password'], $userData['password'])) {
+        if (!password_verify($user['password'], $userData['password'])) {
             $this->helper->message(['message' => 'Senha ou usuário incorreta'], 401);
             return;
         }
@@ -56,29 +57,29 @@ class UserController extends UsersModel
         $this->helper->message(['token' => $this->jwt->generate(['user' => $userData['userhash'], 'message' => 'Login efetuado com sucesso'], (60 * 60 * 7))], 200);
     }
 
-    public function register(
-        string $name,
-        string $email,
-        string $password,
-        string $cpf,
-        $dateofbirth,
-        string $gender,
-        string $phone
-    ): void {
+    public function register(): void
+    {
         $this->helper->verifyMethod('POST');
-
         try {
+            $data = $_POST;
             $user = [
-                'name' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
-                'email' => filter_var($email, FILTER_SANITIZE_EMAIL),
-                'password' => filter_var($password, FILTER_SANITIZE_SPECIAL_CHARS),
-                'cpf' => filter_var($cpf, FILTER_SANITIZE_SPECIAL_CHARS),
-                'dateofbirth' => $dateofbirth,
-                'gender' => filter_var($gender, FILTER_SANITIZE_SPECIAL_CHARS),
-                'phone' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS)
+                'name' => filter_var($_POST['name'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'email' => filter_var($_POST['email'], FILTER_SANITIZE_EMAIL),
+                'password' => filter_var($_POST['password'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'cpf' => filter_var($_POST['cpf'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'dateofbirth' => $_POST['dateofbirth'],
+                'gender' => filter_var($_POST['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'phone' => filter_var($_POST['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
             ];
 
-            if (empty($user)) {
+            foreach ($user as $key => $value) {
+                if (empty($value)) {
+                    $filds[] = $key;
+                }
+            }
+
+            if (!empty($filds)) {
+                dd($filds);
                 $this->helper->message(['error' => 'Campo obrigatorio não informado'], 400);
                 return;
             }
@@ -103,8 +104,8 @@ class UserController extends UsersModel
                 echo json_encode(['error' => 'É necessario passar o hash para que a busca seja feita']);
                 return;
             }
-
-            $userData = $this->getUser(['user' => $hash->paramether]);
+            $data = ['user' => $hash->paramether];
+            $userData = $this->getUser($data['user']);
 
             if (!$userData['active']) {
                 http_response_code(403);

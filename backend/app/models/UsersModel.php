@@ -24,11 +24,12 @@ class UsersModel extends ConnectModel
     }
   }
 
-  protected function getUser(string|array $user): array
+  protected function getUser(string $user): array|false
   {
+    $data = [];
     try {
       $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
-      $sql->bindValue(':user', $user['user']);
+      $sql->bindValue(':user', $user);
       $sql->execute();
 
       $data = $sql->fetch(PDO::FETCH_ASSOC);
