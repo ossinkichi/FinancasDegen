@@ -61,7 +61,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  protected function updateDataUser(object|array $data)
+  protected function updateDataUser(array $data)
   {
     try {
 
@@ -87,7 +87,9 @@ class UsersModel extends ConnectModel
     }
   }
 
-  protected function desactivateAccount(int $hash)
+  protected function activateAccount(string $hash) {}
+
+  protected function desactivateAccount(string $hash)
   {
     try {
 

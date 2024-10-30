@@ -66,7 +66,8 @@ class UserController extends UsersModel
     {
         $this->helper->verifyMethod('POST');
         try {
-            $data = $_POST;
+            $data =  get_object_vars(json_decode(file_get_contents("php://input")));
+
             $user = [
                 'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
                 'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
@@ -84,8 +85,7 @@ class UserController extends UsersModel
             }
 
             if (!empty($filds)) {
-                dd($filds);
-                $this->helper->message(['error' => 'Campo obrigatorio não informado'], 400);
+                $this->helper->message(['error' => 'Campo obrigatorio não informado', $filds], 400);
                 return;
             }
 
@@ -98,27 +98,26 @@ class UserController extends UsersModel
         }
     }
 
-    public function getDataUser($data): void
+    public function get(): void
     {
         try {
             $this->helper->verifyMethod('GET');
-            $this->jwt->validate($data->outher);
+
+            $hash = $_GET['user'];
 
             if (empty($hash)) {
-                http_response_code(400);
-                echo json_encode(['error' => 'É necessario passar o hash para que a busca seja feita']);
-                return;
-            }
-            $data = ['user' => $hash->paramether];
-            $userData = $this->getUser($data['user']);
-
-            if (!$userData['active']) {
-                http_response_code(403);
-                echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
+                $this->helper->message(['error' => 'Usuário não identificado'], 400);
                 return;
             };
+            $userData = $this->getUser($hash);
 
-            echo json_encode(['user' => $userData]);
+            // if (!$userData['active']) {
+            //     http_response_code(403);
+            //     echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
+            //     return;
+            // };
+
+            $this->helper->message(['user' => $userData]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -164,7 +163,16 @@ class UserController extends UsersModel
         }
     }
 
-    public function desactivateAccount(object|int $hash)
+    public function activated()
+    {
+        $this->helper->verifyMethod('GET');
+        try {
+        } catch (Exception $e) {
+            $this->helper->message(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function desactivate()
     {
         $this->helper->verifyMethod('GET');
     }

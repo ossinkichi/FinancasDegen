@@ -26,7 +26,7 @@
 		},
 
 		"dataUser": {
-			"path": "urlDaPagina/user/getDataUser/hashdousuario",
+			"path": "urlDaPagina/user/get/?user=hashdousuario",
 			"method": "GET",
 			"descripton": "Retorna os dados de um usuário"
 		},
