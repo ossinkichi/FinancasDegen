@@ -9,18 +9,11 @@ use PDOException;
 class CompanyModel extends ConnectModel
 {
 
-    private object $db;
-
-    public function __construct()
-    {
-        $this->db = $this->connect();
-    }
-
     protected function getCompany(int $id): array
     {
         $data = [];
         try {
-            $sql = $this->db->prepare('SELECT * FROM companies WHERE  id = :id');
+            $sql = $this->connect()->prepare('SELECT * FROM companies WHERE  id = :id');
             $sql->bindParam(':id', $id);
             $sql->execute();
             $data = $sql->fetch(PDO::FETCH_ASSOC);
@@ -35,7 +28,7 @@ class CompanyModel extends ConnectModel
     protected function setNewCompany(array $companyData)
     {
         try {
-            $sql = $this->db->prepare('
+            $sql = $this->connect()->prepare('
                 INSERT INTO companies (companyname, companydescribe, cnpj, plan) 
                 VALUES (:companyname, :companydescribe, :cnpj, :plan)
             ');
@@ -53,7 +46,7 @@ class CompanyModel extends ConnectModel
     protected function updateTheCompanysPlan(array $companyData)
     {
         try {
-            $sql  = $this->db->prepare('UPDATE companies SET plan = :plan WHERE cnpj = :cnpj');
+            $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan WHERE cnpj = :cnpj');
 
             foreach ($companyData as $key => $value) {
                 $sql->bindValue(':' . $key, $value);
@@ -68,7 +61,7 @@ class CompanyModel extends ConnectModel
     protected function deleteCompany(string $cnpj)
     {
         try {
-            $sql = $this->db->prepare('DELETE FROM companies WHERE cnpj = :cnpj');
+            $sql = $this->connect()->prepare('DELETE FROM companies WHERE cnpj = :cnpj');
             $sql->bindValue(':cnpj', $cnpj);
             $sql->execute();
         } catch (PDOException $pe) {

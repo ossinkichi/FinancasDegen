@@ -9,7 +9,6 @@ use Exception;
 class CompanyController extends CompanyModel
 {
 
-    private $db;
     private $helper;
 
     public function __construct()
@@ -17,19 +16,19 @@ class CompanyController extends CompanyModel
         $this->helper = new Helper;
     }
 
-    public function company(object $company): void
+    public function company(): void
     {
         try {
             $this->helper->verifyMethod('GET');
 
-            $company = htmlspecialchars($company->paramether);
+            $company = get_object_vars(json_decode(file_get_contents("php://input")));
 
-            if (!$company) {
+            if (!$company['user']) {
                 $this->helper->message(['error' => 'Empresa não informada']);
                 return;
             }
 
-            $data = $this->getCompany($company);
+            $data = $this->getCompany($company['user']);
             if (!$data) {
                 $this->helper->message(['message' => 'Sem dados dessa empresa']);
                 return;
@@ -45,8 +44,9 @@ class CompanyController extends CompanyModel
 
     public function register(string $name, string $describe, string $cnpj, int $plan): void
     {
-        try {
             $this->helper->verifyMethod('POST');
+        try {
+            $company = get_object_vars(json_decode(file_get_contents("php://input")));
 
             $companyData = [
                 'companyname' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),

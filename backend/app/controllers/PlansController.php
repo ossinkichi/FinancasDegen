@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use app\models\PlansModel;
 use app\classes\Helper;
-use BadFunctionCallException;
 use Exception;
 
 class PlansController extends PlansModel
