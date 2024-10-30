@@ -8,18 +8,10 @@ use app\models\ConnectModel;
 
 class PlansModel extends ConnectModel
 {
-
-  private object $db;
-
-  public function __construct()
-  {
-    $this->db = $this->connect();
-  }
-
   protected function getPlans(): array
   {
     try {
-      $sql = $this->db->prepare('SELECT * FROM plans');
+      $sql = $this->connect()->prepare('SELECT * FROM plans');
       $sql->execute();
 
       $data =  $sql->fetchAll(PDO::FETCH_ASSOC) ?? [];
@@ -32,7 +24,7 @@ class PlansModel extends ConnectModel
   protected function setNewPlan(array $dataPlan): void
   {
     try {
-      $sql = $this->db->prepare('INSERT INTO plan(planname, plandescribe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
+      $sql = $this->connect()->prepare('INSERT INTO plan(planname, plandescribe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
       foreach ($dataPlan as $key => $value) {
         $sql->bindValue(':' . $key, $value);
       }

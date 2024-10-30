@@ -101,7 +101,7 @@ class UsersModel extends ConnectModel
     }
   }
 
-  protected function deleteUser(int $hash)
+  protected function deleteUser(string $hash)
   {
     try {
       $sql = $this->connect()->prepare('DELETE FROM users WHERE userhash = :hash');

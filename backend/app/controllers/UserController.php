@@ -19,15 +19,16 @@ class UserController extends UsersModel
         $this->jwt =  new JwtHelper;
     }
 
-    public function get()
+    public function index()
     {
         $this->helper->verifyMethod('GET');
         $data = $this->getAllUser();
         $this->helper->message(['data' => $data ?? '']);
     }
 
-    public function login(): void{
-        
+    public function login(): void
+    {
+
         $this->helper->verifyMethod('POST');
         $data = get_object_vars(json_decode(file_get_contents("php://input")));
 
@@ -43,7 +44,7 @@ class UserController extends UsersModel
 
         $userData = $this->getUser($user['user']);
 
-        if(empty($userData)){
+        if (empty($userData)) {
             $this->helper->message(['message' => 'Usuário não encontrado'], 404);
             return;
         }
@@ -63,17 +64,17 @@ class UserController extends UsersModel
 
     public function register(): void
     {
-        // $this->helper->verifyMethod('POST');
+        $this->helper->verifyMethod('POST');
         try {
             $data = $_POST;
             $user = [
-                'name' => filter_var($_POST['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'email' => filter_var($_POST['email'], FILTER_SANITIZE_EMAIL),
-                'password' => filter_var($_POST['password'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'cpf' => filter_var($_POST['cpf'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'dateofbirth' => $_POST['dateofbirth'],
-                'gender' => filter_var($_POST['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'phone' => filter_var($_POST['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
+                'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
+                'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'cpf' => filter_var($data['cpf'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'dateofbirth' => $data['dateofbirth'],
+                'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
             ];
 
             foreach ($user as $key => $value) {
@@ -123,29 +124,20 @@ class UserController extends UsersModel
         }
     }
 
-    public function update(
-        string $token,
-        string $hash,
-        string $name,
-        string $email,
-        string $password,
-        string $cpf,
-        $dateofbirth,
-        string $gender,
-        int $phone
-    ) {
+    public function update()
+    {
         $this->helper->verifyMethod('POST');
-        $this->jwt->validate($token);
 
+        $data = $_POST;
         $user = [
-            'userhash' => filter_var($hash, FILTER_SANITIZE_SPECIAL_CHARS),
-            'name' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
-            'email' => filter_var($email, FILTER_SANITIZE_EMAIL),
-            'password' => filter_var($password, FILTER_SANITIZE_SPECIAL_CHARS),
-            'cpf' => filter_var($cpf, FILTER_SANITIZE_SPECIAL_CHARS),
-            'dateofbirth' => $dateofbirth,
-            'gender' => filter_var($gender, FILTER_SANITIZE_SPECIAL_CHARS),
-            'phone' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS)
+            'userhash' => filter_var(json_decode($data['hash']), FILTER_SANITIZE_SPECIAL_CHARS),
+            'name' => filter_var(json_decode($data['name']), FILTER_SANITIZE_SPECIAL_CHARS),
+            'email' => filter_var(json_decode($data['email']), FILTER_SANITIZE_EMAIL),
+            'password' => filter_var(json_decode($data['password']), FILTER_SANITIZE_SPECIAL_CHARS),
+            'cpf' => filter_var(json_decode($data['cpf']), FILTER_SANITIZE_SPECIAL_CHARS),
+            'dateofbirth' => json_decode($data['dateofbirth']),
+            'gender' => filter_var(json_decode($data['gender']), FILTER_SANITIZE_SPECIAL_CHARS),
+            'phone' => filter_var(json_decode($data['phone']), FILTER_SANITIZE_SPECIAL_CHARS)
         ];
 
         if (empty($user)) {
@@ -157,7 +149,20 @@ class UserController extends UsersModel
         $this->helper->message(['message' => 'success']);
     }
 
-    public function delete(object $hash) {}
+    public function delete()
+    {
+        $this->helper->verifyMethod('GET');
+        try {
+            $hash = $_GET['user'];
+            if (empty($hash) || !isset($hash)) {
+                $this->helper->message(['erro' => 'usuario não indentificado', 'hash' => $hash], 400);
+                return;
+            }
+            $this->deleteUser($hash);
+        } catch (Exception $e) {
+            $this->helper->message(['error' => $e->getMessage()], 400);
+        }
+    }
 
     public function desactivateAccount(object|int $hash)
     {

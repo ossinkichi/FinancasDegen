@@ -34,17 +34,18 @@ class PlansController extends PlansModel
         }
     }
 
-    public function register(string $name, string $describe, string $price, int $numberofusers, int $numberofclients, string $type)
+    public function register()
     {
         $this->helper->verifyMethod('POST');
+        $data = $_POST;
 
         $plan = [
-            'planname' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
-            'plandescribe' => filter_var($describe, FILTER_SANITIZE_SPECIAL_CHARS),
-            'numberofusers' => filter_var($price, FILTER_SANITIZE_SPECIAL_CHARS),
-            'numberofclients' => filter_var($numberofusers, FILTER_SANITIZE_SPECIAL_CHARS),
-            'price' => filter_var($numberofclients, FILTER_SANITIZE_SPECIAL_CHARS),
-            'type' => filter_var($type, FILTER_SANITIZE_SPECIAL_CHARS),
+            'planname' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'plandescribe' => filter_var($data['describe'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'numberofusers' => filter_var($data['price'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'numberofclients' => filter_var($data['numberofusers'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'price' => filter_var($data['numberofclients'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'type' => filter_var($data['type'], FILTER_SANITIZE_SPECIAL_CHARS),
         ];
 
         foreach ($plan as $key => $value) {
