@@ -23,36 +23,35 @@ class CompanyController extends CompanyModel
 
             $company = get_object_vars(json_decode(file_get_contents("php://input")));
 
-            if (!$company['user']) {
+            if (empty($company['company']) || !isset($company['company'])) {
                 $this->helper->message(['error' => 'Empresa não informada']);
                 return;
             }
 
             $data = $this->getCompany($company['user']);
-            if (!$data) {
+            if (empty($data)) {
                 $this->helper->message(['message' => 'Sem dados dessa empresa']);
                 return;
             }
 
-            $this->helper->message(['data' => $data]);
-            return;
+            $this->helper->message(['data' => $data, 'message' => 'success']);
         } catch (Exception $e) {
-        } {
             throw new Exception("company error: " . $e->getMessage());
         }
     }
 
     public function register(string $name, string $describe, string $cnpj, int $plan): void
     {
-            $this->helper->verifyMethod('POST');
+        $this->helper->verifyMethod('POST');
+
         try {
             $company = get_object_vars(json_decode(file_get_contents("php://input")));
 
             $companyData = [
-                'companyname' => filter_var($name, FILTER_SANITIZE_SPECIAL_CHARS),
-                'companydescribe' => filter_var($describe, FILTER_SANITIZE_SPECIAL_CHARS),
-                'cnpj' => filter_var($cnpj, FILTER_SANITIZE_SPECIAL_CHARS),
-                'plan' => filter_var($plan, FILTER_SANITIZE_SPECIAL_CHARS)
+                'companyname' => filter_var($company['name'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'companydescribe' => filter_var($company['describe'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'cnpj' => filter_var($company['cnpj'], FILTER_SANITIZE_SPECIAL_CHARS),
+                'plan' => filter_var($company['plan'], FILTER_SANITIZE_SPECIAL_CHARS)
             ];
 
             if (empty($companyData)) {

@@ -36,10 +36,11 @@ class UserController extends UsersModel
             'user' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
             'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
-
-        if (empty($user)) {
-            $this->helper->message(['message' => 'O campo obrigatorio não preenchido'], 400);
-            return;
+        foreach ($user as $key) {
+            if (empty($key)) {
+                $this->helper->message(['message' => 'O campo obrigatorio não preenchido'], 400);
+                return;
+            }
         }
 
         $userData = $this->getUser($user['user']);
@@ -49,17 +50,17 @@ class UserController extends UsersModel
             return;
         }
 
-        // if (!isset($userData['active']) || empty($userData)) {
-        //     $this->helper->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
-        //     return;
-        // };
+        if (!isset($userData['active']) || empty($userData) && !empty($userData['company'])) {
+            $this->helper->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
+            return;
+        };
 
         if (!password_verify($user['password'], $userData['password'])) {
             $this->helper->message(['message' => 'Senha ou usuário incorreta'], 401);
             return;
         }
 
-        $this->helper->message(['token' => $this->jwt->generate(['user' => $userData['userhash'], 'message' => 'Login efetuado com sucesso'], (60 * 60 * 7))], 200);
+        $this->helper->message(['user' => $userData['userhash'], 'message' => 'success']);
     }
 
     public function register(): void
