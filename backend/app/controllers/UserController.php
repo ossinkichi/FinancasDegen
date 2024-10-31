@@ -23,6 +23,10 @@ class UserController extends UsersModel
     {
         $this->helper->verifyMethod('GET');
         $data = $this->getAllUser();
+        if (empty($data)){
+            $this->helper->message(['message'=>'nenhum usuario encontrado'],400);
+            return;
+        }
         $this->helper->message(['data' => $data ?? '']);
     }
 

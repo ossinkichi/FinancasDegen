@@ -11,6 +11,13 @@ const Login = () => {
   ): Promise<void> => {
     event.preventDefault();
     try {
+      fetch("https://174bef48-1d86-4312-8eac-ede07fbd236e-00-o3f3t4j7n7tx.picard.replit.dev:8000/user/login", {
+          method: 'OPTIONS',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer token'
+          },
+      }).then(response => console.log("Preflight check:", response));
       const response = await axios.post(
           "https://174bef48-1d86-4312-8eac-ede07fbd236e-00-o3f3t4j7n7tx.picard.replit.dev:8000/user/login",
           { email, password },

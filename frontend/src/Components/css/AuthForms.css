@@ -6,11 +6,12 @@ form{
   margin: 20px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0px 0px 12px rgba(0,43,91, 0.2);
+  box-shadow: 0px 0px 12px rgba(0,43,91, 0.5);
   justify-content: center;
   text-align: center;
   padding: 25px;
   border-radius: 20px;
+  border: solid 1px;
 }
 
 h2{

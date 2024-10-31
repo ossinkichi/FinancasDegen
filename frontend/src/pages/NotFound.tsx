@@ -1,3 +1,5 @@
+import "../Components/css/NotFound.css";
+
 const NotFound = () => {
   return (
     <div>
