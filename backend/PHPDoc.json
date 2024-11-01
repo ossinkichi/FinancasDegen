@@ -1,5 +1,5 @@
 {
-	"usuers": {
+	"user": {
 		"register": {
 			"path": "urlDaPagina/user/register",
 			"method": "POST",
@@ -33,7 +33,7 @@
 
 		"update": {
 			"path": "urlDaPagina/user/update",
-			"method": "POST",
+			"method": "PUT",
 			"description": "Atualizar dados do usuário"
 		},
 
@@ -43,10 +43,15 @@
 			"description": "Desativa a conta do usuário"
 		},
 
-		"getAllUsers": {
+		"/": {
 			"path": "urlDaPagina/user",
-			"method": "GET|POST",
+			"method": "GET",
 			"description": "Busca todos os usuário do banco"
+		},
+		"delete": {
+			"path": "urlDaPagina/user/delete/?user=",
+			"method": "DELETE",
+			"description": "Deleta um usuário do banco"
 		}
 	},
 

@@ -24,13 +24,14 @@ class CompanyController extends CompanyModel
             $company = get_object_vars(json_decode(file_get_contents("php://input")));
 
             if (empty($company['company']) || !isset($company['company'])) {
-                $this->helper->message(['error' => 'Empresa não informada']);
+                $this->helper->message(['error' => 'Empresa não informada'],405);
                 return;
             }
 
             $data = $this->getCompany($company['user']);
+            
             if (empty($data)) {
-                $this->helper->message(['message' => 'Sem dados dessa empresa']);
+                $this->helper->message(['message' => 'Empresa não encontrada'],405);
                 return;
             }
 
@@ -40,7 +41,7 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function register(string $name, string $describe, string $cnpj, int $plan): void
+    public function register(): void
     {
         $this->helper->verifyMethod('POST');
 
@@ -54,17 +55,29 @@ class CompanyController extends CompanyModel
                 'plan' => filter_var($company['plan'], FILTER_SANITIZE_SPECIAL_CHARS)
             ];
 
-            if (empty($companyData)) {
-                $this->helper->message(['error' => 'Data not found'], 405);
+            if($this->setNewCompany($companyData)){
+                $this->helper->message(['message' => 'success new register']);
                 return;
             }
 
-            $this->setNewCompany($companyData);
-            $this->helper->message(['message' => 'success new register']);
+            $this->helper->message(['message' => 'Ocorreu um erro ao cadastrar a empresa'],405);
         } catch (Exception $e) {
             throw new Exception('register of company error' . $e->getMessage());
         }
     }
 
-    public function delete(object $company): void {}
+    public function delete(): void {
+        try{
+            $company = get_object_vars(json_decode(file_get_contents("php://input")));
+
+            if(empty($company['company'])){
+                $this->helper->message(['error' => 'Empresa não informada'],405);
+                return;
+            }
+
+            $this->deleteCompany(strval($company['company']));
+        }catch(Exception $e){
+            throw new Exception( $e->getMessage());
+        }
+    }
 }

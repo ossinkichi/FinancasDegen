@@ -83,17 +83,6 @@ class UserController extends UsersModel
                 'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
             ];
 
-            foreach ($user as $key => $value) {
-                if (empty($value)) {
-                    $filds[] = $key;
-                }
-            }
-
-            if (!empty($filds)) {
-                $this->helper->message(['error' => 'Campo obrigatorio não informado', $filds], 400);
-                return;
-            }
-
             $user['userhash'] = $this->createHash($user['cpf']);
 
             $this->setNewUser($user);

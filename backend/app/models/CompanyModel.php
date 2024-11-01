@@ -58,12 +58,16 @@ class CompanyModel extends ConnectModel
         }
     }
 
-    protected function deleteCompany(string $cnpj)
+    protected function deleteCompany(string $cnpj):array
     {
         try {
             $sql = $this->connect()->prepare('DELETE FROM companies WHERE cnpj = :cnpj');
             $sql->bindValue(':cnpj', $cnpj);
-            $sql->execute();
+            $response = $sql->execute();
+            if($response->rowCount() > 0){
+                return ['status' => true, 'message' => 'Empresa deletada com sucesso'];
+            }
+            return ['status' => true, 'message' => 'Empresa não pode ser deletada'];
         } catch (PDOException $pe) {
             throw new PDOException('DeleteCompany error: ' . $pe->getMessage());
         }
