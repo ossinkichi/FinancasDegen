@@ -9,19 +9,11 @@ use app\models\ConnectModel;
 class ClientModel extends ConnectModel
 {
 
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = $this->connect();
-    }
-
     protected function getAllClientsOfCompany(int $company): array
     {
-        $clients = [];
         try {
 
-            $sql = $this->db->prepare('SELECT * FROM clients WHERE company = :company');
+            $sql = $this->connect()->prepare('SELECT * FROM clients WHERE company = :company');
             $sql->bindValue(':company', $company);
             $sql->execute();
             $clients = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -32,18 +24,37 @@ class ClientModel extends ConnectModel
         }
     }
 
-    protected static function getClientData($client)
+    protected function getClient(array $client): array
     {
-        // try{
-
-        // }catch(PDOException $pe){
-        //   return throw new PDOException("Erro ao buscar o cliente $pe->getMessage()");
-        // }
+        try {
+            $sql = $this->connect()->prepare('SELECT * FROM clients WHERE id = :id, company = :company');
+            $sql->bindValue(':id', $client['id']);
+            $sql->bindValue(':company', $client['company']);
+            if (!$sql->execute()) {
+                return ['status' => 403, 'message' => 'Houve um erro ao buscar os clientes'];
+            }
+            $client = $sql->fetch(PDO::FETCH_ASSOC);
+            return ['status' => 200, 'message' => $client];
+        } catch (PDOException $pe) {
+            return throw new PDOException("Erro ao buscar o cliente" . $pe->getMessage());
+        }
     }
 
-    protected static function setNewClientOfCompany(array $clientData) {}
+    protected function setNewClientOfCompany(array $clientData) {}
 
-    protected static function updateDataClientOfCompany(array $clientData) {}
+    protected function updateDataClientOfCompany(array $clientData) {}
 
-    protected static function deleteClientOfCompany(int $client) {}
+    protected function deleteClientOfCompany(array $client): array
+    {
+        try {
+            $sql = $this->connect()->prepare('DELETE FROM clients WHERE id = :id');
+            $sql->bindValue(':id', $client);
+            if (!$sql->execute()) {
+                return ['status' => 403, 'message' => 'Não foi possivel deletar o cliente'];
+            }
+            return ['status' => 200, 'message' => 'Cliente deletado'];
+        } catch (PDOException $pe) {
+            throw new PDOException("delete error: " . $pe->getMessage());
+        }
+    }
 }

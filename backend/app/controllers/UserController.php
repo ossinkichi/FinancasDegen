@@ -5,7 +5,6 @@ namespace app\controllers;
 use \app\models\UsersModel;
 use app\classes\Helper;
 use app\classes\JwtHelper;
-use Dotenv\Util\Str;
 use Exception;
 
 class UserController extends UsersModel
@@ -23,8 +22,8 @@ class UserController extends UsersModel
     {
         $this->helper->verifyMethod('GET');
         $data = $this->getAllUser();
-        if (empty($data)){
-            $this->helper->message(['message'=>'nenhum usuario encontrado'],400);
+        if (empty($data)) {
+            $this->helper->message(['message' => 'nenhum usuario encontrado'], 400);
             return;
         }
         $this->helper->message(['data' => $data ?? '']);

@@ -82,7 +82,7 @@ class ConnectModel
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
             name VARCHAR(350) NOT NULL, 
             email VARCHAR(220) NOT NULL, 
-            phone INTEGER(11) NOT NULL, 
+            phone VARCHAR(11) NOT NULL, 
             shippingaddress VARCHAR(220), 
             billingaddress VARCHAR(220), 
             company INTEGER,

@@ -9,6 +9,20 @@ use PDOException;
 class CompanyModel extends ConnectModel
 {
 
+    protected function getAllCompanies(): array
+    {
+        try {
+            $sql = $this->connect()->prepare('SELECT * FROM companies');
+            $sql->execute();
+
+            $companies = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            return $companies ?? [];
+        } catch (PDOException $pe) {
+            throw new PDOException('getAllCompanies error: ' . $pe->getMessage());
+        }
+    }
+
     protected function getCompany(int $id): array
     {
         $data = [];
@@ -25,7 +39,7 @@ class CompanyModel extends ConnectModel
         }
     }
 
-    protected function setNewCompany(array $companyData)
+    protected function setNewCompany(array $companyData): array
     {
         try {
             $sql = $this->connect()->prepare('
@@ -36,14 +50,16 @@ class CompanyModel extends ConnectModel
             foreach ($companyData as $key => $value) {
                 $sql->bindValue(':' . $key, $value);
             }
-
-            $sql->execute();
+            if (!$sql->execute()) {
+                return ['status' => 405, 'message' => 'Não foi possivel cadastrar a empresa'];
+            }
+            return ['status' => 200, 'message' => 'Empresa cadastrada com sucesso'];
         } catch (PDOException $pe) {
             throw new PDOException('SetNewCompany error: ' . $pe->getMessage());
         }
     }
 
-    protected function updateTheCompanysPlan(array $companyData)
+    protected function updateTheCompanysPlan(array $companyData): array
     {
         try {
             $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan WHERE cnpj = :cnpj');
@@ -51,23 +67,25 @@ class CompanyModel extends ConnectModel
             foreach ($companyData as $key => $value) {
                 $sql->bindValue(':' . $key, $value);
             }
-
-            $sql->execute();
+            if ($sql->execute()) {
+                return ['status' => 403, 'message' => 'Não foi possivel atualizar o plano'];
+            }
+            return ['status' => 200, 'message' => 'Plano atualizado'];
         } catch (PDOException $pe) {
             throw new PDOException('UpdateTheCompanysPlan error: ' . $pe->getMessage());
         }
     }
 
-    protected function deleteCompany(string $cnpj):array
+    protected function deleteCompany(string $cnpj): array
     {
         try {
             $sql = $this->connect()->prepare('DELETE FROM companies WHERE cnpj = :cnpj');
             $sql->bindValue(':cnpj', $cnpj);
-            $response = $sql->execute();
-            if($response->rowCount() > 0){
-                return ['status' => true, 'message' => 'Empresa deletada com sucesso'];
+
+            if ($sql->execute()) {
+                return ['status' => 200, 'message' => 'Empresa deletada com sucesso'];
             }
-            return ['status' => true, 'message' => 'Empresa não pode ser deletada'];
+            return ['status' => 403, 'message' => 'Empresa não pode ser deletada'];
         } catch (PDOException $pe) {
             throw new PDOException('DeleteCompany error: ' . $pe->getMessage());
         }
