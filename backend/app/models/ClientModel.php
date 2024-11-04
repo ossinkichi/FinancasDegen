@@ -27,7 +27,7 @@ class ClientModel extends ConnectModel
     protected function getClient(array $client): array
     {
         try {
-            $sql = $this->connect()->prepare('SELECT * FROM clients WHERE id = :id, company = :company');
+            $sql = $this->connect()->prepare('SELECT * FROM clients WHERE id = :id AND company = :company');
             $sql->bindValue(':id', $client['id']);
             $sql->bindValue(':company', $client['company']);
             if (!$sql->execute()) {
@@ -40,14 +40,31 @@ class ClientModel extends ConnectModel
         }
     }
 
-    protected function setNewClientOfCompany(array $clientData) {}
+    protected function setNewClientOfCompany(array $clientData)
+    {
+        try {
+            $sql = $this->connect()->prepare('INSERT INTO 
+            clients(name, email, phone, shippingaddress, billingaddress, company) 
+            VALUES(:name, :email, :phone, :shippingaddress, :billingaddress, :company)');
+
+            foreach ($clientData as $key => $value) {
+                $sql->bindValue(':' . $key, $value);
+            }
+            if (!$sql->execute()) {
+                return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente'];
+            }
+            return ['status' => 200, 'message' => 'Cadastro feito com sucesso'];
+        } catch (PDOException $pe) {
+            throw new PDOException("Register client error: " . $pe->getMessage());
+        }
+    }
 
     protected function updateDataClientOfCompany(array $clientData) {}
 
     protected function deleteClientOfCompany(array $client): array
     {
         try {
-            $sql = $this->connect()->prepare('DELETE FROM clients WHERE id = :id');
+            $sql = $this->connect()->prepare('DELETE FROM clients WHERE id = :id AND company = :company');
             $sql->bindValue(':id', $client);
             if (!$sql->execute()) {
                 return ['status' => 403, 'message' => 'Não foi possivel deletar o cliente'];

@@ -118,7 +118,7 @@ class UserController extends UsersModel
 
     public function update()
     {
-        $this->helper->verifyMethod('POST');
+        $this->helper->verifyMethod('PUT');
 
         $data = $_POST;
         $user = [
@@ -143,7 +143,7 @@ class UserController extends UsersModel
 
     public function delete()
     {
-        $this->helper->verifyMethod('GET');
+        $this->helper->verifyMethod('DELETE');
         try {
             $hash = $_GET['user'];
             if (empty($hash) || !isset($hash)) {
