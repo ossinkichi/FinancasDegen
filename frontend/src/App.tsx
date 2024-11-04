@@ -21,7 +21,7 @@ function App() {
           <Route path="/auth" element={<LoginOrRegister />} />
           <Route path="/auth/company" element={<NoCompany />} />
           
-          <Route element={<PrivateRoutes />}>
+          <Route element={<PrivateRoutes requiresAssociation={true} />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
 
