@@ -8,9 +8,9 @@ import { AuthProvider } from "./Components/template/AuthContext";
 // Importando Paginas Para As Rotas
 import Home from "./pages/Home";
 import LoginOrRegister from "./pages/LoginOrRegister";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import NotFound from "./pages/NotFound";
-import NoCompany from "./pages/NoCompany";
+import NoCompany from "./pages/NoCompany/NoCompany";
 
 function App() {
   return (
@@ -20,7 +20,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<LoginOrRegister />} />
           <Route path="/auth/company" element={<NoCompany />} />
-          
+
           <Route element={<PrivateRoutes requiresAssociation={true} />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
