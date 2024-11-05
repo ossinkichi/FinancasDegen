@@ -114,4 +114,22 @@ class UsersModel extends ConnectModel
       throw new PDOException("Erro ao deletar o usuário: " . $pe->getMessage());
     }
   }
+
+  protected function setCompany(int $company, string $hash){
+    try{
+
+      $sql = $this->connect()->prepare('UPDATE users SET company = :company WHERE userhash = :hash');
+      $sql->bindValue(':company', $company);
+      $sql->bindValue(':hash', $hash);
+
+      if(!$sql->execute()){
+        return ["status"=>400, "message"=>"Erro ao entrar na empresa"];
+      }
+
+      return ["status"=>200, "message"=>"Exito ao entrar na empresa"];
+      
+    }catch(PDOException $pe){
+      throw new PDOException("Erro ao entrar na empresa: " . $pe->getMessage());
+    }
+  }
 }

@@ -170,6 +170,10 @@ class UserController extends UsersModel
         $this->helper->verifyMethod('GET');
     }
 
+    public function forgotPassword(){}
+
+    public function joinTheCompany(){}
+    
     private function createHash(string $hash): string
     {
         return hash('sha256', $hash);
