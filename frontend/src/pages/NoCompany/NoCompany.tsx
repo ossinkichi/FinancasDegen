@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import "./NoCompany.css";
 import Header from "../../Components/template/Header";
 import Footer from "../../Components/template/Footer";
+import CompanyForm from "./CompanyForm"
 
 import noCompanyIMG_0 from "../../assets/noCompany.png";
 import noCompanyIMG_1 from "../../assets/noCompany_.png";
@@ -23,7 +24,18 @@ const ImageSwitcher: React.FC = () => {
   return <img src={currentImage} alt="No Company" />;
 };
 
-const NoCompany = () => {
+const NoCompany: React.FC = () => {
+
+  const [content, setContent] = useState("code");
+
+  function changeContent(): void{
+    if(content === "code"){
+      setContent("form");
+    }else if(content === "form"){
+      setContent("code");
+    }
+  }
+  
   return (
     <div className="page-container">
       <Header />
@@ -32,9 +44,7 @@ const NoCompany = () => {
           <ImageSwitcher />
         </div>
         <p className="text-1">Você não está vinculado a nenhuma empresa!</p>
-        <p className="text-1">
-          Insira um codigo de convite ou cadastre uma empresa.
-        </p>
+        <button></button>
         <form className="inviteCode">
           <input type="text" placeholder="Código de Convite" />
           <button type="submit">
