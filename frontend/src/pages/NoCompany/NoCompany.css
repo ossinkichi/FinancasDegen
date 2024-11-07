@@ -1,7 +1,13 @@
+.page-container{
+  position: relative;
+  min-height: 100vh;
+}
+
 .text-1{
   color: #002B5B;
   font-size: 1.8rem;
   font-weight: bold;
+  margin: 0;
 }
 
 .inviteCode{
@@ -32,4 +38,13 @@
 
 .inviteCode button i{
   font-size: 1.8rem;
+}
+
+.no-company-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 200px;
+  position: relative;
 }

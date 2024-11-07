@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-
-import "../../Components/css/NoCompany.css";
+import "./NoCompany.css";
 import Header from "../../Components/template/Header";
 import Footer from "../../Components/template/Footer";
 
@@ -13,29 +12,29 @@ const ImageSwitcher: React.FC = () => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentImage(prevImage => 
-        prevImage === noCompanyIMG_0 ? noCompanyIMG_1 : noCompanyIMG_0
+      setCurrentImage((prevImage) =>
+        prevImage === noCompanyIMG_0 ? noCompanyIMG_1 : noCompanyIMG_0,
       );
     }, 800);
 
     return () => clearInterval(intervalId);
   }, []);
 
-  return (
-    <img src={currentImage} alt="No Company" />
-  );
+  return <img src={currentImage} alt="No Company" />;
 };
 
 const NoCompany = () => {
   return (
-    <>
+    <div className="page-container">
       <Header />
       <div className="no-company-container">
         <div className="img-container">
           <ImageSwitcher />
         </div>
         <p className="text-1">Você não está vinculado a nenhuma empresa!</p>
-        <p className="text-1">Insira um codigo de convite ou cadastre uma empresa.</p>
+        <p className="text-1">
+          Insira um codigo de convite ou cadastre uma empresa.
+        </p>
         <form className="inviteCode">
           <input type="text" placeholder="Código de Convite" />
           <button type="submit">
@@ -44,7 +43,7 @@ const NoCompany = () => {
         </form>
       </div>
       <Footer />
-    </>
+    </div>
   );
 };
 
