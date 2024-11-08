@@ -2,9 +2,9 @@
 
 namespace app\models;
 
-use PDO;
-use PDOException;
 use app\models\ConnectModel;
+use \PDO;
+use \PDOException;
 
 class PlansModel extends ConnectModel
 {

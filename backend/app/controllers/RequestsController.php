@@ -1,19 +1,50 @@
 <?php
 
-namespace App\Controllers;
+namespace app\controllers;
 
-use App\Models\RequestsModel;
+use app\models\RequestsModel;
+use app\Classes\Helper;
+use \Exception;
 
-class RequestsController extends RequestsModel {
+class RequestsController extends RequestsModel
+{
 
-  public function get(){}
-  
-  public function register(){}
+  private Helper $helper;
 
-  public function accept(){}
+  public function __construct()
+  {
+    $this->helper = new Helper;
+  }
 
-  public function reject(){}
+  public function get()
+  {
+    try {
+      $this->helper->verifyMethod('GET');
 
-  public function payInInstallment(){}
-  
+      $client = get_object_vars(json_decode(file_get_contents('php://input')));
+      $requests = $this->helper->sanitizeArray($client);
+
+      $response = $this->getRequest($requests['client']);
+
+      $this->helper->message(['message' => $response['message']], $response['status']);
+    } catch (Exception $e) {
+      throw new Exception($e->getMessage());
+    }
+  }
+
+  public function register()
+  {
+    try {
+      $this->helper->verifyMethod('POST');
+      $datas = get_object_vars(json_decode(file_get_contents('php://input')));
+    } catch (Exception $e) {
+      throw new Exception($e->getMessage());
+    }
+  }
+
+  public function recive() {}
+
+  public function discard() {}
+
+  public function payInInstallment() {}
 }

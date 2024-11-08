@@ -28,7 +28,7 @@ class Helper
     public function sanitizeArray(array $data)
     {
         foreach ($data as $key => $value) {
-            $data[$key] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+            $data[$key] = htmlspecialchars($value);
         }
         return $data;
     }

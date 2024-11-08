@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace app\controllers;
 
 use app\models\PlansModel;
 use app\classes\Helper;
