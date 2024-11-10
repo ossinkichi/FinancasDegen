@@ -37,6 +37,9 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('POST');
       $datas = get_object_vars(json_decode(file_get_contents('php://input')));
+      $request = $this->helper->sanitizeArray($datas);
+
+      $response = $this->setNewRequest($request['client'], $request['prica'], $request['']);
     } catch (Exception $e) {
       throw new Exception($e->getMessage());
     }
