@@ -9,16 +9,19 @@ use app\models\ConnectModel;
 class ClientModel extends ConnectModel
 {
 
-    protected function getAllClientsOfCompany(int $company): array
+    protected function getAllClientsOfCompany(string $company): array
     {
         try {
 
             $sql = $this->connect()->prepare('SELECT * FROM clients WHERE company = :company');
             $sql->bindValue(':company', $company);
-            $sql->execute();
-            $clients = $sql->fetchAll(PDO::FETCH_ASSOC);
 
-            return $clients;
+            if (!$sql->execute()) {
+                return ['status' => 400, 'message' => 'Não foi possivel buscar os clientes'];
+            }
+
+            $clients = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return ['status' => 200, 'message' => $clients ? $clients : []];
         } catch (PDOException $pe) {
             throw new PDOException("Erro ao buscar os clientes" . $pe->getMessage());
         }

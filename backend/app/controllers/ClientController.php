@@ -20,20 +20,22 @@ class ClientController extends ClientModel
     {
         try {
             $this->helper->verifyMethod('GET');
-            $company = get_object_vars(json_decode(file_get_contents("php://input")));
+            $company = $_GET;
 
-            if (empty($company) || !isset($company['cnpj'])) {
+            if (empty($company) || !isset($company['company'])) {
                 $this->helper->message(['message' => 'empresa não informada'], 400);
             }
 
-            $data = $this->getAllClientsOfCompany(htmlspecialchars($company['cnpj']));
-            $clients = $this->helper->sanitizeArray($data);
+            $response = $this->getAllClientsOfCompany($company['company']);
+            if (is_array($response['message'])) {
+                $response['message'] = $this->helper->sanitizeArray($response['message']);
+            }
 
-            if (empty($clients)) {
+            if (empty($response['message'])) {
                 $this->helper->message(['message' => 'Nenhum cliente cadastrado']);
                 return;
             }
-            $this->helper->message(['data' => $clients]);
+            $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

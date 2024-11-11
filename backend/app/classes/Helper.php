@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Classes;
+namespace app\classes;
 
 class Helper
 {
@@ -31,5 +31,10 @@ class Helper
             $data[$key] = htmlspecialchars($value);
         }
         return $data;
+    }
+
+    public function getData(string $input)
+    {
+        return get_object_vars(json_decode($input));
     }
 }

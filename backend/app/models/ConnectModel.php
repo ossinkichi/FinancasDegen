@@ -41,7 +41,6 @@ class ConnectModel
             emailverify BOOL DEFAULT false, 
             password VARCHAR(130) NOT NULL, 
             cpf VARCHAR(11) UNIQUE NOT NULL, 
-            active BOOL DEFAULT false, 
             createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, 
             dateofbirth DATE, 
             gender VARCHAR(10), 
@@ -66,6 +65,7 @@ class ConnectModel
             companydescribe TEXT,
             cnpj VARCHAR(14) UNIQUE NOT NULL, 
             plan INTEGER,
+            active BOOL DEFAULT false, 
             FOREIGN KEY (plan) REFERENCES plans(id)
             );');
             $sql->execute();
@@ -86,7 +86,7 @@ class ConnectModel
             shippingaddress VARCHAR(220), 
             billingaddress VARCHAR(220), 
             company INTEGER,
-            FOREIGN KEY (company) REFERENCES company(id) ON DELETE CASCADE
+            FOREIGN KEY (company) REFERENCES companies(id) ON DELETE CASCADE
             );');
 
             $sql->execute();
@@ -107,7 +107,8 @@ class ConnectModel
             numberofclients INTEGER DEFAULT 25,
             price VARCHAR(10),
             type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
-            promotionprice VARCHAR(10)
+            promotionprice VARCHAR(10),
+            promotionvalidity DATE
             );');
 
             $sql->execute();
@@ -119,10 +120,7 @@ class ConnectModel
     protected function requestTable()
     {
         try {
-            $sql = $this->connect();
-            $database = $this->connect();
-
-            $sql = $database->prepare('CREATE TABLE IF NOT EXISTS requests(
+            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS requests(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
             client INTEGER,
             price VARCHAR(10) NOT NULL,

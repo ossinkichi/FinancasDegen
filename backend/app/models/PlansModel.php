@@ -21,13 +21,17 @@ class PlansModel extends ConnectModel
     }
   }
 
-  protected function setNewPlan(array $dataPlan): void
+  protected function setNewPlan($planname, $plandescribe, $numberofusers, $numberofclients, $price, $type): void
   {
     try {
-      $sql = $this->connect()->prepare('INSERT INTO plan(planname, plandescribe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
-      foreach ($dataPlan as $key => $value) {
-        $sql->bindValue(':' . $key, $value);
-      }
+      $sql = $this->connect()->prepare('INSERT INTO plans(planname, plandescribe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
+      $sql->bindValue(':planname', $planname);
+      $sql->bindValue(':plandescribe', $plandescribe);
+      $sql->bindValue(':numberofusers', $numberofusers);
+      $sql->bindValue(':numberofclients', $numberofclients);
+      $sql->bindValue(':price', $price);
+      $sql->bindValue('type', $type);
+
       $sql->execute();
     } catch (PDOException $pe) {
       throw new PDOException("SetNewPLan error " . $pe);

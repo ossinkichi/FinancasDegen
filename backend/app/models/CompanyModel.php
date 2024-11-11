@@ -23,50 +23,58 @@ class CompanyModel extends ConnectModel
         }
     }
 
-    protected function getCompany(int $id): array
+    protected function getCompany(string $cnpj): array
     {
-        $data = [];
         try {
-            $sql = $this->connect()->prepare('SELECT * FROM companies WHERE  id = :id');
-            $sql->bindParam(':id', $id);
-            $sql->execute();
+            $sql = $this->connect()->prepare('SELECT * FROM companies WHERE  cnpj = :cnpj');
+            $sql->bindParam(':cnpj', $cnpj);
+
+            if (!$sql->execute()) {
+                return ['status' => 403, 'message' => 'Não foi possivel buscar a empresa'];
+            }
+
             $data = $sql->fetch(PDO::FETCH_ASSOC);
-
-
-            return $data;
+            return ['status' => 200, 'message' => $data ? $data : []];
         } catch (PDOException $pe) {
             throw new PDOException('GetCompany error: ' . $pe->getMessage());
         }
     }
 
-    protected function setNewCompany(array $companyData): array
-    {
+    protected function setNewCompany(
+        string $companyname,
+        string $companydescribe,
+        string $cnpj,
+        null|int $plan
+    ): array {
         try {
             $sql = $this->connect()->prepare('
                 INSERT INTO companies (companyname, companydescribe, cnpj, plan) 
                 VALUES (:companyname, :companydescribe, :cnpj, :plan)
             ');
+            $sql->bindValue(':companyname', $companyname);
+            $sql->bindValue(':companydescribe', $companydescribe);
+            $sql->bindValue(':cnpj', $cnpj);
+            $sql->bindValue(':plan', $plan);
 
-            foreach ($companyData as $key => $value) {
-                $sql->bindValue(':' . $key, $value);
-            }
             if (!$sql->execute()) {
                 return ['status' => 405, 'message' => 'Não foi possivel cadastrar a empresa'];
             }
             return ['status' => 200, 'message' => 'Empresa cadastrada com sucesso'];
         } catch (PDOException $pe) {
+            if ($pe->getCode() == 23000) {
+                return ['status' => 403, 'message' => 'Empresa já cadastrado, para ingressar na empresa peça permissão ao administrador da mesma!'];
+            }
             throw new PDOException('SetNewCompany error: ' . $pe->getMessage());
         }
     }
 
-    protected function updateTheCompanysPlan(array $companyData): array
+    protected function updateTheCompanysPlan(string $cnpj, int $plan): array
     {
         try {
             $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan WHERE cnpj = :cnpj');
+            $sql->bindValue(':plan', $plan);
+            $sql->bindValue(':cnpj', $cnpj);
 
-            foreach ($companyData as $key => $value) {
-                $sql->bindValue(':' . $key, $value);
-            }
             if ($sql->execute()) {
                 return ['status' => 403, 'message' => 'Não foi possivel atualizar o plano'];
             }

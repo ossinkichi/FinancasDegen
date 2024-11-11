@@ -14,33 +14,37 @@ class UsersModel extends ConnectModel
   {
     try {
       $sql = $this->connect()->prepare('SELECT * FROM users');
-      $sql->execute();
+
+      if (!$sql->execute()) {
+        return ['status' => 403, 'message' => 'Não foi possivel buscar os dados'];
+      }
 
       $data = $sql->fetchAll(PDO::FETCH_ASSOC);
-
-      return $data;
+      return ['status' => 200, 'message' => $data ? $data : []];
     } catch (PDOException $pe) {
       throw new PDOException("Erro ao buscar o usuário " . $pe->getMessage());
     }
   }
 
-  protected function getUser(string $user): array|false
+  protected function getUser(string $user): array
   {
     $data = [];
     try {
       $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
       $sql->bindValue(':user', $user);
-      $sql->execute();
+
+      if (!$sql->execute()) {
+        return ['status' => 403, 'message' => "Não foi possivel buscar o usuário"];
+      }
 
       $data = $sql->fetch(PDO::FETCH_ASSOC);
-
-      return $data;
+      return ['status' => 200, 'message' => $data ? $data : []];
     } catch (PDOException $pe) {
       throw new PDOException("Erro ao buscar usuário " . $pe->getMessage());
     }
   }
 
-  protected function setNewUser(array $data)
+  protected function setNewUser(array $data): array
   {
     try {
 
@@ -55,49 +59,62 @@ class UsersModel extends ConnectModel
         $sql->bindValue(':' . $key, $data[$key]);
       }
 
-      $sql->execute();
+      if (!$sql->execute()) {
+        return ['status' => 403, 'message' => 'Não foi possivel cadastrar o usuario'];
+      }
+      return ['status' => 200, 'message' => 'Usuário cadastrado'];
     } catch (PDOException $pe) {
+      if ($pe->getCode() == 23000) {
+        return ['status' => 400, 'message' => 'Não foi possivel cadastrar o usuario, '];
+      }
       throw new PDOException("Erro ao criar o usuário: " . $pe->getMessage());
     }
   }
 
-  protected function updateDataUser(array $data)
-  {
+  protected function updateDataUser(
+    string $name,
+    string $email,
+    string $password,
+    $dateofbirth,
+    string $gender,
+    string $phone,
+    string $hash
+  ): array {
     try {
 
-      $sql = $this->connect()->prepare('UPDATE users SET hash = :hash name = :name, email = :email, password = :password, cpf = :cpf, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE id = :id OR userhash = :userhash');
+      $sql = $this->connect()->prepare('UPDATE users SET name = :name, email = :email, password = :password, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE userhash = :hash');
+      $sql->bindValue(':name', $name);
+      $sql->bindValue(':email', $email);
+      $sql->bindValue(':password', password_hash($password, PASSWORD_DEFAULT));
+      $sql->bindValue(':dateofbirth', $dateofbirth);
+      $sql->bindValue(':gender', $gender);
+      $sql->bindValue(':phone', $phone);
+      $sql->bindValue(':hash', $hash);
 
-      $sql->bindValue(':name', $data['name']);
-      $sql->bindValue(':email', $data['email']);
-      $sql->bindValue(':password', password_hash($data['password'], PASSWORD_DEFAULT));
-      $sql->bindValue(':cpf', $data['cpf']);
-      $sql->bindValue(':dateofbirth', $data['dateofbirth']);
-      $sql->bindValue(':gender', $data['gender']);
-      $sql->bindValue(':phone', $data['phone']);
-      $sql->bindValue(':hash', $data['hash']);
-      $sql->bindValue(':id', $data['id']);
-
-      if ($sql->execute()) {
-        return true;
-      } else {
-        return false;
+      if (!$sql->execute()) {
+        return ['status' => 403, 'message' => 'Não foi possivel atualizar os dados do cliente'];
       }
+      return ['status' => 200, 'message' => 'Dados atualizados'];
     } catch (PDOException $pe) {
+      if ($pe->getCode() == 23000) {
+        return ['status' => 403, 'message' => 'Não foi possivel atualizar os dados do cliente'];
+      }
       throw new PDOException("Erro ao atualizar usuário: " . $pe->getMessage());
     }
   }
 
-  protected function activateAccount(string $hash) {}
-
-  protected function desactivateAccount(string $hash)
+  protected function activateAccount(string $hash): array
   {
     try {
 
-      $sql = $this->connect()->prepare('UPDATE users set active = :value WHERE userhash = :hash');
-      $sql->bindValue(':value', false);
+      $sql = $this->connect()->prepare('UPDATE users set emailverify = :value WHERE userhash = :hash');
+      $sql->bindValue(':value', true);
       $sql->bindValue(':hash', $hash);
 
-      $sql->execute();
+      if (!$sql->execute()) {
+        return ['satus' => 400, 'message' => 'Não foi possivel ingressar na empresa'];
+      }
+      return ['status' => 200, 'message' => 'Você ingressou na empresa com sucesso'];
     } catch (PDOException $pe) {
       throw new PDOException("Erro ao desativar usuário: " . $pe->getMessage());
     }
@@ -115,21 +132,40 @@ class UsersModel extends ConnectModel
     }
   }
 
-  protected function setCompany(int $company, string $hash){
-    try{
+  protected function setCompany(int $company, string $hash)
+  {
+    try {
 
       $sql = $this->connect()->prepare('UPDATE users SET company = :company WHERE userhash = :hash');
       $sql->bindValue(':company', $company);
       $sql->bindValue(':hash', $hash);
 
-      if(!$sql->execute()){
-        return ["status"=>400, "message"=>"Erro ao entrar na empresa"];
+      if (!$sql->execute()) {
+        return ["status" => 400, "message" => "Erro ao entrar na empresa"];
       }
 
-      return ["status"=>200, "message"=>"Exito ao entrar na empresa"];
-      
-    }catch(PDOException $pe){
+      return ["status" => 200, "message" => "Exito ao entrar na empresa"];
+    } catch (PDOException $pe) {
+      if ($pe->getCode() == 23000) {
+        return ["status" => 400, "message" => "Erro ao entrar na empresa"];
+      }
       throw new PDOException("Erro ao entrar na empresa: " . $pe->getMessage());
+    }
+  }
+
+  protected function setNewPassword(string $hash, string $password)
+  {
+    try {
+      $sql = $this->connect()->prepare('UPDATE users SET password = :password WHERE userhash = :hash');
+      $sql->bindValue(':password', password_hash($password, PASSWORD_DEFAULT));
+      $sql->bindValue(':hash', $hash);
+
+      if (!$sql->execute()) {
+        return ['status' => 400, 'message' => 'Não foi possivel atualizar a senha'];
+      }
+      return ['status' => 200, 'message' => 'Senha atualizada'];
+    } catch (PDOException $pe) {
+      throw new PDOException('' . $pe->getMessage());
     }
   }
 }

@@ -9,7 +9,7 @@ use Exception;
 class PlansController extends PlansModel
 {
 
-    private object $helper;
+    private Helper $helper;
 
     public function __construct()
     {
@@ -36,30 +36,16 @@ class PlansController extends PlansModel
     public function register()
     {
         $this->helper->verifyMethod('POST');
-        $data = $_POST;
+        $plan = file_get_contents("php://input");
+        $plan = $this->helper->getData($plan);
+        $plan = $this->helper->sanitizeArray($plan);
 
-        $plan = [
-            'planname' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'plandescribe' => filter_var($data['describe'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'numberofusers' => filter_var($data['price'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'numberofclients' => filter_var($data['numberofusers'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'price' => filter_var($data['numberofclients'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'type' => filter_var($data['type'], FILTER_SANITIZE_SPECIAL_CHARS),
-        ];
-
-        foreach ($plan as $key => $value) {
-            if (empty($value)) {
-                $this->helper->message(['error' => 'Campo obrigatorio não informado'], 400);
-                return;
-            }
-        }
-
-        if ($plan['typer'] != 'anual' || $plan['typer'] != 'mensal') {
+        if ($plan['type'] !== "anual" && $plan['type'] !== "mensal") {
             $this->helper->message(['error' => 'Tipo de plano invalido'], 400);
             return;
         }
 
-        $this->setNewPlan($plan);
+        $this->setNewPlan($plan['name'], $plan['describe'], $plan['users'], $plan['clients'], $plan['price'], $plan['type']);
         $this->helper->message(['message' => 'success']);
     }
 

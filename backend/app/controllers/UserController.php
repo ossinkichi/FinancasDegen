@@ -2,15 +2,15 @@
 
 namespace app\controllers;
 
-use \app\models\UsersModel;
+use app\models\UsersModel;
 use app\classes\Helper;
 use app\classes\JwtHelper;
-use Exception;
+use \Exception;
 
 class UserController extends UsersModel
 {
-    private object $helper;
-    private $jwt;
+    private Helper $helper;
+    private JwtHelper $jwt;
 
     public function __construct()
     {
@@ -18,7 +18,7 @@ class UserController extends UsersModel
         $this->jwt =  new JwtHelper;
     }
 
-    public function index()
+    public function index(): void
     {
         $this->helper->verifyMethod('GET');
         $data = $this->getAllUser();
@@ -33,44 +33,37 @@ class UserController extends UsersModel
     {
 
         $this->helper->verifyMethod('POST');
-        $data = get_object_vars(json_decode(file_get_contents("php://input")));
+        $data = file_get_contents("php://input");
+        $data = $this->helper->getData($data);;
 
         $user = [
-            'user' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
+            'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
             'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
-        foreach ($user as $key) {
-            if (empty($key)) {
-                $this->helper->message(['message' => 'O campo obrigatorio não preenchido'], 400);
-                return;
-            }
-        }
 
-        $userData = $this->getUser($user['user']);
-
-        if (empty($userData)) {
+        $response = $this->getUser($user['email']);
+        if (empty($response['message'])) {
             $this->helper->message(['message' => 'Usuário não encontrado'], 404);
             return;
         }
+        if ($response['status'] == 200) {
+            $response['message'] = $this->helper->sanitizeArray($response['message']);
+        }
 
-        if (!isset($userData['active']) || empty($userData) && !empty($userData['company'])) {
-            $this->helper->message(['error' => 'Usuário está com a conta inativa ou inexistente'], 403);
-            return;
-        };
-
-        if (!password_verify($user['password'], $userData['password'])) {
+        if (!password_verify($user['password'], $response['message']['password'])) {
             $this->helper->message(['message' => 'Senha ou usuário incorreta'], 401);
             return;
         }
 
-        $this->helper->message(['user' => $userData['userhash'], 'message' => 'success']);
+        $this->helper->message(['message' => $response['message']['userhash']], $response['status']);
     }
 
     public function register(): void
     {
         $this->helper->verifyMethod('POST');
         try {
-            $data =  get_object_vars(json_decode(file_get_contents("php://input")));
+            $data =  file_get_contents("php://input");
+            $data = $this->helper->getData($data);
 
             $user = [
                 'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
@@ -84,8 +77,8 @@ class UserController extends UsersModel
 
             $user['userhash'] = $this->createHash($user['cpf']);
 
-            $this->setNewUser($user);
-            $this->helper->message(['message' => 'success']);
+            $reponse = $this->setNewUser($user);
+            $this->helper->message(['message' => $reponse['message']], $reponse['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -104,7 +97,7 @@ class UserController extends UsersModel
             };
             $userData = $this->getUser($hash);
 
-            // if (!$userData['active']) {
+            // if (!$userData['emailverify']) {
             //     http_response_code(403);
             //     echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
             //     return;
@@ -116,20 +109,20 @@ class UserController extends UsersModel
         }
     }
 
-    public function update()
+    public function update(): void
     {
         $this->helper->verifyMethod('PUT');
 
-        $data = $_POST;
+        $data = file_get_contents('php://input');
+        $data = $this->helper->getData($data);
         $user = [
-            'userhash' => filter_var(json_decode($data['hash']), FILTER_SANITIZE_SPECIAL_CHARS),
-            'name' => filter_var(json_decode($data['name']), FILTER_SANITIZE_SPECIAL_CHARS),
-            'email' => filter_var(json_decode($data['email']), FILTER_SANITIZE_EMAIL),
-            'password' => filter_var(json_decode($data['password']), FILTER_SANITIZE_SPECIAL_CHARS),
-            'cpf' => filter_var(json_decode($data['cpf']), FILTER_SANITIZE_SPECIAL_CHARS),
-            'dateofbirth' => json_decode($data['dateofbirth']),
-            'gender' => filter_var(json_decode($data['gender']), FILTER_SANITIZE_SPECIAL_CHARS),
-            'phone' => filter_var(json_decode($data['phone']), FILTER_SANITIZE_SPECIAL_CHARS)
+            'userhash' => filter_var($data['hash'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
+            'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'dateofbirth' => $data['dateofbirth'],
+            'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
+            'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
 
         if (empty($user)) {
@@ -137,11 +130,11 @@ class UserController extends UsersModel
             return;
         }
 
-        $this->updateDataUser($user);
-        $this->helper->message(['message' => 'success']);
+        $response = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $data['hash']);
+        $this->helper->message(['message' => $response['message']], $response['status']);
     }
 
-    public function delete()
+    public function delete(): void
     {
         $this->helper->verifyMethod('DELETE');
         try {
@@ -156,24 +149,61 @@ class UserController extends UsersModel
         }
     }
 
-    public function activated()
+    public function forgotPassword(): void
     {
-        $this->helper->verifyMethod('GET');
         try {
+            $this->helper->verifyMethod('PUT');
+            $data = file_get_contents('php://input');
+            $data = $this->helper->getData($data);
+
+            if (empty($data) || !isset($data['user']) || empty($data['password'])) {
+                $this->helper->message(['message' => 'Dados não informados'], 403);
+                return;
+            };
+
+            $response = $this->setNewPassword($data['user'], $data['password']);
+            $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
-            $this->helper->message(['error' => $e->getMessage()]);
+            throw new Exception($e->getMessage());
         }
     }
 
-    public function desactivate()
+    public function join(): void
     {
-        $this->helper->verifyMethod('GET');
+        try {
+            $this->helper->verifyMethod('GET');
+            $data = $_GET;
+
+            if (empty($data) || !isset($data['user']) || !isset($data['company'])) {
+                $this->helper->message(['message' => 'Dados não informados']);
+                return;
+            }
+
+            $response = $this->setCompany(intval($data['company']), $data['user']);
+            $this->helper->message(['message' => $response['message']], $response['status']);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 
-    public function forgotPassword(){}
+    public function active(): void
+    {
+        try {
+            $this->helper->verifyMethod('GET');;
+            $data = $_GET;
 
-    public function joinTheCompany(){}
-    
+            if (empty($data) && !isset($data['user'])) {
+                $this->helper->message(['message' => 'Usuário não informado'], 403);
+                return;
+            }
+
+            $response = $this->activateAccount($data['user']);
+            $this->helper->message(['message' => $response['message']], $response['status']);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
     private function createHash(string $hash): string
     {
         return hash('sha256', $hash);

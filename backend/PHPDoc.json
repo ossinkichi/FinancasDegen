@@ -5,13 +5,13 @@
 			"method": "POST",
 			"descripton": "Registra um novo usuário",
 			"data": {
-				"name": "",
-				"email": "",
-				"password": "",
-				"cpf": "",
-				"dateofbirth": "",
-				"gender": "",
-				"phone": ""
+				"name": "string",
+				"email": "string",
+				"password": "string",
+				"cpf": "string",
+				"dateofbirth": "date",
+				"gender": "string",
+				"phone": "string"
 			}
 		},
 
@@ -20,8 +20,8 @@
 			"method": "POST",
 			"description": "Realiza o login de um usuário",
 			"data": {
-				"email": "",
-				"password": ""
+				"email": "string",
+				"password": "string"
 			}
 		},
 
@@ -34,13 +34,22 @@
 		"update": {
 			"path": "urlDaPagina/user/update",
 			"method": "PUT",
-			"description": "Atualizar dados do usuário"
+			"description": "Atualizar dados do usuário",
+			"data": {
+				"name": "string",
+				"email": "string",
+				"password": "string",
+				"dateofbirth": "date",
+				"gender": "string",
+				"phone": "string",
+				"hash": "string"
+			}
 		},
 
-		"desactivate": {
-			"path": "urlDaPagina/user/desactivateAccount/hashdousuario",
+		"activate": {
+			"path": "urlDaPagina/user/desactivateAccount?user=",
 			"method": "GET",
-			"description": "Desativa a conta do usuário"
+			"description": "Ativa a conta do usuário"
 		},
 
 		"/": {
@@ -48,18 +57,71 @@
 			"method": "GET",
 			"description": "Busca todos os usuário do banco"
 		},
+
 		"delete": {
 			"path": "urlDaPagina/user/delete/?user=",
 			"method": "DELETE",
 			"description": "Deleta um usuário do banco"
+		},
+
+		"join": {
+			"path": "urlDaPagina/user/join/?user=&company=",
+			"method": "GET",
+			"description": "Deleta um usuário do banco"
+		},
+
+		"forgot Password": {
+			"path": "urlDaPagina/user/forgotPassword",
+			"method": "PUT",
+			"description": "Atualizar a senha do usuário",
+			"data": {
+				"user": "string",
+				"password": "string"
+			}
 		}
 	},
 
-	"companies": {},
+	"companies": {
+		"All companies": {
+			"path": "urlDaPagina/company",
+			"method": "GET",
+			"descripton": "Resgata todas as empresas"
+		},
+		"register": {
+			"path": "localhost:8000/company/register",
+			"method": "POST",
+			"descripton": "registrar a empresa",
+			"data": {
+				"name": "string",
+				"describe": "string",
+				"cnpj": "string",
+				"plan": "number"
+			}
+		},
+		"get companby": {
+			"path": "localhost:8000/company/get?cnpj=",
+			"method": "GET",
+			"descripton": "Pega os dados de uma empresa em especifica"
+		},
+		"delete": {
+			"path": "localhost:8000/company/get?cnpj=",
+			"method": "DELETE",
+			"descripton": "Deleta uma empresa em especifica"
+		},
+		"update plan": {
+			"path": "localhost:8000/company/plan",
+			"method": "PUT",
+			"descripton": "Atualiza o plano de uma empresa em especifica",
+			"data": {
+				"plan": "int",
+				"cnpj": "string"
+			}
+		}
+	},
 
 	"plans": {
-		"push": {
-			"path": "urlDaPagina/plans/",
+		"All plans": {
+			"path": "urlDaPagina/plans",
 			"method": "GET",
 			"descripton": "Resgata todos os planos"
 		},
