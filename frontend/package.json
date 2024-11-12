@@ -11,6 +11,7 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "axios": "^1.7.7",
+    "http-proxy-middleware": "^3.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
@@ -45,5 +46,6 @@
   "devDependencies": {
     "@types/http-proxy-middleware": "^1.0.0",
     "@types/react-router-dom": "^5.3.3"
-  }
+  },
+  "proxy": "https://2cae765b-838b-40b0-92ee-603295810c20-00-2h6t6s6eo3ctx.riker.replit.dev:8000"
 }

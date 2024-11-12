@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./css/AuthForms.css";
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -12,23 +13,23 @@ const Login = () => {
     event.preventDefault();
     try {
       const response = await axios.post(
-          "/user/login",
-          { email, password },
-          { headers: { "Content-Type": "application/json" } }
-        );
-      
-      if(response.data.status === "success"){
-        console.log(response)
+        "/user/login",
+        { email, password },
+        { headers: { "Content-Type": "application/json" } },
+      );
+
+      if (response.status === 200) {
+        navigate("/dashboard");
       }
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       if (error.response) {
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
       } else {
         showError(error.message);
-        console.log(error)
+        console.log(error);
       }
     }
   };

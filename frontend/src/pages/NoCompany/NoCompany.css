@@ -1,16 +1,27 @@
-.page-container{
+.page-container {
   position: relative;
   min-height: 100vh;
 }
 
-.text-1{
+.text-1 {
   color: #002B5B;
   font-size: 1.8rem;
   font-weight: bold;
   margin: 0;
+  user-select: none;
 }
 
-.inviteCode{
+.text-button {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.text-button:hover {
+  color: green;
+  transform: scale(1, 3) !important;
+}
+
+.inviteCode {
   display: flex;
   flex-direction: row;
   width: 400px;
@@ -19,7 +30,7 @@
   box-shadow: none;
 }
 
-.inviteCode input{
+.inviteCode input {
   width: 300px;
   height: 30px;
   margin: 0;
@@ -28,7 +39,7 @@
   text-align: center;
 }
 
-.inviteCode button{
+.inviteCode button {
   padding: 0;
   margin: 0;
   width: 100px;
@@ -36,15 +47,15 @@
   border-radius: 0;
 }
 
-.inviteCode button i{
+.inviteCode button i {
   font-size: 1.8rem;
 }
 
-.no-company-container{
+.no-company-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 200px;
+  padding-bottom: 250px;
   position: relative;
 }

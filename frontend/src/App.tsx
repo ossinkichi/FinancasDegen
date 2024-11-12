@@ -7,7 +7,7 @@ import { AuthProvider } from "./Components/template/AuthContext";
 
 // Importando Paginas Para As Rotas
 import Home from "./pages/Home";
-import LoginOrRegister from "./pages/LoginOrRegister";
+import LoginOrRegister from "./pages/Auth/LoginOrRegister";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import NotFound from "./pages/NotFound";
 import NoCompany from "./pages/NoCompany/NoCompany";

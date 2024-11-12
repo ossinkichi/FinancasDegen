@@ -1,0 +1,77 @@
+.register-company-form {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid;
+  border-radius: 20px;
+  box-shadow: 0px 0px 12px rgba(0,43,91, 0.5);
+}
+
+form {
+  width: auto;
+}
+
+.register-company-form h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.form-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+  .form-inline {
+    flex-direction: column;
+  }
+
+  .form-group input {
+    font-size: 13px;
+  }
+
+  .register-company-form {
+    padding: 15px;
+  }
+
+  .submit-button {
+    font-size: 15px;
+  }
+}
