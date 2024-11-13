@@ -85,6 +85,7 @@ class ConnectModel
             phone VARCHAR(11) NOT NULL, 
             shippingaddress VARCHAR(220), 
             billingaddress VARCHAR(220), 
+            gender TEXT,
             company VARCHAR(14),
             FOREIGN KEY (company) REFERENCES companies(cnpj) ON DELETE CASCADE
             );');

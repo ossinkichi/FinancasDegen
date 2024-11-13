@@ -114,6 +114,10 @@ class UserController extends UsersModel
         $this->helper->verifyMethod('PUT');
 
         $data = file_get_contents('php://input');
+        if (empty($user)) {
+            $this->helper->message(['error' => 'campo obrigatorio não informado'], 400);
+            return;
+        }
         $data = $this->helper->getData($data);
         $user = [
             'userhash' => filter_var($data['hash'], FILTER_SANITIZE_SPECIAL_CHARS),
@@ -124,11 +128,6 @@ class UserController extends UsersModel
             'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
             'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
-
-        if (empty($user)) {
-            $this->helper->message(['error' => 'campo obrigatorio não informado'], 400);
-            return;
-        }
 
         $response = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $data['hash']);
         $this->helper->message(['message' => $response['message']], $response['status']);

@@ -162,6 +162,18 @@
 			"path": "localhost:8000/client/delete?client=",
 			"method": "DELETE",
 			"descripton": "Deleta um cliente em especifica"
+		},
+		"update": {
+			"path": "urlDaPagina/user/update",
+			"method": "PUT",
+			"description": "Atualizar dados do usuário",
+			"data": {
+				"name": "string",
+				"email": "string",
+				"gender": "string",
+				"phone": "string",
+				"hash": "string"
+			}
 		}
 	},
 

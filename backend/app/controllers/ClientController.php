@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace app\controllers;
 
 use app\models\ClientModel;
 use app\Classes\Helper;
@@ -48,17 +48,14 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('POST');
 
-            $data = get_object_vars(json_decode(file_get_contents("php://input")));
-            $client = [
-                'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-                'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'shippingaddress' => filter_var($data['shippingaddress'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'billingaddress' => filter_var($data['billingaddress'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'company' => filter_var($data['company'], FILTER_SANITIZE_NUMBER_INT)
-            ];
+            $client = file_get_contents("php://input");
+            if (empty($client)) {
+                $this->helper->message(['message' => 'Dados não informado'], 400);
+            }
 
-            $response = $this->setNewClientOfCompany($client);
+            $client = $this->helper->getData($client);
+
+            $response = $this->setNewClientOfCompany($client['company'], $client['name'], $client['email'], $client['phone'], $client['gender'], $client['shippingaddress'], $client['billingaddress']);
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -118,14 +115,14 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('PUT');
             $data = file_get_contents("php://input");
-            $data = $this->helper->getData($data);
 
-            if (empty($data) || !isset($data['client'])) {
+            if (empty($data)) {
                 $this->helper->message(['message' => 'Dados não informados'], 400);
                 return;
             }
 
-            $response = $this->updateDataClientOfCompany($data);
+            $data = $this->helper->getData($data);
+            $response = $this->updateDataClientOfCompany($data['id'], $data['name'], $data['email'], $data['phone'], $data['gender'], $data['shippingaddress'], $data['billingaddress']);
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
