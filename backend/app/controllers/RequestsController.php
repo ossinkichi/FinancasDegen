@@ -21,10 +21,24 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('GET');
 
-      $client = get_object_vars(json_decode(file_get_contents('php://input')));
-      $requests = $this->helper->sanitizeArray($client);
+      $client = $_GET;
+      
+      if(empty($client['client']) || !isset($client['client'])){
+        $this->helper->message(['message' => 'Cliente não informado'],403);
+        return;
+      }
 
-      $response = $this->getRequest($requests['client']);
+      $response = $this->getRequest($client['client']);
+
+      if(is_array($response['message'])){
+        foreach($response['message'] as $key => $value){
+        $response['message'][$key] = $this->helper->sanitizetArray($response['message'][$key]);
+        }
+      }
+
+      if(empty($response['message'])){
+        $response['message'] = 'O cliente não possui nenhum boleto';
+      }
 
       $this->helper->message(['message' => $response['message']], $response['status']);
     } catch (Exception $e) {
@@ -36,10 +50,17 @@ class RequestsController extends RequestsModel
   {
     try {
       $this->helper->verifyMethod('POST');
-      $datas = get_object_vars(json_decode(file_get_contents('php://input')));
+      $datas = file_get_contents('php://input');
+      
+      if(empty($datas)){
+        $this->helper->message(['message' => 'Informações incompletas'],403);
+        return;
+      }
+        
+      $datas = $this->helper->getData($datas);
       $request = $this->helper->sanitizeArray($datas);
 
-      $response = $this->setNewRequest($request['client'], $request['prica'], $request['installments']);
+      $response = $this->setNewRequest($request['client'], $request['price'], $request['installments']);
       $this->helper->message(['message' => $response['message']], $response['status']);
     } catch (Exception $e) {
       throw new Exception($e->getMessage());
@@ -50,10 +71,16 @@ class RequestsController extends RequestsModel
   {
     try {
       $this->helper->verifyMethod('GET');
-      $request = get_object_vars(json_decode(file_get_contents("php://input")));
+      $request = $_GET;
+
+      if(empty($request['account']) || !isset($request['account'])){
+        $this->helper->message(['message' => 'Pedido não informado'],403);
+        return;
+      }
+      
       $request = $this->helper->sanitizeArray($request);
 
-      $response = $this->updateStatus($request['id'], 'Acceito');
+      $response = $this->updateStatus($request['account'], 'Aceito');
       $this->helper->message(['message' => $response['message']], $response['status']);
     } catch (Exception $e) {
       throw new Exception($e->getMessage());
@@ -64,10 +91,14 @@ class RequestsController extends RequestsModel
   {
     try {
       $this->helper->verifyMethod('GET');
-      $request = get_object_vars(json_decode(file_get_contents("php://input")));
+      $request = $_GET;
+      if(empty($request['account']) || !isset($request['account'])){
+        $this->helper->message(['message' => 'Pedido não informado'],403);
+        return;
+      }
       $request = $this->helper->sanitizeArray($request);
 
-      $response = $this->updateStatus($request['id'], 'Recusado');
+      $response = $this->updateStatus($request['account'], 'Recusado');
       $this->helper->message(['message' => $response['message']], $response['status']);
     } catch (Exception $e) {
       throw new Exception($e->getMessage());
@@ -79,6 +110,13 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('PUT');
 
+      $request = file_get_contents('php://input');
+
+      if(empty($request)){
+        $this->helper->message(['message'=>'Nenhum dado informado'],403);
+        return;
+      }
+      
       $request = $this->helper->getData();
       $request = $this->helper->sanitizeArray($request);
 
