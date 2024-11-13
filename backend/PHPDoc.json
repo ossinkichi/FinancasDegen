@@ -140,7 +140,30 @@
 		}
 	},
 
-	"clients": {},
+	"clients": {
+		"register": {
+			"path": "urlDaPagina/client/register",
+			"method": "POST",
+			"descripton": "Registra um novo cliente",
+			"data": {
+				"name": "string",
+				"gender": "string",
+				"phone": "string",
+				"shippingaddress": "string",
+				"billingaddress": "string"
+			}
+		},
+		"get client": {
+			"path": "localhost:8000/client/get?company=",
+			"method": "GET",
+			"descripton": "Pega os clientes de uma empresa em especifica"
+		},
+		"delete": {
+			"path": "localhost:8000/client/delete?client=",
+			"method": "DELETE",
+			"descripton": "Deleta um cliente em especifica"
+		}
+	},
 
 	"accounts": {}
 }

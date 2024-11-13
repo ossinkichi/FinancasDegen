@@ -58,16 +58,19 @@ class ClientModel extends ConnectModel
             }
             return ['status' => 200, 'message' => 'Cadastro feito com sucesso'];
         } catch (PDOException $pe) {
+            if ($pe->getCode() == 23000) {
+                return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente'];
+            }
             throw new PDOException("Register client error: " . $pe->getMessage());
         }
     }
 
     protected function updateDataClientOfCompany(array $clientData) {}
 
-    protected function deleteClientOfCompany(array $client): array
+    protected function deleteClientOfCompany(int $client): array
     {
         try {
-            $sql = $this->connect()->prepare('DELETE FROM clients WHERE id = :id AND company = :company');
+            $sql = $this->connect()->prepare('DELETE FROM clients WHERE id = :id');
             $sql->bindValue(':id', $client);
             if (!$sql->execute()) {
                 return ['status' => 403, 'message' => 'Não foi possivel deletar o cliente'];

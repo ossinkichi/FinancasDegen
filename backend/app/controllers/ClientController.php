@@ -9,7 +9,7 @@ use \Exception;
 class ClientController extends ClientModel
 {
 
-    private object $helper;
+    private Helper $helper;
 
     public function __construct()
     {
@@ -28,7 +28,9 @@ class ClientController extends ClientModel
 
             $response = $this->getAllClientsOfCompany($company['company']);
             if (is_array($response['message'])) {
-                $response['message'] = $this->helper->sanitizeArray($response['message']);
+                foreach ($response['message'] as $key => $value) {
+                    $response['message'][$key] = $this->helper->sanitizeArray($response['message'][$key]);
+                }
             }
 
             if (empty($response['message'])) {
@@ -68,13 +70,25 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('GET');
 
-            $client = get_object_vars(json_decode(file_get_contents("php://input")));
+            $client = $_GET;
 
-            if (empty($client) || !isset($client["id"]) || !isset($client['company'])) {
+            if (empty($client) || !isset($client["id"]) || !isset($client['company']) || empty($client["id"]) || empty($client['company'])) {
                 $this->helper->message(['message' => 'Cliente não informado'], 400);
+                return;
             }
 
-            $this->getClient($client);
+            $response = $this->getClient($client);
+
+            if (empty($response['message'])) {
+                $this->helper->message(['message' => 'Nenhum dado encontrado!'], 400);
+                return;
+            }
+
+            if (is_array($response['message'])) {
+                $response['message'] = $this->helper->sanitizeArray($response['message']);
+            }
+
+            $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -85,16 +99,14 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('DELETE');
 
-            $client = get_object_vars(json_decode(file_get_contents("php://input")));
+            $client = $_GET;
 
-            if (empty($client) || !isset($client['client'])) {
+            if (empty($client) || !isset($client['client']) || empty($client['client'])) {
                 $this->helper->message(['message' => 'Cliente não informado'], 400);
                 return;
             }
 
-            $client = $this->helper->sanitizeArray($client);
-            $response = $this->deleteClientOfCompany($client);
-
+            $response = $this->deleteClientOfCompany($client['client']);
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -105,7 +117,8 @@ class ClientController extends ClientModel
     {
         try {
             $this->helper->verifyMethod('PUT');
-            $data = get_object_vars(json_decode(file_get_contents("php://input")));
+            $data = file_get_contents("php://input");
+            $data = $this->helper->getData($data);
 
             if (empty($data) || !isset($data['client'])) {
                 $this->helper->message(['message' => 'Dados não informados'], 400);
