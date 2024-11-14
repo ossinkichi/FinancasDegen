@@ -20,20 +20,26 @@ class PlansController extends PlansModel
     {
         $this->helper->verifyMethod('GET');
         try {
-            $plans = $this->getPlans();
+            $response = $this->getPlans();
 
-            if (empty($plans)) {
+            if (empty($response['message'])) {
                 $this->helper->message(['message' => 'nenhum plano encontrado'], 400);
                 return;
             }
 
-            $this->helper->message(['message' => 'success', 'data' => $plans]);
+            if (is_array($response['message'])) {
+                foreach ($response['message'] as $key => $value) {
+                    $response['message'][$key] = $this->helper->sanitizeArray($response['message'][$key]);
+                }
+            }
+
+            $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception('Planos não encontrados: ' . $e->getMessage(), 404);
         }
     }
 
-    public function register()
+    public function register(): void
     {
         $this->helper->verifyMethod('POST');
         $plan = file_get_contents("php://input");
@@ -45,11 +51,36 @@ class PlansController extends PlansModel
             return;
         }
 
-        $this->setNewPlan($plan['name'], $plan['describe'], $plan['users'], $plan['clients'], $plan['price'], $plan['type']);
-        $this->helper->message(['message' => 'success']);
+        $response = $this->setNewPlan($plan['name'], $plan['describe'], $plan['users'], $plan['clients'], $plan['price'], $plan['type']);
+        $this->helper->message(['message' => $response['message']], $response['status']);
     }
 
-    public function promotion(string $type, string $price) {}
+    public function update(): void
+    {
+        try {
+            $this->helper->verifyMethod('PUT');
+            $planData = file_get_contents('php://input');
 
-    private function promotionPrice(string $type, int $price) {}
+            if (empty($planData)) {
+                $this->helper->message(['message' => 'Dados incompletos'], 403);
+                return;
+            }
+
+            $planData = $this->helper->getData($planData);
+
+            if ($planData['type'] !== "anual" && $planData['type'] !== "mensal") {
+                $this->helper->message(['error' => 'Tipo de plano invalido'], 400);
+                return;
+            }
+
+            $response = $this->updatePlan($planData['id'], $planData['name'], $planData['describe'], $planData['users'], $planData['clients'], $planData['price'], $planData['type']);
+            $this->helper->message(['message' => $response['message']], $response['status']);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function promotion(): void {}
+
+    private function promotionPrice(): void {}
 }

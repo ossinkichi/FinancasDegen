@@ -130,12 +130,26 @@
 			"method": "POST",
 			"descripton": "Registra um novo plano",
 			"data": {
-				"name": "",
-				"describe": "",
-				"price": "",
-				"numberofusers": "",
-				"numberofclients": "",
-				"type": ""
+				"name": "string",
+				"describe": "string",
+				"price": "string",
+				"numberofusers": "int",
+				"numberofclients": "int",
+				"type": "string"
+			}
+		},
+		"update": {
+			"path": "urlDaPagina/plans/register",
+			"method": "POST",
+			"descripton": "atualiza os dados de um plano",
+			"data": {
+				"id": "int",
+				"name": "string",
+				"describe": "string",
+				"price": "string",
+				"numberofusers": "int",
+				"numberofclients": "int",
+				"type": "string"
 			}
 		}
 	},
