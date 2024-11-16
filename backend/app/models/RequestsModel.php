@@ -18,7 +18,7 @@ class RequestsModel extends ConnectModel
         return ['status' => 403, 'message' => 'Não foi possivel buscar as contas do cliente'];
       }
 
-      $data = $sql->fetch(PDO::FETCH_ASSOC) ?? [];
+      $data = $sql->fetchAll(PDO::FETCH_ASSOC) ?? [];
       return ['status' => 200, 'message' => $data];
     } catch (PDOException $pe) {
       throw new PDOException($pe->getMessage());
@@ -45,9 +45,9 @@ class RequestsModel extends ConnectModel
   public function updateStatus(int $request, string $status): array
   {
     try {
-      $sql =  $this->connect()->prepare('UPDATE requests SET status = :status WHERE client = :client');
+      $sql =  $this->connect()->prepare('UPDATE requests SET status = :status WHERE id = :id');
       $sql->bindValue(':status', $status);
-      $sql->bindValue(':client', $request);
+      $sql->bindValue(':id', $request);
 
       if (!$sql->execute()) {
         return ['status' => 403, 'message' => 'Não foi possivel modificar o status do pedido'];

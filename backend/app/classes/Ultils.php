@@ -16,6 +16,7 @@ class Ultils extends ConnectModel
         $db->companyTable();
         $db->usersTable();
         $db->clientsTable();
+        $db->requestTable();
     }
 
     public static function seedUsersTable(array $user)

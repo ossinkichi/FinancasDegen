@@ -191,5 +191,40 @@
 		}
 	},
 
-	"accounts": {}
+	"requests": {
+		"get": {
+			"path": "urlDaPagina/requests/get?client=",
+			"method": "GET",
+			"descripton": "Puxa todos os pedidos do cliente"
+		},
+		"register": {
+			"path": "urlDaPagina/requests/register",
+			"method": "POST",
+			"descripton": "Registra um novo pedido",
+			"data": {
+				"client": "int",
+				"price": "string",
+				"installments": "int"
+			}
+		},
+		"discard": {
+			"path": "urlDaPagina/requests/discard?account=3r",
+			"method": "GET",
+			"descripton": "Rejeita o pedido"
+		},
+		"recive": {
+			"path": "urlDaPagina/requests/recive?account=",
+			"method": "GET",
+			"descripton": "Aceita o pedido"
+		},
+		"pay installment": {
+			"path": "urlDaPagina/requests/payInInstallment",
+			"method": "PUT",
+			"descripton": "Paga uma parcela do pedido",
+			"data": {
+				"id": "int",
+				"installment": "int"
+			}
+		}
+	}
 }

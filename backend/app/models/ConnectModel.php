@@ -64,8 +64,8 @@ class ConnectModel
             companyname VARCHAR(200) NOT NULL, 
             companydescribe TEXT,
             cnpj VARCHAR(14) UNIQUE NOT NULL, 
-            plan INTEGER,
             active BOOL DEFAULT false, 
+            plan INTEGER,
             FOREIGN KEY (plan) REFERENCES plans(id)
             );');
             $sql->execute();
