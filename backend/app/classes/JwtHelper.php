@@ -6,13 +6,13 @@ use Dotenv\Dotenv;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Classes\Helper;
-use Exception;
+use \Exception;
 
 class JwtHelper
 {
 
     private string $key;
-    private object $helper;
+    private Helper $helper;
 
     public function __construct()
     {
@@ -22,7 +22,7 @@ class JwtHelper
         $this->helper = new Helper;
     }
 
-    public function generate(array $data, int $time)
+    public function generate(int $time)
     {
         try {
             $payload = [
@@ -30,7 +30,6 @@ class JwtHelper
                 "aud" => "example.com",     // Destinatário do token
                 "iat" => time(),            // Data de criação do token
                 "exp" => time() + $time,     // Data de expiração
-                "data" => $data
             ];
 
             return JWT::encode($payload, $this->key, 'HS256');
@@ -39,12 +38,12 @@ class JwtHelper
         }
     }
 
-    public function validate(string $jwt)
+    public function validate()
     {
         try {
-            if (isset($jwt)) {
-                return JWT::decode($jwt, new Key($this->key, 'HS256'));
-            }
+            $jwt = 0;
+            return JWT::decode($jwt, new Key($this->key, 'HS256'));
+
 
             $this->helper->message(['message' => 'acesso negado'], 403);
         } catch (Exception $e) {

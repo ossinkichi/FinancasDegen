@@ -2,8 +2,12 @@
 
 namespace app\classes;
 
+use App\Classes\JwtHelper;
+
 class Helper
 {
+    private JwtHelper $jwt;
+
     public function verifyMethod(string $method)
     {
         cors($method);
@@ -18,7 +22,7 @@ class Helper
         }
     }
 
-    public function message(array $message, int $code = 200)
+    public function message(array $message, int $code = 200): void
     {
         header('Content-Type: application/json');
         http_response_code($code);

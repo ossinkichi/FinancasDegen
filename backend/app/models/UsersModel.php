@@ -112,27 +112,30 @@ class UsersModel extends ConnectModel
       $sql->bindValue(':hash', $hash);
 
       if (!$sql->execute()) {
-        return ['satus' => 400, 'message' => 'Não foi possivel ingressar na empresa'];
+        return ['satus' => 400, 'message' => 'Não foi possivel verificar o email'];
       }
-      return ['status' => 200, 'message' => 'Você ingressou na empresa com sucesso'];
+      return ['status' => 200, 'message' => 'Email verificado'];
     } catch (PDOException $pe) {
       throw new PDOException("Erro ao desativar usuário: " . $pe->getMessage());
     }
   }
 
-  protected function deleteUser(string $hash)
+  protected function deleteUser(string $hash): array
   {
     try {
       $sql = $this->connect()->prepare('DELETE FROM users WHERE userhash = :hash');
       $sql->bindValue(':hash', $hash);
 
-      $sql->execute();
+      if (!$sql->execute()) {
+        return ['status' => 400, 'message' => 'Não foi possivel deletar a conta do usuario'];
+      }
+      return ['status' => 200, 'message' => 'Conta deletada'];
     } catch (PDOException $pe) {
       throw new PDOException("Erro ao deletar o usuário: " . $pe->getMessage());
     }
   }
 
-  protected function setCompany(int $company, string $hash)
+  protected function setCompany(string $company, string $hash)
   {
     try {
 
@@ -146,9 +149,9 @@ class UsersModel extends ConnectModel
 
       return ["status" => 200, "message" => "Exito ao entrar na empresa"];
     } catch (PDOException $pe) {
-      if ($pe->getCode() == 23000) {
-        return ["status" => 400, "message" => "Erro ao entrar na empresa"];
-      }
+      // if ($pe->getCode() == 23000) {
+      //   return ["status" => 400, "message" => "Erro ao entrar na empresa"];
+      // }
       throw new PDOException("Erro ao entrar na empresa: " . $pe->getMessage());
     }
   }
