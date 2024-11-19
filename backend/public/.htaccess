@@ -1,0 +1,27 @@
+# Habilitar reescrita de URLs
+
+RewriteEngine On
+
+# Redirecionar todas as requisições para o arquivo index.php
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+# Bloquear acesso ao próprio arquivo .htaccess
+
+<Files ".htaccess">
+Require all denied
+</Files>
+
+# Configurar compressão de arquivos
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json application/xml text/xml image/svg+xml
+</IfModule>
+
+# Proteger arquivos sensíveis
+
+<FilesMatch "\.(env|json|log|ini|phar|sh)$">
+Require all denied
+</FilesMatch>
