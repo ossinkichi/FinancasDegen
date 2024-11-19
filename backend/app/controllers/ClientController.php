@@ -4,22 +4,27 @@ namespace app\controllers;
 
 use app\models\ClientModel;
 use app\Classes\Helper;
+use App\Classes\JwtHelper;
 use \Exception;
 
 class ClientController extends ClientModel
 {
 
     private Helper $helper;
+    private JwtHelper $jwt;
 
     public function __construct()
     {
         $this->helper = new Helper;
+        $this->jwt = new JwtHelper;
     }
 
     public function get(): void
     {
         try {
             $this->helper->verifyMethod('GET');
+            $this->jwt->validate();
+
             $company = $_GET;
 
             if (empty($company) || !isset($company['company'])) {
@@ -47,6 +52,7 @@ class ClientController extends ClientModel
     {
         try {
             $this->helper->verifyMethod('POST');
+            $this->jwt->validate();
 
             $client = file_get_contents("php://input");
             if (empty($client)) {
@@ -66,6 +72,7 @@ class ClientController extends ClientModel
     {
         try {
             $this->helper->verifyMethod('GET');
+            $this->jwt->validate();
 
             $client = $_GET;
 
@@ -95,6 +102,7 @@ class ClientController extends ClientModel
     {
         try {
             $this->helper->verifyMethod('DELETE');
+            $this->jwt->validate();
 
             $client = $_GET;
 
@@ -114,6 +122,8 @@ class ClientController extends ClientModel
     {
         try {
             $this->helper->verifyMethod('PUT');
+            $this->jwt->validate();
+
             $data = file_get_contents("php://input");
 
             if (empty($data)) {

@@ -2,24 +2,28 @@
 
 namespace app\controllers;
 
-use app\models\RequestsModel;
-use app\Classes\Helper;
 use \Exception;
+use app\Classes\Helper;
+use App\Classes\JwtHelper;
+use app\models\RequestsModel;
 
 class RequestsController extends RequestsModel
 {
 
   private Helper $helper;
+  private JwtHelper $jwt;
 
   public function __construct()
   {
     $this->helper = new Helper;
+    $this->jwt = new JwtHelper;
   }
 
   public function get()
   {
     try {
       $this->helper->verifyMethod('GET');
+      $this->jwt->validate();
 
       $client = $_GET;
 
@@ -50,6 +54,8 @@ class RequestsController extends RequestsModel
   {
     try {
       $this->helper->verifyMethod('POST');
+      $this->jwt->validate();
+
       $datas = file_get_contents('php://input');
 
       if (empty($datas)) {
@@ -91,6 +97,8 @@ class RequestsController extends RequestsModel
   {
     try {
       $this->helper->verifyMethod('GET');
+      $this->jwt->validate();
+
       $request = $_GET;
       if (empty($request['account']) || !isset($request['account'])) {
         $this->helper->message(['message' => 'Pedido não informado'], 403);
@@ -109,6 +117,7 @@ class RequestsController extends RequestsModel
   {
     try {
       $this->helper->verifyMethod('PUT');
+      $this->jwt->validate();
 
       $request = file_get_contents('php://input');
 

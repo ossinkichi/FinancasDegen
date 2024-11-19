@@ -2,24 +2,25 @@
 
 namespace App\Classes;
 
+use \Exception;
 use Dotenv\Dotenv;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Classes\Helper;
-use \Exception;
+use Firebase\JWT\ExpiredException;
 
 class JwtHelper
 {
 
-    private string $key;
-    private Helper $helper;
+    private static string $key;
+    private static Helper $helper;
 
     public function __construct()
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
-        $this->key = $_ENV['TOKEN'];
-        $this->helper = new Helper;
+        self::$key = $_ENV['TOKEN'];
+        self::$helper = new Helper;
     }
 
     public function generate(int $time)
@@ -32,7 +33,7 @@ class JwtHelper
                 "exp" => time() + $time,     // Data de expiração
             ];
 
-            return JWT::encode($payload, $this->key, 'HS256');
+            return JWT::encode($payload, self::$key, 'HS256');
         } catch (Exception $e) {
             throw new Exception('Error ao gerar JWT' . $e->getMessage());
         }
@@ -40,14 +41,26 @@ class JwtHelper
 
     public function validate()
     {
+
         try {
-            $jwt = 0;
-            return JWT::decode($jwt, new Key($this->key, 'HS256'));
+            $jwt = getallheaders();
+            if (!isset($jwt['Authorization'])) {
+                self::$helper->message(['message' => 'acesso negado'], 401);
+                die();
+            }
+            $jwtDecoded = get_object_vars(JWT::decode($jwt['Authorization'], new Key(self::$key, 'HS256')));
 
-
-            $this->helper->message(['message' => 'acesso negado'], 403);
-        } catch (Exception $e) {
-            throw new Exception('Erro no token' . $e->getMessage());
+            if (!$jwtDecoded) {
+                self::$helper->message(['message' => 'acesso negado'], 401);
+                die();
+            }
+        } catch (ExpiredException  $e) {
+            self::$helper->message(['message' => 'Acesso negado'], 401);
+            die();
+        } catch (Exception $e) { {
+                self::$helper->message(['message' => 'token inválido'], 401);
+                die();
+            }
         }
     }
 }

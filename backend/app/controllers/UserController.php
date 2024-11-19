@@ -58,8 +58,8 @@ class UserController extends UsersModel
         $this->helper->message(
             ['message' =>
             [
-                'user' => $response['message']['userhash'],
-                'token' => $this->jwt->generate(60 * 60 * 7)
+                'user' => $response['message']['userhash'] ?  $response['message']['userhash'] : [],
+                'token' => $response['message']['userhash'] ? $this->jwt->generate(60 * 60 * 7) : ''
             ]],
             $response['status']
         );
@@ -95,7 +95,6 @@ class UserController extends UsersModel
     {
         try {
             $this->helper->verifyMethod('GET');
-
             $this->jwt->validate();
 
             $hash = $_GET['user'];
@@ -115,7 +114,7 @@ class UserController extends UsersModel
             $this->helper->message([
                 'message' =>
                 [
-                    'token' => $this->jwt->generate(60 * 60 * 7),
+
                     'name' => $response['message']['name'],
                     'email' => $response['message']['email'],
                     'verify' => $response['message']['emailverify'],
@@ -135,6 +134,7 @@ class UserController extends UsersModel
     public function update(): void
     {
         $this->helper->verifyMethod('PUT');
+        $this->jwt->validate();
 
         $data = file_get_contents('php://input');
         if (empty($data)) {
@@ -159,6 +159,8 @@ class UserController extends UsersModel
     public function delete(): void
     {
         $this->helper->verifyMethod('DELETE');
+        $this->jwt->validate();
+
         try {
             $hash = $_GET['user'];
             if (empty($hash) || !isset($hash)) {
@@ -208,7 +210,7 @@ class UserController extends UsersModel
             $response = $this->setCompany(intval($data['company']), $data['user']);
             $this->helper->message(['message' =>
             [
-                'token' => $this->jwt->generate(60 * 60 * 7),
+
                 'message' => $response['message']
             ]], $response['status']);
         } catch (Exception $e) {

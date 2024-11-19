@@ -4,22 +4,26 @@ namespace app\controllers;
 
 use app\models\CompanyModel;
 use app\classes\Helper;
+use App\Classes\JwtHelper;
 use \Exception;
 
 class CompanyController extends CompanyModel
 {
 
     private Helper $helper;
+    private JwtHelper $jwt;
 
     public function __construct()
     {
         $this->helper = new Helper;
+        $this->jwt = new JwtHelper;
     }
 
     public function index(): void
     {
         try {
             $this->helper->verifyMethod('GET');
+            $this->jwt->validate();
 
             $companies = $this->getAllCompanies();
             foreach ($companies as $key => $value) {
@@ -35,6 +39,8 @@ class CompanyController extends CompanyModel
     {
         try {
             $this->helper->verifyMethod('GET');
+            $this->jwt->validate();
+
             $company = $_GET;
 
             if (empty($company['cnpj']) || !isset($company['cnpj'])) {
@@ -60,15 +66,16 @@ class CompanyController extends CompanyModel
     {
         try {
             $this->helper->verifyMethod('POST');
-
+            $this->jwt->validate();
 
             $company = file_get_contents("php://input");
-            $company = $this->helper->getData($company);
 
             if (empty($company)) {
                 $this->helper->message(['message' => 'Informações inconpletas'], 403);
                 return;
             }
+
+            $company = $this->helper->getData($company);
 
             $response = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan']);
             $this->helper->message(['message' => $response['message']], $response['status']);
@@ -81,6 +88,7 @@ class CompanyController extends CompanyModel
     {
         try {
             $this->helper->verifyMethod('DELETE');
+            $this->jwt->validate();
 
             $company = $_GET;
 
@@ -100,16 +108,19 @@ class CompanyController extends CompanyModel
     {
         try {
             $this->helper->verifyMethod('PUT');
+            $this->jwt->validate();
 
             $company = file_get_contents("php://input");
+
+            if (empty($company)) {
+                $this->helper->message(['message' => 'Informações inconpletas'], 403);
+                return;
+            }
+
             $company = $this->helper->getData($company);
 
-            // $datasOfCompany = [
-            //     'cnpj' => filter_var($company['id'], FILTER_SANITIZE_SPECIAL_CHARS),
-            //     'plan' => filter_var($company['plan'], FILTER_SANITIZE_NUMBER_INT)
-            // ];
             $response = $this->updateTheCompanysPlan($company['cnpj'], $company['plan']);
-            // $this->helper->message([$response['message']], $response['status']);
+            $this->helper->message([$response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception('newPlan error' . $e->getMessage());
         }
