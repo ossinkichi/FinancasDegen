@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\models\CompanyModel;
 use app\classes\Helper;
-use App\Classes\JwtHelper;
+use app\classes\JwtHelper;
 use \Exception;
 
 class CompanyController extends CompanyModel
@@ -77,7 +77,7 @@ class CompanyController extends CompanyModel
 
             $company = $this->helper->getData($company);
 
-            $response = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan']);
+            $response = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan'], $company['value']);
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception('register of company error' . $e->getMessage());
@@ -119,7 +119,7 @@ class CompanyController extends CompanyModel
 
             $company = $this->helper->getData($company);
 
-            $response = $this->updateTheCompanysPlan($company['cnpj'], $company['plan']);
+            $response = $this->updateTheCompanysPlan($company['cnpj'], $company['plan'], $company['value']);
             $this->helper->message([$response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception('newPlan error' . $e->getMessage());

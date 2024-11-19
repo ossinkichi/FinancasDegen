@@ -95,7 +95,8 @@
 				"name": "string",
 				"describe": "string",
 				"cnpj": "string",
-				"plan": "number"
+				"plan": "number",
+				"value": "string"
 			}
 		},
 		"get companby": {
@@ -114,7 +115,8 @@
 			"descripton": "Atualiza o plano de uma empresa em especifica",
 			"data": {
 				"plan": "int",
-				"cnpj": "string"
+				"cnpj": "string",
+				"value": "string"
 			}
 		}
 	},

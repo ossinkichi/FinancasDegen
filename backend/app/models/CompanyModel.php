@@ -44,17 +44,19 @@ class CompanyModel extends ConnectModel
         string $companyname,
         string $companydescribe,
         string $cnpj,
-        null|int $plan
+        int $plan,
+        string $planValue
     ): array {
         try {
             $sql = $this->connect()->prepare('
-                INSERT INTO companies (companyname, companydescribe, cnpj, plan) 
-                VALUES (:companyname, :companydescribe, :cnpj, :plan)
+                INSERT INTO companies (companyname, companydescribe, cnpj, plan, planvalue) 
+                VALUES (:companyname, :companydescribe, :cnpj, :plan, :planvalue)
             ');
             $sql->bindValue(':companyname', $companyname);
             $sql->bindValue(':companydescribe', $companydescribe);
             $sql->bindValue(':cnpj', $cnpj);
             $sql->bindValue(':plan', $plan);
+            $sql->bindValue(':planvalue', $planValue);
 
             if (!$sql->execute()) {
                 return ['status' => 405, 'message' => 'Não foi possivel cadastrar a empresa'];
@@ -68,11 +70,12 @@ class CompanyModel extends ConnectModel
         }
     }
 
-    protected function updateTheCompanysPlan(string $cnpj, int $plan): array
+    protected function updateTheCompanysPlan(string $cnpj, int $plan, string $planValue): array
     {
         try {
-            $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan WHERE cnpj = :cnpj');
+            $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan, planvalue = :planvalue WHERE cnpj = :cnpj');
             $sql->bindValue(':plan', $plan);
+            $sql->bindValue(':planvalue', $planValue);
             $sql->bindValue(':cnpj', $cnpj);
 
             if ($sql->execute()) {
