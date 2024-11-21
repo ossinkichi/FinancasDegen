@@ -101,4 +101,21 @@ class CompanyModel extends ConnectModel
             throw new PDOException('DeleteCompany error: ' . $pe->getMessage());
         }
     }
+
+    protected function activateAccount(string $cnpj): array
+    {
+        try {
+
+            $sql = $this->connect()->prepare('UPDATE companies set active = :value WHERE cnpj = :cnpj');
+            $sql->bindValue(':value', true);
+            $sql->bindValue(':cnpj', $cnpj);
+
+            if (!$sql->execute()) {
+                return ['satus' => 400, 'message' => 'Não foi possivel ativar a empresa'];
+            }
+            return ['status' => 200, 'message' => 'Empresa ativada'];
+        } catch (PDOException $pe) {
+            throw new PDOException("Erro ao ativa a empresa: " . $pe->getMessage());
+        }
+    }
 }

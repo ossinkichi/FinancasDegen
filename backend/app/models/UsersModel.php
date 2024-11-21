@@ -116,7 +116,7 @@ class UsersModel extends ConnectModel
       }
       return ['status' => 200, 'message' => 'Email verificado'];
     } catch (PDOException $pe) {
-      throw new PDOException("Erro ao desativar usuário: " . $pe->getMessage());
+      throw new PDOException("Erro ao ativar usuário: " . $pe->getMessage());
     }
   }
 

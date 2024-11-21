@@ -125,4 +125,22 @@ class CompanyController extends CompanyModel
             throw new Exception('newPlan error' . $e->getMessage());
         }
     }
+
+    public function active(): void
+    {
+        try {
+            $this->helper->verifyMethod('GET');;
+            $data = $_GET;
+
+            if (empty($data) && !isset($data['compay'])) {
+                $this->helper->message(['message' => 'Empresa não informada'], 403);
+                return;
+            }
+
+            $response = $this->activateAccount($data['company']);
+            $this->helper->message(['message' => $response['message']], $response['status']);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
 }

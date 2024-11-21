@@ -2,10 +2,14 @@
 
 namespace app\controllers;
 
-use app\models\UsersModel;
+use \Exception;
+use Dotenv\Dotenv;
 use app\classes\Helper;
 use app\classes\JwtHelper;
-use \Exception;
+use app\models\UsersModel;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use PHPMailer\PHPMailer\PHPMailer;
+use stdClass;
 
 class UserController extends UsersModel
 {
@@ -85,6 +89,13 @@ class UserController extends UsersModel
             $user['userhash'] = $this->createHash($user['cpf']);
 
             $reponse = $this->setNewUser($user);
+            $this->sendEmail([
+                'from' => 'exampleemail@gmail.com',
+                'to' => $user['email'],
+                'fromName' => 'Example Name',
+                'toName' => $user['name'],
+                'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
+            ]);
             $this->helper->message(['message' => $reponse['message']], $reponse['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -240,4 +251,53 @@ class UserController extends UsersModel
     {
         return hash('sha256', $hash);
     }
+
+    private function emailConfig(): object
+    {
+        try {
+            $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+            $dotenv->load();
+
+            // Looking to send emails in production? Check out our Email API/SMTP product!
+            $phpmailer = new PHPMailer();
+            $phpmailer->isSMTP();
+            $phpmailer->Host = $_ENV['EMAILHOST'];
+            $phpmailer->SMTPAuth = true;
+            $phpmailer->Port = $_ENV['EMAILPORT'];
+            $phpmailer->Username = $_ENV['EMAILUSERNAME'];
+            $phpmailer->Password = $_ENV['EMAILPASSWORD'];
+
+            return $phpmailer;
+        } catch (PHPMailerException $pme) {
+            $this->helper->message(['message' => 'Erro ao configurar o email'], 403);
+            throw new PHPMailerException($pme->errorMessage());
+        } catch (Exception $e) {
+            $this->helper->message(['message' => 'Erro ao configurar o email'], 403);
+        }
+    }
+
+    private function sendEmail(array $emailData): void
+    {
+        try {
+            $mail = $this->emailConfig();
+
+            //Recipients
+            $mail->setFrom($emailData['from'], $emailData['fromName']);
+            $mail->addAddress($emailData['to'], $emailData['toName']);
+
+            //Content
+            $mail->isHTML(true);
+            $mail->Subject = 'Here is the subject';
+            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+            $mail->send();
+        } catch (PHPMailerException $pme) {
+            throw new PHPMailerException($pme->errorMessage());
+        } catch (Exception $e) {
+            $this->helper->message(['message' => 'Não foi possivel enviar o email'], 403);
+        }
+    }
+
+    public function inviteCompany() {}
 }
