@@ -2,4 +2,4 @@
 /vendor/
 
 # Ignorar arquivos de configuração
-/.env/
+.env
