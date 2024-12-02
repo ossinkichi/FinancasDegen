@@ -89,14 +89,16 @@ class UserController extends UsersModel
             $user['userhash'] = $this->createHash($user['cpf']);
 
             $reponse = $this->setNewUser($user);
-            $this->sendEmail([
-                'from' => 'exampleemail@gmail.com',
-                'to' => $user['email'],
-                'fromName' => 'Example Name',
-                'toName' => $user['name'],
-                'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
-            ]);
             $this->helper->message(['message' => $reponse['message']], $reponse['status']);
+            if ($reponse['status'] == 200) {
+                $this->sendEmail([
+                    'from' => 'exampleemail@gmail.com',
+                    'to' => $user['email'],
+                    'fromName' => 'Example Name',
+                    'toName' => $user['name'],
+                    'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
+                ]);
+            }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -192,11 +194,34 @@ class UserController extends UsersModel
             $this->helper->verifyMethod('PUT');
             $data = file_get_contents('php://input');
             $data = $this->helper->getData($data);
-
+            if (!empty($data) && isset($data['user']) && !isset($data['password'])) {
+                $response = $this->getUser($data['user']);
+                if ($response['status'] == 200) {
+                    $this->sendEmail([
+                        'from' => 'exampleemail@gmail.com',
+                        'to' => $response['message']['email'],
+                        'fromName' => 'Example Name',
+                        'toName' => $response['message']['name'],
+                        'subject' => 'Alterar senha do usuario',
+                        'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
+                    ]);
+                } else {
+                    $this->helper->message(['message' => $response['message']], $response['status']);
+                    return;
+                }
+                return;
+            };
             if (empty($data) || !isset($data['user']) || empty($data['password'])) {
                 $this->helper->message(['message' => 'Dados não informados'], 403);
                 return;
             };
+
+            $response = $this->getUser($data['user']);
+
+            if (password_verify($data['password'], $response['message']['password'])) {
+                $this->helper->message(['message' => 'A nova senha não pode ser igual a anterior'], 401);
+                return;
+            }
 
             $response = $this->setNewPassword($data['user'], $data['password']);
             $this->helper->message(['message' => $response['message']], $response['status']);
@@ -263,6 +288,7 @@ class UserController extends UsersModel
             $phpmailer->isSMTP();
             $phpmailer->Host = $_ENV['EMAILHOST'];
             $phpmailer->SMTPAuth = true;
+            $phpmailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Tipo de criptografia
             $phpmailer->Port = $_ENV['EMAILPORT'];
             $phpmailer->Username = $_ENV['EMAILUSERNAME'];
             $phpmailer->Password = $_ENV['EMAILPASSWORD'];
@@ -287,15 +313,15 @@ class UserController extends UsersModel
 
             //Content
             $mail->isHTML(true);
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+            $mail->Subject = $emailData['subject'];
+            $mail->Body    = $emailData['message'];
 
             $mail->send();
         } catch (PHPMailerException $pme) {
             throw new PHPMailerException($pme->errorMessage());
         } catch (Exception $e) {
-            $this->helper->message(['message' => 'Não foi possivel enviar o email'], 403);
+            throw new Exception($e->getMessage());
+            // $this->helper->message(['message' => 'Não foi possivel enviar o email'], 403);
         }
     }
 
