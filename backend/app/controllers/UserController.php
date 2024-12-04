@@ -230,6 +230,28 @@ class UserController extends UsersModel
         }
     }
 
+    public function inviteFromCompany(): void
+    {
+        $this->helper->verifyMethod('POST');
+        $invite = file_get_contents('php://input');
+
+        if (empty($invite) || !isset($invite['invite']) && !isset($invite['company'])) {
+            $this->helper->message(['message' => 'Dados não informados'], 403);
+            return;
+        }
+
+
+        $response = $this->getUser($invite);
+        $this->sendEmail([
+            'from' => 'exampleemail@gmail.com',
+            'to' => $response['message']['email'],
+            'fromName' => 'Example Name',
+            'toName' => $response['message']['name'],
+            'subject' => 'Alterar senha do usuario',
+            'message' => 'Olá ' . ['name'] . ', você foi convidado a entrar na enpresa **, para ingressar click no link a seguir!'
+        ]);
+    }
+
     public function join(): void
     {
         try {
