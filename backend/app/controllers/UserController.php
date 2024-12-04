@@ -235,13 +235,19 @@ class UserController extends UsersModel
         $this->helper->verifyMethod('POST');
         $invite = file_get_contents('php://input');
 
-        if (empty($invite) || !isset($invite['invite']) && !isset($invite['company'])) {
+        if (empty($invite)) {
             $this->helper->message(['message' => 'Dados não informados'], 403);
             return;
         }
 
+        $invite = $this->helper->getData($invite);
 
-        $response = $this->getUser($invite);
+        if (!isset($invite['invite']) || !isset($invite['company'])) {
+            $this->helper->message(['message' => 'Dados não informados'], 403);
+            return;
+        }
+
+        $response = $this->getUser($invite['invite']);
         $this->sendEmail([
             'from' => 'exampleemail@gmail.com',
             'to' => $response['message']['email'],
