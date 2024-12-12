@@ -9,7 +9,6 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
 
-
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if(!context){
@@ -26,6 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsAssociated(!!company)
       setIsAuthenticated(true)
     };
+  
     const logout = () => setIsAuthenticated(false);
   
     return (
