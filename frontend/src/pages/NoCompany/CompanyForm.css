@@ -5,9 +5,6 @@
   border: 1px solid;
   border-radius: 20px;
   box-shadow: 0px 0px 12px rgba(0,43,91, 0.5);
-}
-
-form {
   width: auto;
 }
 
@@ -17,31 +14,31 @@ form {
   margin-bottom: 20px;
 }
 
-.form-group {
+.register-company-form .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
 }
 
-.form-group label {
+.register-company-form .form-group label {
   margin-bottom: 5px;
   color: #555;
   font-weight: 500;
 }
 
-.form-group input {
+.register-company-form .form-group input {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
 }
 
-.form-inline {
+.register-company-form .form-inline {
   display: flex;
   gap: 10px;
 }
 
-.submit-button {
+.register-company-form .submit-button {
   width: 100%;
   padding: 10px;
   background-color: #007bff;
@@ -51,19 +48,19 @@ form {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.register-company-form .3s;
 }
 
-.submit-button:hover {
+.register-company-form .submit-button:hover {
   background-color: #0056b3;
 }
 
 @media (max-width: 600px) {
-  .form-inline {
+  .register-company-form .form-inline {
     flex-direction: column;
   }
 
-  .form-group input {
+  .register-company-form .form-group input {
     font-size: 13px;
   }
 
@@ -71,7 +68,7 @@ form {
     padding: 15px;
   }
 
-  .submit-button {
+  .register-company-form .submit-button {
     font-size: 15px;
   }
 }

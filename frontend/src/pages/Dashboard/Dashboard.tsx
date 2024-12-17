@@ -3,9 +3,11 @@ import "./Dashboard.css";
 
 const Dashboard = () => {
     return (
-        <>
-            <h1>Dashboard</h1>
-        </>
+        <div className="dashboard-container">
+            <div className="dashboard-item">Item 1</div>
+            <div className="dashboard-item">Item 2</div>
+            <div className="dashboard-item">Item 3</div>
+        </div>
     )
 }
 
