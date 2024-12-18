@@ -74,8 +74,17 @@ class UserController extends UsersModel
         $this->helper->verifyMethod('POST');
         try {
             $data =  file_get_contents("php://input");
-            $data = $this->helper->getData($data);
 
+            $this->helper->arrayValidate($data, [
+                'name',
+                'email',
+                'password',
+                'cpf',
+                'dateofbirth',
+                'gender',
+                'phone'
+            ]);
+            $data = $this->helper->getData($data);
             $user = [
                 'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
                 'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
@@ -96,6 +105,7 @@ class UserController extends UsersModel
                     'to' => $user['email'],
                     'fromName' => 'Example Name',
                     'toName' => $user['name'],
+                    'subject' => 'Resgister',
                     'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
                 ]);
             }

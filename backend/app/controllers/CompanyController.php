@@ -43,10 +43,7 @@ class CompanyController extends CompanyModel
 
             $company = $_GET;
 
-            if (empty($company['cnpj']) || !isset($company['cnpj'])) {
-                $this->helper->message(['error' => 'Empmresa não informada'], 400);
-                return;
-            }
+            $this->helper->arrayValidate($company, ['cnpj']);
 
             $response = $this->getCompany($company['cnpj']);
             if ($response['status'] == 200) {
@@ -76,7 +73,6 @@ class CompanyController extends CompanyModel
             }
 
             $company = $this->helper->getData($company);
-
             $response = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan'], $company['value']);
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {

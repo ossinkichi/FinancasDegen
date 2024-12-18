@@ -2,13 +2,10 @@
 
 namespace app\classes;
 
-use App\Classes\JwtHelper;
-
 class Helper
 {
-    private JwtHelper $jwt;
 
-    public function verifyMethod(string $method)
+    public function verifyMethod(string $method): void
     {
         cors($method);
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -29,7 +26,7 @@ class Helper
         echo json_encode($message);
     }
 
-    public function sanitizeArray(array $data)
+    public function sanitizeArray(array $data): array
     {
         foreach ($data as $key => $value) {
             $data[$key] = htmlspecialchars($value);
@@ -37,8 +34,29 @@ class Helper
         return $data;
     }
 
-    public function getData(string $input)
+    public function getData(string $input): array
     {
         return get_object_vars(json_decode($input));
+    }
+
+    public function arrayValidate(array|string $arrayForValidate, array $keys): void
+    {
+        is_string($arrayForValidate) ? $arrayForValidate = $this->getData($arrayForValidate) : null;
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $arrayForValidate)) {
+                $this->message(['message' => 'Dados não informados'], 400);
+                die();
+            }
+            $this->arrayValueNotNull($key);
+        }
+        return;
+    }
+
+    private function arrayValueNotNull(array|string $dataForValidate): void
+    {
+        if (empty($dataForValidate)) {
+            $this->message(['message' => 'Dados não informados'], 400);
+            die();
+        }
     }
 }

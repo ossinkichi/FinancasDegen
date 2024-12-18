@@ -64,7 +64,7 @@ class CompanyModel extends ConnectModel
             return ['status' => 200, 'message' => 'Empresa cadastrada com sucesso'];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
-                return ['status' => 403, 'message' => 'Empresa já cadastrado, para ingressar na empresa peça permissão ao administrador da mesma!'];
+                return ['status' => 403, 'message' => 'Não foi possivel cadastrar!'];
             }
             throw new PDOException('SetNewCompany error: ' . $pe->getMessage());
         }
