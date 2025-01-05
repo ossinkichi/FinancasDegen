@@ -53,11 +53,16 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('POST');
             $this->jwt->validate();
-
             $client = file_get_contents("php://input");
-            if (empty($client)) {
-                $this->helper->message(['message' => 'Dados não informado'], 400);
-            }
+            $this->helper->arrayValidate($client, [
+                'company',
+                'name',
+                'email',
+                'phone',
+                'gender',
+                'shippingaddress',
+                'billingaddress'
+            ]);
 
             $client = $this->helper->getData($client);
 
@@ -73,25 +78,14 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('GET');
             $this->jwt->validate();
-
             $client = $_GET;
-
-            if (empty($client) || !isset($client["id"]) || !isset($client['company']) || empty($client["id"]) || empty($client['company'])) {
-                $this->helper->message(['message' => 'Cliente não informado'], 400);
-                return;
-            }
-
+            $this->helper->arrayValidate($client, ['id', 'company']);
             $response = $this->getClient($client);
 
-            if (empty($response['message'])) {
-                $this->helper->message(['message' => 'Nenhum dado encontrado!'], 400);
-                return;
-            }
-
+            $this->helper->arrayValidate($response, ['message', 'status']);
             if (is_array($response['message'])) {
                 $response['message'] = $this->helper->sanitizeArray($response['message']);
             }
-
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -103,13 +97,8 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('DELETE');
             $this->jwt->validate();
-
             $client = $_GET;
-
-            if (empty($client) || !isset($client['client']) || empty($client['client'])) {
-                $this->helper->message(['message' => 'Cliente não informado'], 400);
-                return;
-            }
+            $this->helper->arrayValidate($client, ['client']);
 
             $response = $this->deleteClientOfCompany($client['client']);
             $this->helper->message(['message' => $response['message']], $response['status']);
@@ -123,15 +112,18 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('PUT');
             $this->jwt->validate();
-
             $data = file_get_contents("php://input");
-
-            if (empty($data)) {
-                $this->helper->message(['message' => 'Dados não informados'], 400);
-                return;
-            }
-
+            $this->helper->arrayValidate($data, [
+                'id',
+                'name',
+                'email',
+                'phone',
+                'gender',
+                'shippingaddress',
+                'billingaddress'
+            ]);
             $data = $this->helper->getData($data);
+
             $response = $this->updateDataClientOfCompany($data['id'], $data['name'], $data['email'], $data['phone'], $data['gender'], $data['shippingaddress'], $data['billingaddress']);
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {

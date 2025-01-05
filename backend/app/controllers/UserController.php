@@ -9,7 +9,6 @@ use app\classes\JwtHelper;
 use app\models\UsersModel;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
-use stdClass;
 
 class UserController extends UsersModel
 {
@@ -35,57 +34,46 @@ class UserController extends UsersModel
 
     public function login(): void
     {
-
         $this->helper->verifyMethod('POST');
         $data = file_get_contents("php://input");
-        $data = $this->helper->getData($data);;
 
+        $this->helper->arrayValidate($data, [
+            'email',
+            'password'
+        ]);
+
+        $data = $this->helper->getData($data);;
         $user = [
             'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
             'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
 
-        $response = $this->getUser($user['email']);
-        if (empty($response['message'])) {
-            $this->helper->message(['message' => 'Usuário não encontrado'], 404);
-            return;
-        }
-        if ($response['status'] == 200) {
-            $response['message'] = $this->helper->sanitizeArray($response['message']);
-        }
-
-        if (!password_verify($user['password'], $response['message']['password'])) {
-            $this->helper->message(['message' => 'Senha ou usuário incorreta'], 401);
-            return;
-        }
-
-        $this->helper->message(
-            ['message' =>
-            [
-                'user' => $response['message']['userhash'] ?  $response['message']['userhash'] : [],
-                'token' => $response['message']['userhash'] ? $this->jwt->generate(60 * 60 * 7) : ''
-            ]],
-            $response['status']
-        );
+        $response = $this->validateLogin($user);
+        $this->helper->message(['message' => $response['message']], $response['status']);
     }
 
     public function register(): void
     {
-        $this->helper->verifyMethod('POST');
         try {
+            $this->helper->verifyMethod('POST');
             $data =  file_get_contents("php://input");
+
+            $this->helper->arrayValidate($data, [
+                'name',
+                'email',
+                'password',
+                'cpf',
+                'dateofbirth',
+                'gender',
+                'phone'
+            ]);
+
             $data = $this->helper->getData($data);
 
-            $user = [
-                'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-                'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'cpf' => filter_var($data['cpf'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'dateofbirth' => $data['dateofbirth'],
-                'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
-                'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
-            ];
+            $this->userExist(['email' => $data['email']]);
 
+            $user = $this->helper->sanitizeArray($data);
+            $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
             $user['userhash'] = $this->createHash($user['cpf']);
 
             $reponse = $this->setNewUser($user);
@@ -96,6 +84,7 @@ class UserController extends UsersModel
                     'to' => $user['email'],
                     'fromName' => 'Example Name',
                     'toName' => $user['name'],
+                    'subject' => 'Resgistro de novo usuário',
                     'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
                 ]);
             }
@@ -110,24 +99,19 @@ class UserController extends UsersModel
             $this->helper->verifyMethod('GET');
             $this->jwt->validate();
 
-            $hash = $_GET['user'];
+            $hash = $_GET;
+            $this->helper->arrayValidate($hash, ['user']);
+            $response = $this->getUser($hash['user']);
 
-            if (empty($hash)) {
-                $this->helper->message(['error' => 'Usuário não identificado'], 400);
+            if (!$response['message']['emailverify']) {
+                http_response_code(403);
+                echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
                 return;
             };
-            $response = $this->getUser($hash);
-
-            // if (!$response['message']['emailverify']) {
-            //     http_response_code(403);
-            //     echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
-            //     return;
-            // };
 
             $this->helper->message([
                 'message' =>
                 [
-
                     'name' => $response['message']['name'],
                     'email' => $response['message']['email'],
                     'verify' => $response['message']['emailverify'],
@@ -135,8 +119,7 @@ class UserController extends UsersModel
                     'cpf' => substr($response['message']['cpf'], 0, 3) . str_repeat('*', 7),
                     'nascimento' => str_replace('/', '-', $response['message']['dateofbirth']),
                     'genero' => $response['message']['gender'],
-                    'contato' => $response['message']['phone'],
-                    'cnpj' => $response['message']['company']
+                    'contato' => $response['message']['phone']
                 ]
             ], $response['status']);
         } catch (Exception $e) {
@@ -150,22 +133,22 @@ class UserController extends UsersModel
         $this->jwt->validate();
 
         $data = file_get_contents('php://input');
-        if (empty($data)) {
-            $this->helper->message(['error' => 'campo obrigatorio não informado'], 400);
-            return;
-        }
+        $this->helper->arrayValidate($data, [
+            'hash',
+            'name',
+            'email',
+            'password',
+            'dateofbirth',
+            'gender',
+            'phone'
+        ]);
         $data = $this->helper->getData($data);
-        $user = [
-            'userhash' => filter_var($data['hash'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'name' => filter_var($data['name'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-            'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'dateofbirth' => $data['dateofbirth'],
-            'gender' => filter_var($data['gender'], FILTER_SANITIZE_SPECIAL_CHARS),
-            'phone' => filter_var($data['phone'], FILTER_SANITIZE_SPECIAL_CHARS)
-        ];
+        $user = $this->helper->sanitizeArray($data);
+        $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 
-        $response = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $data['hash']);
+        $this->userExist(['email' => $user['email'], 'hash' => $user['hash']]);
+
+        $response = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['hash']);
         $this->helper->message(['message' => $response['message']], $response['status']);
     }
 
@@ -175,12 +158,9 @@ class UserController extends UsersModel
         $this->jwt->validate();
 
         try {
-            $hash = $_GET['user'];
-            if (empty($hash) || !isset($hash)) {
-                $this->helper->message(['message' => 'usuario não indentificado'], 400);
-                return;
-            }
-            $response = $this->deleteUser($hash);
+            $hash = $_GET;
+            $this->helper->arrayValidate($hash, ['user']);
+            $response = $this->deleteUser($hash['user']);
 
             $this->helper->message(['message' => $response['message']], $response['status']);
         } catch (Exception $e) {
@@ -193,29 +173,12 @@ class UserController extends UsersModel
         try {
             $this->helper->verifyMethod('PUT');
             $data = file_get_contents('php://input');
+            $this->helper->arrayValidate($data, ['user']);
             $data = $this->helper->getData($data);
-            if (!empty($data) && isset($data['user']) && !isset($data['password'])) {
-                $response = $this->getUser($data['user']);
-                if ($response['status'] == 200) {
-                    $this->sendEmail([
-                        'from' => 'exampleemail@gmail.com',
-                        'to' => $response['message']['email'],
-                        'fromName' => 'Example Name',
-                        'toName' => $response['message']['name'],
-                        'subject' => 'Alterar senha do usuario',
-                        'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
-                    ]);
-                } else {
-                    $this->helper->message(['message' => $response['message']], $response['status']);
-                    return;
-                }
-                return;
-            };
-            if (empty($data) || !isset($data['user']) || empty($data['password'])) {
-                $this->helper->message(['message' => 'Dados não informados'], 403);
-                return;
-            };
 
+            $this->sendMessageForForgotPassword($data);
+            $this->helper->arrayValidate($data, ['user', 'password']);
+            dd($data);
             $response = $this->getUser($data['user']);
 
             if (password_verify($data['password'], $response['message']['password'])) {
@@ -233,13 +196,10 @@ class UserController extends UsersModel
     public function inviteFromCompany(): void
     {
         $this->helper->verifyMethod('POST');
+        $this->jwt->validate();
         $invite = file_get_contents('php://input');
-
-        if (empty($invite) || !isset($invite['invite']) && !isset($invite['company'])) {
-            $this->helper->message(['message' => 'Dados não informados'], 403);
-            return;
-        }
-
+        $this->helper->arrayValidate($invite, ['invite', 'company']);
+        $this->helper->getData($invite);
 
         $response = $this->getUser($invite);
         $this->sendEmail([
@@ -256,21 +216,13 @@ class UserController extends UsersModel
     {
         try {
             $this->helper->verifyMethod('PUT');
+            $this->jwt->validate();
             $data = file_get_contents('php://input');
-
-            if (empty($data)) {
-                $this->helper->message(['message' => 'Dados não informados']);
-                return;
-            }
-
+            $this->helper->arrayValidate($data, ['user', 'company']);
             $data = $this->helper->getData($data);
 
             $response = $this->setCompany(intval($data['company']), $data['user']);
-            $this->helper->message(['message' =>
-            [
-
-                'message' => $response['message']
-            ]], $response['status']);
+            $this->helper->message(['message' => ['message' => $response['message']]], $response['status']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -281,11 +233,7 @@ class UserController extends UsersModel
         try {
             $this->helper->verifyMethod('GET');;
             $data = $_GET;
-
-            if (empty($data) && !isset($data['user'])) {
-                $this->helper->message(['message' => 'Usuário não informado'], 403);
-                return;
-            }
+            $this->helper->arrayValidate($data, ['user']);
 
             $response = $this->activateAccount($data['user']);
             $this->helper->message(['message' => $response['message']], $response['status']);
@@ -347,5 +295,68 @@ class UserController extends UsersModel
         }
     }
 
-    public function inviteCompany() {}
+    private function validateLogin(array $user): array
+    {
+        $response = $this->getUser($user['email']);
+        if (empty($response['message'])) {
+            return ['message' => 'Usuário não encontrado', 'status' => 404];
+        }
+
+        if (!password_verify($user['password'], $response['message']['password'])) {
+            return ['message' => 'Senha ou usuário incorreta', 'status' => 401];
+        }
+
+        if ($response['status'] == 200 && is_array($response['message'])) {
+            $response['message'] = $this->helper->sanitizeArray($response['message']);
+        }
+
+        return [
+            'message' => [
+                'user' => $response['message']['userhash'] ?  $response['message']['userhash'] : [],
+                'token' => $response['message']['userhash'] ? $this->jwt->generate(60 * 60 * 7) : ''
+            ],
+            'status' => 200
+        ];
+    }
+
+    private function userExist(array $user): void
+    {
+        try {
+            $response = $this->getUser($user['email']);
+
+            if (is_array($response['message']) && !empty($response['message'])) {
+                if (!isset($user['hash'])) {
+                    $this->helper->message(['message' => 'Não foi possivel executar a ação'], 401);
+                    die();
+                }
+
+                if ($response['message']['userhash'] !== $user['hash']) {
+                    $this->helper->message(['message' => 'Não foi possivel atualizar os dados'], 400);
+                    die();
+                }
+            }
+        } catch (Exception $e) {
+            $this->helper->message(['message' => 'Não foi possivel atualizar os dados', 'status' => 400]);
+        }
+    }
+
+    private function sendMessageForForgotPassword($user)
+    {
+        if (!isset($user['password'])) {
+            $response = $this->getUser($user['user']);
+            if ($response['status'] == 200) {
+                $this->sendEmail([
+                    'from' => 'exampleemail@gmail.com',
+                    'to' => $response['message']['email'],
+                    'fromName' => 'Example Name',
+                    'toName' => $response['message']['name'],
+                    'subject' => 'Alterar senha do usuario',
+                    'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
+                ]);
+            } else {
+                $this->helper->message(['message' => $response['message']], $response['status']);
+                die();
+            }
+        }
+    }
 }

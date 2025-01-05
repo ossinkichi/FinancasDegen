@@ -41,4 +41,25 @@ class Helper
     {
         return get_object_vars(json_decode($input));
     }
+
+    public function arrayValidate(array|string $arrayForValidate, array $keys): void
+    {
+        is_string($arrayForValidate) ? $arrayForValidate = $this->getData($arrayForValidate) : null;
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $arrayForValidate)) {
+                $this->message(['message' => 'Dados não informados'], 400);
+                die();
+            }
+            $this->arrayValueNotNull($key);
+        }
+        return;
+    }
+
+    private function arrayValueNotNull(array|string $dataForValidate): void
+    {
+        if (empty($dataForValidate)) {
+            $this->message(['message' => 'Dados não informados'], 400);
+            die();
+        }
+    }
 }

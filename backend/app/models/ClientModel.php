@@ -40,7 +40,7 @@ class ClientModel extends ConnectModel
                 return ['status' => 403, 'message' => 'Houve um erro ao buscar os clientes'];
             }
             $client = $sql->fetch(PDO::FETCH_ASSOC);
-            return ['status' => 200, 'message' => $client];
+            return ['status' => 200, 'message' => $client ?? []];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente'];

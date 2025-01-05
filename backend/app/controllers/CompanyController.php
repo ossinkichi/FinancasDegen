@@ -40,13 +40,9 @@ class CompanyController extends CompanyModel
         try {
             $this->helper->verifyMethod('GET');
             $this->jwt->validate();
-
             $company = $_GET;
 
-            if (empty($company['cnpj']) || !isset($company['cnpj'])) {
-                $this->helper->message(['error' => 'Empmresa não informada'], 400);
-                return;
-            }
+            $this->helper->arrayValidate($company, ['cnpj']);
 
             $response = $this->getCompany($company['cnpj']);
             if ($response['status'] == 200) {
@@ -67,14 +63,8 @@ class CompanyController extends CompanyModel
         try {
             $this->helper->verifyMethod('POST');
             $this->jwt->validate();
-
             $company = file_get_contents("php://input");
-
-            if (empty($company)) {
-                $this->helper->message(['message' => 'Informações inconpletas'], 403);
-                return;
-            }
-
+            $this->helper->arrayValidate($company, ['name', 'describe', 'cnpj', 'plan', 'value']);
             $company = $this->helper->getData($company);
 
             $response = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan'], $company['value']);
@@ -89,13 +79,8 @@ class CompanyController extends CompanyModel
         try {
             $this->helper->verifyMethod('DELETE');
             $this->jwt->validate();
-
             $company = $_GET;
-
-            if (empty($company['cnpj'])) {
-                $this->helper->message(['error' => 'Empresa não informada'], 405);
-                return;
-            }
+            $this->helper->arrayValidate($company, ['cnpj']);
 
             $response = $this->deleteCompany(strval($company['cnpj']));
             $this->helper->message([$response['message']], $response['status']);
@@ -109,14 +94,8 @@ class CompanyController extends CompanyModel
         try {
             $this->helper->verifyMethod('PUT');
             $this->jwt->validate();
-
             $company = file_get_contents("php://input");
-
-            if (empty($company)) {
-                $this->helper->message(['message' => 'Informações inconpletas'], 403);
-                return;
-            }
-
+            $this->helper->arrayValidate($company, ['cnpj', 'plan', 'value']);
             $company = $this->helper->getData($company);
 
             $response = $this->updateTheCompanysPlan($company['cnpj'], $company['plan'], $company['value']);

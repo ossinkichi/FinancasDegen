@@ -24,14 +24,8 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('GET');
       $this->jwt->validate();
-
       $client = $_GET;
-
-      if (empty($client['client']) || !isset($client['client'])) {
-        $this->helper->message(['message' => 'Cliente não informado'], 403);
-        return;
-      }
-
+      $this->helper->arrayValidate($client, ['client']);
       $response = $this->getRequest($client['client']);
 
       if (is_array($response['message'])) {
@@ -55,14 +49,8 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('POST');
       $this->jwt->validate();
-
       $datas = file_get_contents('php://input');
-
-      if (empty($datas)) {
-        $this->helper->message(['message' => 'Informações incompletas'], 403);
-        return;
-      }
-
+      $this->helper->arrayValidate($datas, ['client', 'price', 'installments']);
       $datas = $this->helper->getData($datas);
       $request = $this->helper->sanitizeArray($datas);
 
@@ -78,12 +66,7 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('GET');
       $request = $_GET;
-
-      if (empty($request['account']) || !isset($request['account'])) {
-        $this->helper->message(['message' => 'Pedido não informado'], 403);
-        return;
-      }
-
+      $this->helper->arrayValidate($request, ['account']);
       $request = $this->helper->sanitizeArray($request);
 
       $response = $this->updateStatus($request['account'], 'Aceito');
@@ -98,12 +81,8 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('GET');
       $this->jwt->validate();
-
       $request = $_GET;
-      if (empty($request['account']) || !isset($request['account'])) {
-        $this->helper->message(['message' => 'Pedido não informado'], 403);
-        return;
-      }
+      $this->helper->arrayValidate($request, ['account']);
       $request = $this->helper->sanitizeArray($request);
 
       $response = $this->updateStatus($request['account'], 'Recusado');
@@ -118,14 +97,8 @@ class RequestsController extends RequestsModel
     try {
       $this->helper->verifyMethod('PUT');
       $this->jwt->validate();
-
       $request = file_get_contents('php://input');
-
-      if (empty($request)) {
-        $this->helper->message(['message' => 'Nenhum dado informado'], 403);
-        return;
-      }
-
+      $this->helper->arrayValidate($request, ['id', 'installment']);
       $request = $this->helper->getData($request);
       $request = $this->helper->sanitizeArray($request);
 
