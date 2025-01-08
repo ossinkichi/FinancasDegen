@@ -119,6 +119,9 @@ class ConnectModel
         }
     }
 
+    /* 
+        Adicionar uma coluna de taxa em caso de atraso no pagamento.
+    */
     protected function requestTable()
     {
         try {
