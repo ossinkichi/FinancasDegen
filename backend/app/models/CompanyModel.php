@@ -49,7 +49,7 @@ class CompanyModel extends ConnectModel
     ): array {
         try {
             $sql = $this->connect()->prepare('
-                INSERT INTO companies (companyname, companydescribe, cnpj, plan, planvalue) 
+                INSERT INTO companies (companyname, companydescribe, cnpj, plan, planvalue)
                 VALUES (:companyname, :companydescribe, :cnpj, :plan, :planvalue)
             ');
             $sql->bindValue(':companyname', $companyname);

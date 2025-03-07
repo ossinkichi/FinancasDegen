@@ -1,0 +1,37 @@
+require 'vendor/autoload.php';
+
+
+use Klein\Request;
+use Klein\Response;
+
+class UserController
+{
+public function getUser(Request $request, Response $response)
+{
+return $response->json(["message" => "Usuário ID: " . $request->id]);
+}
+
+public function createUser(Request $request, Response $response)
+{
+return $response->json(["message" => "Usuário criado com nome: " . $request->param('name')]);
+}
+
+public function updateUser(Request $request, Response $response)
+{
+return $response->json(["message" => "Usuário " . $request->id . " atualizado para: " . $request->param('name')]);
+}
+
+public function deleteUser(Request $request, Response $response)
+{
+return $response->json(["message" => "Usuário " . $request->id . " deletado."]);
+}
+}
+
+$klein = new Klein();
+$userController = new UserController();
+
+// Definição das rotas
+$klein->respond('GET', '/user/[i:id]', [$userController, 'getUser']);
+$klein->respond('POST', '/user', [$userController, 'createUser']);
+$klein->respond('PUT', '/user/[i:id]', [$userController, 'updateUser']);
+$klein->respond('DELETE', '/user/[i:id]', [$userController, 'deleteUser']);

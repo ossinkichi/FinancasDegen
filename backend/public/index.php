@@ -1,28 +1,17 @@
 <?php
 
+
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../app/functions/config.php';
 include __DIR__ . '/../app/functions/helpers.php';
+include __DIR__ . '/../core/route.php';
 
-use core\Controller;
-use core\Method;
-use core\Paramethers;
-use app\classes\Ultils;
+use Klein\Request;
+use Klein\Response;
 
-try {
-  $ultils = new Ultils;
-  $ultils->createTables();
 
-  $controller = new Controller();
-  $controller = $controller->load();
 
-  $method = new Method();
-  $method = $method->load($controller);
 
-  $paramethers = new Paramethers();
-  $paramethers = $paramethers->load();
-
-  $controller->$method($paramethers);
-} catch (Exception $e) {
-  dd($e->getMessage());
-}
+$klein->respond('GET', '/', function (Request $request, Response $response) {
+    dd(['message' => $request->id()]);
+});

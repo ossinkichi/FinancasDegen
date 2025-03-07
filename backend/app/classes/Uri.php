@@ -1,11 +1,12 @@
 <?php
 
-namespace App\classes;
+namespace app\classes;
 
-class Uri{
+class Uri
+{
 
-  public static function getUri(){
-    return parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
-  }
-  
+    public static function getUri()
+    {
+        return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    }
 }

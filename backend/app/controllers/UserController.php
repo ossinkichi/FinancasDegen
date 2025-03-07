@@ -247,7 +247,7 @@ class UserController extends UsersModel
         return hash('sha256', $hash);
     }
 
-    private function emailConfig(): object
+    private function emailConfig()
     {
         try {
             $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');

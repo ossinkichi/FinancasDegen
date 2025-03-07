@@ -2,7 +2,7 @@
 
 namespace app\classes;
 
-use App\Classes\JwtHelper;
+use app\Classes\JwtHelper;
 
 class Helper
 {

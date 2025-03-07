@@ -1,0 +1,17 @@
+GET http://localhost:8000/request/
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###
+
+GET http://localhost:8000/request
+
+###
+
+GET http://localhost:8000/request
+
+###
+
+GET http://localhost:8000/request
+
+###

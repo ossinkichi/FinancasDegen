@@ -33,18 +33,18 @@ class ConnectModel
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(
-            id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            userhash VARCHAR(64) UNIQUE, 
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userhash VARCHAR(64) UNIQUE,
             type VARCHAR(14) CHECK(type IN(\'administrador\', \'funcionario\')) DEFAULT \'funcionario\',
-            name VARCHAR(340) NOT NULL, 
-            email VARCHAR(220) UNIQUE NOT NULL, 
-            emailverify BOOL DEFAULT false, 
-            password VARCHAR(130) NOT NULL, 
-            cpf VARCHAR(11) UNIQUE NOT NULL, 
-            createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP, 
-            dateofbirth DATE, 
-            gender VARCHAR(10), 
-            phone INTEGER(20), 
+            name VARCHAR(340) NOT NULL,
+            email VARCHAR(220) UNIQUE NOT NULL,
+            emailverify BOOL DEFAULT false,
+            password VARCHAR(130) NOT NULL,
+            cpf VARCHAR(11) UNIQUE NOT NULL,
+            createdaccount DATETIME DEFAULT CURRENT_TIMESTAMP,
+            dateofbirth DATE,
+            gender VARCHAR(10),
+            phone INTEGER(20),
             company VARCHAR(14),
             FOREIGN KEY (company)  REFERENCES companies(cnpj) ON DELETE CASCADE
             );');
@@ -60,11 +60,11 @@ class ConnectModel
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS companies(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-            companyname VARCHAR(200) NOT NULL, 
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            companyname VARCHAR(200) NOT NULL,
             companydescribe TEXT,
-            cnpj VARCHAR(14) UNIQUE NOT NULL, 
-            active BOOL DEFAULT false, 
+            cnpj VARCHAR(14) UNIQUE NOT NULL,
+            active BOOL DEFAULT false,
             plan INTEGER,
             planvalue TEXT,
             FOREIGN KEY (plan) REFERENCES plans(id)
@@ -80,12 +80,12 @@ class ConnectModel
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS clients(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-            name VARCHAR(350) NOT NULL, 
-            email VARCHAR(220) NOT NULL, 
-            phone VARCHAR(11) NOT NULL, 
-            shippingaddress VARCHAR(220), 
-            billingaddress VARCHAR(220), 
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name VARCHAR(350) NOT NULL,
+            email VARCHAR(220) NOT NULL,
+            phone VARCHAR(11) NOT NULL,
+            shippingaddress VARCHAR(220),
+            billingaddress VARCHAR(220),
             gender TEXT,
             company VARCHAR(14),
             FOREIGN KEY (company) REFERENCES companies(cnpj) ON DELETE CASCADE
@@ -102,9 +102,9 @@ class ConnectModel
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-            planname VARCHAR(200) NOT NULL, 
-            plandescribe TEXT, 
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            planname VARCHAR(200) NOT NULL,
+            plandescribe TEXT,
             numberofusers INTEGER DEFAULT 5,
             numberofclients INTEGER DEFAULT 25,
             price VARCHAR(10),
@@ -119,14 +119,14 @@ class ConnectModel
         }
     }
 
-    /* 
+    /*
         Adicionar uma coluna de taxa em caso de atraso no pagamento.
     */
     protected function requestTable()
     {
         try {
             $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS requests(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             client INTEGER,
             price VARCHAR(10) NOT NULL,
             numberofinstallments INTEGER DEFAULT 1,

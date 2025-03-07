@@ -32,6 +32,10 @@ class ComposerStaticInit2085ed907853b883b9c5d50b8b7b3072
             'PhpOption\\' => 10,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
+        'K' => 
+        array (
+            'Klein\\' => 6,
+        ),
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
@@ -74,6 +78,10 @@ class ComposerStaticInit2085ed907853b883b9c5d50b8b7b3072
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'Klein\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/klein/klein/src/Klein',
         ),
         'GrahamCampbell\\ResultType\\' => 
         array (

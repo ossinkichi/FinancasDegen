@@ -1,0 +1,42 @@
+GET http://localhost:8000/client/00000000000000
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###
+
+POST  http://localhost:8000/client/register
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+{
+    "name": "Bob esponja",
+    "gender": "masc",
+    "phone": "000000000",
+    "shippingaddress": "Fenda do biquini",
+    "billingaddress": "Abacaxi",
+    "company": "00000000000000"
+}
+###
+
+DELETE  http://localhost:8000/client/delete
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+{
+    "client": 1,
+    "company": 132
+}
+###
+
+PUT  http://localhost:8000/client/update
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+{
+    "name": "Bob Marley",
+    "gender": "masc",
+    "phone": "000000000",
+    "shippingaddress": "Para brisa",
+    "billingaddress": "Verdinha"
+}
+###

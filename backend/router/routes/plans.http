@@ -1,0 +1,32 @@
+GET http://localhost:8000/plan
+
+###
+
+POST  http://localhost:8000/plan/create
+Content-Type: application/json
+
+{
+    "name" : "Padrão",
+    "describe" : "Plano ultilizado por todos",
+    "users" : 24,
+    "clients" : 6,
+    "price" : "22,99",
+    "type" : "anual"
+}
+
+###
+
+PUT  http://localhost:8000/plan/update
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name" : "Padrão",
+    "describe" : "Plano ultilizado por todos",
+    "users" : 60,
+    "clients" : 200,
+    "price" : "120,59",
+    "type" : "mensal"
+}
+
+###

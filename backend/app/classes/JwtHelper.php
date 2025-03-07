@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Classes;
+namespace app\Classes;
 
 use \Exception;
 use Dotenv\Dotenv;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use App\Classes\Helper;
+use app\Classes\Helper;
 use Firebase\JWT\ExpiredException;
 
 class JwtHelper

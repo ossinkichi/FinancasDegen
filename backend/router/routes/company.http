@@ -1,0 +1,38 @@
+GET http://localhost:8000/company
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###
+GET http://localhost:8000/company/00000000000000
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###
+POST http://localhost:8000/company/register
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+{
+    "name": "bacon awards",
+    "describe": "O lugar onde seu bacon é um grande trofeu nosso",
+    "cnpj": "00000000000000",
+    "plan": "1",
+    "value": "120,59"
+}
+
+###
+GET http://localhost:8000/company/delete/123
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###
+PATCH http://localhost:8000/company/update/plan
+Content-Type: application/json
+Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+{
+    "plan": "2",
+    "cnpj": "00000000000000",
+    "value": "120,59"
+}
+###

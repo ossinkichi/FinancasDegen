@@ -59,8 +59,8 @@ class ClientModel extends ConnectModel
         string $billingaddress
     ): array {
         try {
-            $sql = $this->connect()->prepare('INSERT INTO 
-            clients(name, email, phone, gender,shippingaddress, billingaddress, company) 
+            $sql = $this->connect()->prepare('INSERT INTO
+            clients(name, email, phone, gender,shippingaddress, billingaddress, company)
             VALUES(:name, :email, :phone, :gender,:shippingaddress, :billingaddress, :company)');
             $sql->bindValue(':name', $name);
             $sql->bindValue(':email', $email);

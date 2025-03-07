@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\models\ClientModel;
 use app\Classes\Helper;
-use App\Classes\JwtHelper;
+use app\Classes\JwtHelper;
 use \Exception;
 
 class ClientController extends ClientModel

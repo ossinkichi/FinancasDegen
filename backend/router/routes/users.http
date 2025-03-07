@@ -1,0 +1,79 @@
+GET http://localhost:8000/user
+
+###
+
+POST http://localhost:8000/user/login
+Content-Type: application/json
+
+{
+    "user": "catea@gmail.com",
+    "password": "1211"
+}
+
+###
+
+POST http://localhost:8000/user/register
+Content-Type: application/json
+
+{
+    "name": "Abacate",
+    "email": "catea@gmail.com",
+    "password": "1211",
+    "cpf": "12122",
+    "dateofbirth": "21/12/1910",
+    "gender": "masc",
+    "phone": "000000000"
+}
+###
+
+DELETE http://localhost:8000/user/delete/74823bffe3413bd66c557d707aac7014ba771496bbba949ad8c9bf6915a0f1b9
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM4OTU0NTYxLCJleHAiOjE3Mzg5Nzk3NjF9.l9NozUItdAdAFAj_X3ACj9H4mZvd_joX_t4ZtC2QjYY
+
+###
+
+PUT http://localhost:8000/user/update
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM4OTU0NTYxLCJleHAiOjE3Mzg5Nzk3NjF9.l9NozUItdAdAFAj_X3ACj9H4mZvd_joX_t4ZtC2QjYY
+
+{
+    "hash": "29b55714f046d82a8c8d2ad096b561aed5a8189128eda52865c10ee0b9b35338",
+    "name": "ba2cate",
+    "email": "cat2ea@gmail.com",
+    "password": "1211",
+    "cpf": "12122",
+    "dateofbirth": "21/12/1910",
+    "gender": "masc",
+    "phone": "000000000"
+}
+
+###
+
+PATCH http://localhost:8000/user/active/b26c24a907122c9595f0f4228b3eeea21d7f8cc7687326cc70fb4ae781377c37
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM4OTU0NTYxLCJleHAiOjE3Mzg5Nzk3NjF9.l9NozUItdAdAFAj_X3ACj9H4mZvd_joX_t4ZtC2QjYY
+
+###
+
+PATCH http://localhost:8000/user/forgoat
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM4OTU0NTYxLCJleHAiOjE3Mzg5Nzk3NjF9.l9NozUItdAdAFAj_X3ACj9H4mZvd_joX_t4ZtC2QjYY
+
+{
+    "user":"29b55714f046d82a8c8d2ad096b561aed5a8189128eda52865c10ee0b9b35338",
+    "password": "1290"
+}
+
+###
+
+GET http://localhost:8000/user/dac83bb166491b2329888108d66e2b70df84e678f89ea98d71c9552ceb9f0907
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###
+
+PATCH http://localhost:8000/user/join/00000000000000/dac83bb166491b2329888108d66e2b70df84e678f89ea98d71c9552ceb9f0907
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+
+###

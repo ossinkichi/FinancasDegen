@@ -1,6 +1,6 @@
 <?php
 
-namespace App\classes;
+namespace app\classes;
 
 use app\models\ConnectModel;
 use app\controllers\UserController;
