@@ -54,7 +54,7 @@ class UserController extends UsersModel
     public function register(Request $request, Response $response): void
     {
         try {
-            $this->helper->verifyMethod('POST');
+
             $data =  file_get_contents("php://input");
 
             $this->helper->arrayValidate($data, [
@@ -194,7 +194,7 @@ class UserController extends UsersModel
 
     public function inviteFromCompany(Request $request, Response $response): void
     {
-        $this->helper->verifyMethod('POST');
+
         $this->jwt->validate();
         $invite = file_get_contents('php://input');
         $this->helper->arrayValidate($invite, ['invite', 'company']);
