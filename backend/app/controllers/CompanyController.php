@@ -2,10 +2,12 @@
 
 namespace app\controllers;
 
-use app\models\CompanyModel;
+use \Exception;
+use Klein\Request;
+use Klein\Response;
 use app\classes\Helper;
 use app\classes\JwtHelper;
-use \Exception;
+use app\models\CompanyModel;
 
 class CompanyController extends CompanyModel
 {
@@ -19,7 +21,7 @@ class CompanyController extends CompanyModel
         $this->jwt = new JwtHelper;
     }
 
-    public function index(): void
+    public function index(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -35,7 +37,7 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function get(): void
+    public function get(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -58,7 +60,7 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function register(): void
+    public function register(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('POST');
@@ -74,7 +76,7 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function delete(): void
+    public function delete(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('DELETE');
@@ -89,7 +91,7 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function plan(): void
+    public function plan(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('PUT');
@@ -105,7 +107,7 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function active(): void
+    public function active(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');;

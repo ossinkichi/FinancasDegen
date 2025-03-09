@@ -9,7 +9,7 @@ use Dotenv\Dotenv;
 class ConnectModel
 {
 
-    public function connect()
+    public function connect(): PDO
     {
         try {
 
@@ -28,14 +28,14 @@ class ConnectModel
         }
     }
 
-    protected function usersTable()
+    protected function usersTable(): void
     {
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS users(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userhash VARCHAR(64) UNIQUE,
-            type VARCHAR(14) CHECK(type IN(\'administrador\', \'funcionario\')) DEFAULT \'funcionario\',
+            position VARCHAR(14) CHECK(type IN(\'administrador\', \'funcionario\')) DEFAULT \'funcionario\',
             name VARCHAR(340) NOT NULL,
             email VARCHAR(220) UNIQUE NOT NULL,
             emailverify BOOL DEFAULT false,
@@ -55,18 +55,16 @@ class ConnectModel
         }
     }
 
-    protected function companyTable()
+    protected function companyTable(): void
     {
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS companies(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            companyname VARCHAR(200) NOT NULL,
-            companydescribe TEXT,
+            name VARCHAR(200) NOT NULL,
+            describe TEXT,
             cnpj VARCHAR(14) UNIQUE NOT NULL,
-            active BOOL DEFAULT false,
             plan INTEGER,
-            planvalue TEXT,
             FOREIGN KEY (plan) REFERENCES plans(id)
             );');
             $sql->execute();
@@ -75,7 +73,7 @@ class ConnectModel
         }
     }
 
-    protected function clientsTable()
+    protected function clientsTable(): void
     {
         try {
             $database = $this->connect();
@@ -83,7 +81,7 @@ class ConnectModel
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             name VARCHAR(350) NOT NULL,
             email VARCHAR(220) NOT NULL,
-            phone VARCHAR(11) NOT NULL,
+            phone INTEGER(11) NOT NULL,
             shippingaddress VARCHAR(220),
             billingaddress VARCHAR(220),
             gender TEXT,
@@ -97,43 +95,92 @@ class ConnectModel
         }
     }
 
-    protected function plansTable()
+    protected function plansTable(): void
     {
         try {
             $database = $this->connect();
             $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            planname VARCHAR(200) NOT NULL,
-            plandescribe TEXT,
+            name VARCHAR(200) NOT NULL,
+            describe TEXT,
             numberofusers INTEGER DEFAULT 5,
             numberofclients INTEGER DEFAULT 25,
-            price VARCHAR(10),
+            price DECIMAL(10,2) NOT NULL,
             type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
-            promotionprice VARCHAR(10),
-            promotionvalidity DATE
             );');
 
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('PlainsTable error ' . $pe->getMessage());
+            throw new PDOException('PlainsTable error: ' . $pe->getMessage());
         }
     }
 
-    /*
-        Adicionar uma coluna de taxa em caso de atraso no pagamento.
-    */
-    protected function requestTable()
+    protected function requestTable(): void
     {
         try {
             $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS requests(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             client INTEGER,
-            price VARCHAR(10) NOT NULL,
+            price DECIMAL(10,2) NOT NULL,
             numberofinstallments INTEGER DEFAULT 1,
             installmentspaid INTEGER DEFAULT 0,
             status VARCHAR(20) DEFAULT \'pendente\',
+            fees VARCHAR(10),
             FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
             );');
+            $sql->execute();
+        } catch (PDOException $pe) {
+            throw new PDOException('RequestTable error: ' . $pe->getMessage());
+        }
+    }
+
+    protected function ticketTable(): void
+    {
+        try {
+            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS ticket(
+            id INTEGER AUTOINCREMENT PRIMARY KEY,
+            request INTEGER,
+            price DECIMAL(10,2) NOT NULL,
+            numberofinstallments INTEGER,
+            dateofpayment DATE,
+            paid BOOLEAN,
+            fees DECIMAL(10,2),
+            FOREIGN KEY (request) REFERENCES requests(id) ON DELETE CASCADE
+            )');
+        } catch (PDOException $pe) {
+            throw new PDOException('ticketTable error: ' . $pe->getMessage());
+        }
+    }
+    protected function promotionPlansTable(): void
+    {
+        try {
+            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS promotionplans(
+            id INTEGER AUTOINCREMENT PRIMARY KEY,
+            plan INTEGER,
+            price DECIMAL(10,2) NOT NULL,
+            dateofexpired DATE NOT NULL,
+            FOREIGN KEY (plan) REFERENCES plan(id) ON DELETE CASCADE)');
+        } catch (PDOException $pe) {
+            throw new PDOException('promotionPlansTable error: ' . $pe->getMessage());
+        }
+    }
+
+    protected function accordTable(): void
+    {
+        try {
+            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS requests(
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            client INTEGER,
+            price DECIMAL(10,2) NOT NULL,
+            numberofinstallments INTEGER DEFAULT 1,
+            installmentspaid INTEGER DEFAULT 0,
+            status VARCHAR(20) DEFAULT \'pendente\',
+            fees VARCHAR(10),
+            requests TEXT NOT NULL,
+            tickets TEXT NOT NULL,
+            FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
+            );');
+
             $sql->execute();
         } catch (PDOException $pe) {
             throw new PDOException('RequestTable error: ' . $pe->getMessage());

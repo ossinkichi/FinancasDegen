@@ -16,7 +16,7 @@ Content-Type: application/json
 
 ###
 
-PUT  http://localhost:8000/plan/update
+PUT  http://localhost:8000/plan/
 Content-Type: application/json
 
 {

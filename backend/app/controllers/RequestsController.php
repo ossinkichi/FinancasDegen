@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use \Exception;
+use Klein\Request;
+use Klein\Response;
 use app\Classes\Helper;
 use app\Classes\JwtHelper;
 use app\models\RequestsModel;
@@ -44,7 +46,7 @@ class RequestsController extends RequestsModel
         }
     }
 
-    public function register()
+    public function register(Request $request, Response $response)
     {
         try {
             $this->helper->verifyMethod('POST');
@@ -61,7 +63,7 @@ class RequestsController extends RequestsModel
         }
     }
 
-    public function recive()
+    public function recive(Request $request, Response $response)
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -76,7 +78,7 @@ class RequestsController extends RequestsModel
         }
     }
 
-    public function discard()
+    public function discard(Request $request, Response $response)
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -92,7 +94,7 @@ class RequestsController extends RequestsModel
         }
     }
 
-    public function payInInstallment()
+    public function payInInstallment(Request $request, Response $response)
     {
         try {
             $this->helper->verifyMethod('PUT');

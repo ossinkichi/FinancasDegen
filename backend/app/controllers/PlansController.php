@@ -2,9 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\PlansModel;
-use app\classes\Helper;
 use Exception;
+use app\classes\Helper;
+use app\models\PlansModel;
+use Klein\Response;
+use Klein\Request;
 
 class PlansController extends PlansModel
 {
@@ -16,71 +18,60 @@ class PlansController extends PlansModel
         $this->helper = new Helper;
     }
 
-    public function index(): void
+    public function index(Request $request, Response $response): Response
     {
-        $this->helper->verifyMethod('GET');
         try {
-            $response = $this->getPlans();
+            $res = $this->getPlans();
 
-            if (empty($response['message'])) {
-                $this->helper->message(['message' => 'nenhum plano encontrado'], 400);
-                return;
+            if (empty($res['message'])) {
+                return $response->code(400)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum plano encontrado']));
             }
 
-            if (is_array($response['message'])) {
-                foreach ($response['message'] as $key => $value) {
-                    $response['message'][$key] = $this->helper->sanitizeArray($response['message'][$key]);
-                }
+            if (is_array($res['message'])) {
+                $res['message'] = \array_map([$this->helper, 'sanitizeArray'], $res['message']);
             }
 
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            return $response->code($response['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message']]));
         } catch (Exception $e) {
             throw new Exception('Planos não encontrados: ' . $e->getMessage(), 404);
         }
     }
 
-    public function register(): void
+    public function register(Request $request, Response $response): Response
     {
-        $this->helper->verifyMethod('POST');
-        $plan = file_get_contents("php://input");
-        $plan = $this->helper->getData($plan);
-        $plan = $this->helper->sanitizeArray($plan);
+        $plan = \json_decode($request->body(), true);
 
-        if ($plan['type'] !== "anual" && $plan['type'] !== "mensal") {
-            $this->helper->message(['error' => 'Tipo de plano invalido'], 400);
-            return;
+        if (empty($plan)) {
+            return $response->code(400)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Dados não informados']));
         }
 
-        $response = $this->setNewPlan($plan['name'], $plan['describe'], $plan['users'], $plan['clients'], $plan['price'], $plan['type']);
-        $this->helper->message(['message' => $response['message']], $response['status']);
+        $plan = $this->helper->sanitizeArray($plan);
+
+        if (\strtolower($plan['type']) !== "anual" && strtolower($plan['type']) !== "mensal") {
+            return $response->code(400)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Tipo de plano invalido']));
+        }
+
+        $res = $this->setNewPlan($plan['name'], $plan['describe'], $plan['users'], $plan['clients'], $plan['price'], $plan['type']);
+        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message']]));
     }
 
-    public function update(): void
+    public function update(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('PUT');
-            $planData = file_get_contents('php://input');
+            $planData = \json_decode($request->body(), true);
 
             if (empty($planData)) {
-                $this->helper->message(['message' => 'Dados incompletos'], 403);
-                return;
+                return $response->code(403)->header('Content-Type', 'application/json')->body(['message' => 'Dados incompletos']);
             }
 
-            $planData = $this->helper->getData($planData);
-
-            if ($planData['type'] !== "anual" && $planData['type'] !== "mensal") {
-                $this->helper->message(['error' => 'Tipo de plano invalido'], 400);
-                return;
+            if (\strtolower($planData['type']) !== "anual" && \strtolower($planData['type']) !== "mensal") {
+                return $response->code(400)->header('Content-Type', 'application/json')->body(['message' => 'Tipo de plano invalido']);
             }
 
-            $response = $this->updatePlan($planData['id'], $planData['name'], $planData['describe'], $planData['users'], $planData['clients'], $planData['price'], $planData['type']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->updatePlan($planData['id'], $planData['name'], $planData['describe'], $planData['users'], $planData['clients'], $planData['price'], $planData['type']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(['message' => $res['message']]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
-
-    public function promotion(): void {}
-
-    private function promotionPrice(): void {}
 }

@@ -4,11 +4,13 @@ namespace app\controllers;
 
 use \Exception;
 use Dotenv\Dotenv;
+use Klein\Request;
+use Klein\Response;
 use app\classes\Helper;
 use app\classes\JwtHelper;
 use app\models\UsersModel;
-use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class UserController extends UsersModel
 {
@@ -21,38 +23,35 @@ class UserController extends UsersModel
         $this->jwt =  new JwtHelper;
     }
 
-    public function index(): void
+    public function index(Request $request, Response $response): Response
     {
-        $this->helper->verifyMethod('GET');
-        $response = $this->getAllUser();
+        $res = $this->getAllUser();
         if (empty($response)) {
-            $this->helper->message(['message' => 'nenhum usuario encontrado'], 400);
-            return;
+            return $response->code(400)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum usuario encontrado']));
         }
-        $this->helper->message(['message' => $response['message'] ? $response['message'] : []], $response['status']);
+
+        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $response['message'] ? $response['message'] : []]));
     }
 
-    public function login(): void
+    public function login(Request $request, Response $response): Response
     {
-        $this->helper->verifyMethod('POST');
-        $data = file_get_contents("php://input");
+        $data = \json_decode($request->body());
 
         $this->helper->arrayValidate($data, [
             'email',
             'password'
         ]);
 
-        $data = $this->helper->getData($data);;
         $user = [
             'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
             'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
         ];
 
-        $response = $this->validateLogin($user);
-        $this->helper->message(['message' => $response['message']], $response['status']);
+        $res = $this->validateLogin($user);
+        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
     }
 
-    public function register(): void
+    public function register(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('POST');
@@ -93,7 +92,7 @@ class UserController extends UsersModel
         }
     }
 
-    public function get(): void
+    public function get(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -127,7 +126,7 @@ class UserController extends UsersModel
         }
     }
 
-    public function update(): void
+    public function update(Request $request, Response $response): void
     {
         $this->helper->verifyMethod('PUT');
         $this->jwt->validate();
@@ -152,7 +151,7 @@ class UserController extends UsersModel
         $this->helper->message(['message' => $response['message']], $response['status']);
     }
 
-    public function delete(): void
+    public function delete(Request $request, Response $response): void
     {
         $this->helper->verifyMethod('DELETE');
         $this->jwt->validate();
@@ -168,7 +167,7 @@ class UserController extends UsersModel
         }
     }
 
-    public function forgotPassword(): void
+    public function forgotPassword(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('PUT');
@@ -193,7 +192,7 @@ class UserController extends UsersModel
         }
     }
 
-    public function inviteFromCompany(): void
+    public function inviteFromCompany(Request $request, Response $response): void
     {
         $this->helper->verifyMethod('POST');
         $this->jwt->validate();
@@ -212,7 +211,7 @@ class UserController extends UsersModel
         ]);
     }
 
-    public function join(): void
+    public function join(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('PUT');
@@ -228,7 +227,7 @@ class UserController extends UsersModel
         }
     }
 
-    public function active(): void
+    public function active(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');;

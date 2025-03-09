@@ -2,6 +2,8 @@
 
 namespace app\Controllers;
 
+use Klein\Request;
+use Klein\Response;
 use app\Models\PromotionModel;
 
 class PromotionController extends PromotionModel
@@ -9,9 +11,9 @@ class PromotionController extends PromotionModel
 
     public function __construct() {}
 
-    public function create() {}
+    public function create(Request $request, Response $response) {}
 
-    public function get() {}
+    public function get(Request $request, Response $response) {}
 
-    public function disabled() {}
+    public function disabled(Request $request, Response $response) {}
 }

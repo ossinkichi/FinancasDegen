@@ -2,10 +2,12 @@
 
 namespace app\controllers;
 
-use app\models\ClientModel;
+use \Exception;
+use Klein\Request;
+use Klein\Response;
 use app\Classes\Helper;
 use app\Classes\JwtHelper;
-use \Exception;
+use app\models\ClientModel;
 
 class ClientController extends ClientModel
 {
@@ -19,7 +21,7 @@ class ClientController extends ClientModel
         $this->jwt = new JwtHelper;
     }
 
-    public function get(): void
+    public function get(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -48,7 +50,7 @@ class ClientController extends ClientModel
         }
     }
 
-    public function register(): void
+    public function register(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('POST');
@@ -73,7 +75,7 @@ class ClientController extends ClientModel
         }
     }
 
-    public function client(): void
+    public function client(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('GET');
@@ -92,7 +94,7 @@ class ClientController extends ClientModel
         }
     }
 
-    public function delete(): void
+    public function delete(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('DELETE');
@@ -107,7 +109,7 @@ class ClientController extends ClientModel
         }
     }
 
-    public function update(): void
+    public function update(Request $request, Response $response): void
     {
         try {
             $this->helper->verifyMethod('PUT');
