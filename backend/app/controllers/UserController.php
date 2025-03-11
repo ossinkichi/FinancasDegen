@@ -51,11 +51,10 @@ class UserController extends UsersModel
         return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
     }
 
-    public function register(Request $request, Response $response): void
+    public function register(Request $request, Response $response): Response
     {
         try {
-
-            $data =  file_get_contents("php://input");
+            $data = \json_decode($request->body());
 
             $this->helper->arrayValidate($data, [
                 'name',
@@ -67,17 +66,15 @@ class UserController extends UsersModel
                 'phone'
             ]);
 
-            $data = $this->helper->getData($data);
-
             $this->userExist(['email' => $data['email']]);
 
             $user = $this->helper->sanitizeArray($data);
             $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
             $user['userhash'] = $this->createHash($user['cpf']);
 
-            $reponse = $this->setNewUser($user);
-            $this->helper->message(['message' => $reponse['message']], $reponse['status']);
-            if ($reponse['status'] == 200) {
+            $res = $this->setNewUser($user);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            if ($res['status'] == 200) {
                 $this->sendEmail([
                     'from' => 'exampleemail@gmail.com',
                     'to' => $user['email'],
@@ -92,23 +89,20 @@ class UserController extends UsersModel
         }
     }
 
-    public function get(Request $request, Response $response): void
+    public function get(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
             $this->jwt->validate();
 
-            $hash = $_GET;
-            $this->helper->arrayValidate($hash, ['user']);
-            $response = $this->getUser($hash['user']);
+            $hash = $request->param('user');
+            $this->helper->arrayValidate([$hash], [0]);
+            $res = $this->getUser($hash);
 
             if (!$response['message']['emailverify']) {
-                http_response_code(403);
-                echo json_encode(['error' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
-                return;
+                return $response->code(403)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
             };
 
-            $this->helper->message([
+            return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body(\json_encode([
                 'message' =>
                 [
                     'name' => $response['message']['name'],
@@ -120,18 +114,17 @@ class UserController extends UsersModel
                     'genero' => $response['message']['gender'],
                     'contato' => $response['message']['phone']
                 ]
-            ], $response['status']);
+            ]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function update(Request $request, Response $response): void
+    public function update(Request $request, Response $response): Response
     {
-        $this->helper->verifyMethod('PUT');
         $this->jwt->validate();
 
-        $data = file_get_contents('php://input');
+        $data = \json_decode($request->body());
         $this->helper->arrayValidate($data, [
             'hash',
             'name',
@@ -141,101 +134,99 @@ class UserController extends UsersModel
             'gender',
             'phone'
         ]);
-        $data = $this->helper->getData($data);
+
         $user = $this->helper->sanitizeArray($data);
         $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 
         $this->userExist(['email' => $user['email'], 'hash' => $user['hash']]);
 
-        $response = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['hash']);
-        $this->helper->message(['message' => $response['message']], $response['status']);
+        $res = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['hash']);
+        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
     }
 
-    public function delete(Request $request, Response $response): void
+    public function delete(Request $request, Response $response): Response
     {
         $this->helper->verifyMethod('DELETE');
         $this->jwt->validate();
 
         try {
-            $hash = $_GET;
+            $hash = $request->param('user');
             $this->helper->arrayValidate($hash, ['user']);
-            $response = $this->deleteUser($hash['user']);
+            $res = $this->deleteUser($hash['user']);
 
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
-            $this->helper->message(['error' => $e->getMessage()], 400);
+            throw new Exception('Erro ao deletar: ' . $e->getMessage());
         }
     }
 
-    public function forgotPassword(Request $request, Response $response): void
+    public function forgotPassword(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('PUT');
-            $data = file_get_contents('php://input');
+            $data = \json_decode($request->body());
             $this->helper->arrayValidate($data, ['user']);
             $data = $this->helper->getData($data);
 
             $this->sendMessageForForgotPassword($data);
             $this->helper->arrayValidate($data, ['user', 'password']);
-            dd($data);
-            $response = $this->getUser($data['user']);
+
+            $res = $this->getUser($data['user']);
 
             if (password_verify($data['password'], $response['message']['password'])) {
-                $this->helper->message(['message' => 'A nova senha não pode ser igual a anterior'], 401);
-                return;
+                return $response->code(401)->header('Content-Type', 'aplication/json')->body(['message' => 'A nova senha não pode ser igual a anterior']);
             }
 
-            $response = $this->setNewPassword($data['user'], $data['password']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->setNewPassword($data['user'], $data['password']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function inviteFromCompany(Request $request, Response $response): void
+    public function inviteFromCompany(Request $request, Response $response): Response
     {
 
         $this->jwt->validate();
-        $invite = file_get_contents('php://input');
+        $invite = \json_decode($request->body());
         $this->helper->arrayValidate($invite, ['invite', 'company']);
         $this->helper->getData($invite);
 
-        $response = $this->getUser($invite);
+        $res = $this->getUser($invite);
         $this->sendEmail([
             'from' => 'exampleemail@gmail.com',
-            'to' => $response['message']['email'],
+            'to' => $res['message']['email'],
             'fromName' => 'Example Name',
-            'toName' => $response['message']['name'],
+            'toName' => $res['message']['name'],
             'subject' => 'Alterar senha do usuario',
             'message' => 'Olá ' . ['name'] . ', você foi convidado a entrar na enpresa **, para ingressar click no link a seguir!'
         ]);
+        return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body([]);
     }
 
-    public function join(Request $request, Response $response): void
+    public function join(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('PUT');
-            $this->jwt->validate();
-            $data = file_get_contents('php://input');
-            $this->helper->arrayValidate($data, ['user', 'company']);
-            $data = $this->helper->getData($data);
 
-            $response = $this->setCompany(intval($data['company']), $data['user']);
-            $this->helper->message(['message' => ['message' => $response['message']]], $response['status']);
+            $this->jwt->validate();
+            $data = \json_decode($request->body());
+            $this->helper->arrayValidate($data, ['user', 'company']);
+
+            $res = $this->setCompany(intval($data['company']), $data['user']);
+            return $response->code($res['status'])->header('Content-type', 'aplication/json')->body($res['message']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function active(Request $request, Response $response): void
+    public function active(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');;
-            $data = $_GET;
-            $this->helper->arrayValidate($data, ['user']);
 
-            $response = $this->activateAccount($data['user']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $data = $request->param('user');
+            $this->helper->arrayValidate($data, [0]);
+
+            $res = $this->activateAccount($data['user']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

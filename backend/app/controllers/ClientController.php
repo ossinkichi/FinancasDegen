@@ -27,13 +27,13 @@ class ClientController extends ClientModel
             $this->helper->verifyMethod('GET');
             $this->jwt->validate();
 
-            $company = $_GET;
+            $company = $request->param();
 
             if (empty($company) || !isset($company['company'])) {
                 $this->helper->message(['message' => 'empresa não informada'], 400);
             }
 
-            $response = $this->getAllClientsOfCompany($company['company']);
+            $res = $this->getAllClientsOfCompany($company['company']);
             if (is_array($response['message'])) {
                 foreach ($response['message'] as $key => $value) {
                     $response['message'][$key] = $this->helper->sanitizeArray($response['message'][$key]);
@@ -44,7 +44,7 @@ class ClientController extends ClientModel
                 $this->helper->message(['message' => 'Nenhum cliente cadastrado']);
                 return;
             }
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -55,7 +55,7 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('POST');
             $this->jwt->validate();
-            $client = file_get_contents("php://input");
+            $client = \json_decode($request->body());
             $this->helper->arrayValidate($client, [
                 'company',
                 'name',
@@ -68,8 +68,8 @@ class ClientController extends ClientModel
 
             $client = $this->helper->getData($client);
 
-            $response = $this->setNewClientOfCompany($client['company'], $client['name'], $client['email'], $client['phone'], $client['gender'], $client['shippingaddress'], $client['billingaddress']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->setNewClientOfCompany($client['company'], $client['name'], $client['email'], $client['phone'], $client['gender'], $client['shippingaddress'], $client['billingaddress']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -80,15 +80,15 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('GET');
             $this->jwt->validate();
-            $client = $_GET;
+            $client = $request->param();
             $this->helper->arrayValidate($client, ['id', 'company']);
-            $response = $this->getClient($client);
+            $res = $this->getClient($client);
 
             $this->helper->arrayValidate($response, ['message', 'status']);
             if (is_array($response['message'])) {
                 $response['message'] = $this->helper->sanitizeArray($response['message']);
             }
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -99,11 +99,11 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('DELETE');
             $this->jwt->validate();
-            $client = $_GET;
+            $client = $request->param();
             $this->helper->arrayValidate($client, ['client']);
 
-            $response = $this->deleteClientOfCompany($client['client']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->deleteClientOfCompany($client['client']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -114,7 +114,7 @@ class ClientController extends ClientModel
         try {
             $this->helper->verifyMethod('PUT');
             $this->jwt->validate();
-            $data = file_get_contents("php://input");
+            $data = \json_decode($request->body());
             $this->helper->arrayValidate($data, [
                 'id',
                 'name',
@@ -126,8 +126,8 @@ class ClientController extends ClientModel
             ]);
             $data = $this->helper->getData($data);
 
-            $response = $this->updateDataClientOfCompany($data['id'], $data['name'], $data['email'], $data['phone'], $data['gender'], $data['shippingaddress'], $data['billingaddress']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->updateDataClientOfCompany($data['id'], $data['name'], $data['email'], $data['phone'], $data['gender'], $data['shippingaddress'], $data['billingaddress']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

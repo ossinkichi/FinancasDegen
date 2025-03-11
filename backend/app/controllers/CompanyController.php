@@ -21,107 +21,84 @@ class CompanyController extends CompanyModel
         $this->jwt = new JwtHelper;
     }
 
-    public function index(Request $request, Response $response): void
+    public function index(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
+
             $this->jwt->validate();
 
             $companies = $this->getAllCompanies();
-            foreach ($companies as $key => $value) {
-                $companies[$key] = $this->helper->sanitizeArray($value);
-            }
-            $this->helper->message(['data' => $companies]);
+            $companies['message'] = \array_map([$this->helper, 'sanitizeArray'], $companies['message']);
+
+            return $response->code($companies['status'])->header('Content-Type', 'aplication/json')->body(['message' => $companies['message']]);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function get(Request $request, Response $response): void
+    public function get(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
+
             $this->jwt->validate();
-            $company = $_GET;
+            $company = $request->param('company');
 
-            $this->helper->arrayValidate($company, ['cnpj']);
-
-            $response = $this->getCompany($company['cnpj']);
-            if ($response['status'] == 200) {
-                $response['message'] = $this->helper->sanitizeArray($response['message']);
-                if (empty($response['message'])) {
-                    $response['message'] = 'Nenhuma empresa encontrada';
+            $this->helper->arrayValidate($company, [0]);
+            $res = $this->getCompany($company['cnpj']);
+            if ($res['status'] == 200) {
+                $res['message'] = $this->helper->sanitizeArray($res['message']);
+                if (empty($res['message'])) {
+                    $res['message'] = 'Nenhuma empresa encontrada';
                 }
             }
 
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception("company error: " . $e->getMessage());
         }
     }
 
-    public function register(Request $request, Response $response): void
+    public function register(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('POST');
             $this->jwt->validate();
-            $company = file_get_contents("php://input");
+            $company = \json_decode($request->body());
             $this->helper->arrayValidate($company, ['name', 'describe', 'cnpj', 'plan', 'value']);
             $company = $this->helper->getData($company);
 
-            $response = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan'], $company['value']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan'], $company['value']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception('register of company error' . $e->getMessage());
         }
     }
 
-    public function delete(Request $request, Response $response): void
+    public function delete(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('DELETE');
-            $this->jwt->validate();
-            $company = $_GET;
-            $this->helper->arrayValidate($company, ['cnpj']);
 
-            $response = $this->deleteCompany(strval($company['cnpj']));
-            $this->helper->message([$response['message']], $response['status']);
+            $this->jwt->validate();
+            $company = $request->param('company');
+            $this->helper->arrayValidate($company, [0]);
+
+            $res = $this->deleteCompany(strval($company['cnpj']));
+            return $response->code($response['status'])->header('Content-Type', 'aplication/json')->body($res['message']);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function plan(Request $request, Response $response): void
+    public function plan(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('PUT');
             $this->jwt->validate();
-            $company = file_get_contents("php://input");
+            $company = \json_decode($request->body());
             $this->helper->arrayValidate($company, ['cnpj', 'plan', 'value']);
-            $company = $this->helper->getData($company);
 
-            $response = $this->updateTheCompanysPlan($company['cnpj'], $company['plan'], $company['value']);
-            $this->helper->message([$response['message']], $response['status']);
+            $res = $this->updateTheCompanysPlan($company['cnpj'], $company['plan'], $company['value']);
+            return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body($res['message']);
         } catch (Exception $e) {
             throw new Exception('newPlan error' . $e->getMessage());
-        }
-    }
-
-    public function active(Request $request, Response $response): void
-    {
-        try {
-            $this->helper->verifyMethod('GET');;
-            $data = $_GET;
-
-            if (empty($data) && !isset($data['compay'])) {
-                $this->helper->message(['message' => 'Empresa não informada'], 403);
-                return;
-            }
-
-            $response = $this->activateAccount($data['company']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
         }
     }
 }

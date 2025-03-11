@@ -11,7 +11,13 @@ class TicketModel extends ConnectModel
     protected function createTicket()
     {
         try {
-            $this->connect()->prepare('');
+            $sql = $this->connect()->prepare('INSERT INTO ticket(request, price, numberofinstallment, dateofpayment, paid, fees) VALUE(:request, :price, :numberofinstallment, :dateofpayment, :paid, :fees)');
+            $sql->$sql->execute();
+
+            if ($sql->rowCount() == 0) {
+                return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado'];
+            }
+            return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
         } catch (Exception $e) {
         }

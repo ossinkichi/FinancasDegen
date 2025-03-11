@@ -21,91 +21,85 @@ class RequestsController extends RequestsModel
         $this->jwt = new JwtHelper;
     }
 
-    public function get()
+    public function get(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
             $this->jwt->validate();
-            $client = $_GET;
-            $this->helper->arrayValidate($client, ['client']);
-            $response = $this->getRequest($client['client']);
+            $client = $request->param('client');
+            $this->helper->arrayValidate($client, [0]);
+            $res = $this->getRequest($client);
 
-            if (is_array($response['message'])) {
-                foreach ($response['message'] as $key => $value) {
-                    $response['message'][$key] = $this->helper->sanitizeArray($response['message'][$key]);
-                }
-            }
+            $res['message'] = \is_array($res['message'])  ? \array_map([$this->helper, 'sanitizeArray'], $res['message']) : $res['message'];
 
             if (empty($response['message'])) {
                 $response['message'] = 'O cliente não possui nenhum boleto';
             }
 
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function register(Request $request, Response $response)
+    public function register(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('POST');
+
             $this->jwt->validate();
-            $datas = file_get_contents('php://input');
+            $datas = \json_decode($request->body());
             $this->helper->arrayValidate($datas, ['client', 'price', 'installments']);
-            $datas = $this->helper->getData($datas);
+
             $request = $this->helper->sanitizeArray($datas);
 
-            $response = $this->setNewRequest($request['client'], $request['price'], $request['installments']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->setNewRequest($request['client'], $request['price'], $request['installments']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function recive(Request $request, Response $response)
+    public function recive(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
-            $request = $_GET;
-            $this->helper->arrayValidate($request, ['account']);
+
+            $request = \json_decode($request->body());
+            $this->helper->arrayValidate($request, [0]);
             $request = $this->helper->sanitizeArray($request);
 
-            $response = $this->updateStatus($request['account'], 'Aceito');
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->updateStatus($request['account'], 'Aceito');
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function discard(Request $request, Response $response)
+    public function discard(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
             $this->jwt->validate();
-            $request = $_GET;
-            $this->helper->arrayValidate($request, ['account']);
-            $request = $this->helper->sanitizeArray($request);
+            $req = \json_decode($request->body());
+            $this->helper->arrayValidate($req, ['client', 'account', 'company']);
+            $req = $this->helper->sanitizeArray($req);
 
-            $response = $this->updateStatus($request['account'], 'Recusado');
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $res = $this->updateStatus($request['account'], 'Recusado');
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function payInInstallment(Request $request, Response $response)
+    public function payInInstallment(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('PUT');
-            $this->jwt->validate();
-            $request = file_get_contents('php://input');
-            $this->helper->arrayValidate($request, ['id', 'installment']);
-            $request = $this->helper->getData($request);
-            $request = $this->helper->sanitizeArray($request);
 
-            $response = $this->setPay($request['id'], $request['installment']);
-            $this->helper->message(['message' => $response['message']], $response['status']);
+            $this->jwt->validate();
+            $req = \json_decode($request->body());
+            $this->helper->arrayValidate($req, ['id', 'installment']);
+
+            $req = $this->helper->sanitizeArray($req);
+
+            $res = $this->setPay($request['id'], $request['installment']);
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
