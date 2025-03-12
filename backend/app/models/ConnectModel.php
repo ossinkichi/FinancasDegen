@@ -82,7 +82,7 @@ class ConnectModel
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             name VARCHAR(350) NOT NULL,
             email VARCHAR(220) NOT NULL,
-            phone VARCHAR(11) NOT NULL,
+            phone VARCHAR(20) NOT NULL,
             shippingaddress VARCHAR(220),
             billingaddress VARCHAR(220),
             gender TEXT,
@@ -107,7 +107,7 @@ class ConnectModel
             numberofusers INTEGER DEFAULT 5,
             numberofclients INTEGER DEFAULT 25,
             price DECIMAL(10,2) NOT NULL,
-            type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\')),
+            type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\'))
             );');
 
             $sql->execute();
@@ -148,6 +148,7 @@ class ConnectModel
             fees DECIMAL(10,2),
             FOREIGN KEY (request) REFERENCES requests(id) ON DELETE CASCADE
             )');
+            $sql->execute();
         } catch (PDOException $pe) {
             throw new PDOException('ticketTable error: ' . $pe->getMessage());
         }
@@ -161,7 +162,7 @@ class ConnectModel
             price DECIMAL(10,2) NOT NULL,
             dateofexpired DATE NOT NULL,
             status BOOLEAN DEFAULT true,
-            FOREIGN KEY (plan) REFERENCES plan(id) ON DELETE CASCADE)');
+            FOREIGN KEY (plan) REFERENCES plans(id) ON DELETE CASCADE)');
         } catch (PDOException $pe) {
             throw new PDOException('promotionPlansTable error: ' . $pe->getMessage());
         }

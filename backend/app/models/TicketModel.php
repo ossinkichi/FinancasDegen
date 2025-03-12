@@ -2,28 +2,74 @@
 
 namespace app\Models;
 
-use app\models\ConnectModel;
 use \Exception;
 use \PDOException;
+use app\models\ConnectModel;
+use PDO;
 
 class TicketModel extends ConnectModel
 {
-    protected function createTicket()
+    /**
+     * @return array {status: int, message: string}
+     */
+    protected function setNewTicket(int $request, string $price, int $numberofinstallment, mixed $dateofpayment, int|bool $paid, mixed $fees): array
     {
         try {
             $sql = $this->connect()->prepare('INSERT INTO ticket(request, price, numberofinstallment, dateofpayment, paid, fees) VALUE(:request, :price, :numberofinstallment, :dateofpayment, :paid, :fees)');
-            $sql->$sql->execute();
+            $sql->bindValue(':request', $request);
+            $sql->bindValue(':price', $price);
+            $sql->bindValue(':numberofinstallment', $numberofinstallment);
+            $sql->bindValue(':dateofpayment', $dateofpayment);
+            $sql->bindValue(':paid', $paid);
+            $sql->bindValue(':fees', $fees);
+            $sql->execute();
 
             if ($sql->rowCount() == 0) {
                 return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado'];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-        } catch (Exception $e) {
+            throw new PDOException('Erro ao Criar o boleto: ' . $pe->getMessage(), $pe->getCode());
         }
     }
 
-    protected function getTickets(int $account) {}
+    /**
+     * @return array {status: int, message: string}
+     */
+    protected function getTickets(int $account): array
+    {
+        try {
+            $sql = $this->connect()->prepare('SELECT * FROM ticket WHERE request = :account');
+            $sql->bindValue(':account', $account);
+            $sql->execute();
 
-    protected function payinstallment(int $account, int $ticket) {}
+            if ($sql->rowCount() == 0) {
+                return ['status' => 404, 'message' => 'Nenhum dado encontrado'];
+            }
+            return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC)];
+        } catch (PDOException $pe) {
+            throw new PDOException('Erro ao buscar os boletos: ' . $pe->getMessage(), $pe->getCode());
+        }
+    }
+
+    /**
+     * @return array {status: int, message: string}
+     */
+    protected function payinstallment(int $account, int $ticket): array
+    {
+        try {
+            $sql = $this->connect()->prepare('UPDATE ticket SET paid = 1 WHERE request = :account AND id = :ticket');
+            $sql->bindValue(':account', $account);
+            $sql->bindValue(':ticket', $ticket);
+            $sql->execute();
+
+            if ($sql->rowCount() == 0) {
+                return ['status' => 404, 'message' => 'Houve um erro ao pagar a parcela'];
+            }
+
+            return ['status' => 201, 'message' => ''];
+        } catch (PDOException $pe) {
+            throw new PDOException('Erro ao pagar a parcela: ' . $pe->getMessage(), $pe->getCode());
+        }
+    }
 }

@@ -10,6 +10,9 @@ use PDOException;
 class PromotionModel extends ConnectModel
 {
 
+    /**
+     * @return array {status: int, message: string}
+     */
     protected function setPromotion(int $plan, string|int $price, mixed $expired): array
     {
         try {
@@ -27,6 +30,9 @@ class PromotionModel extends ConnectModel
         }
     }
 
+    /**
+     * @return array {status: int, message: array}
+     */
     protected function getPromotion(int $plan): array
     {
         try {
@@ -45,6 +51,9 @@ class PromotionModel extends ConnectModel
         }
     }
 
+    /**
+     * @return array {status: int, message: string|null}
+     */
     protected function desactivatedPromotion(int $promotion): array
     {
         try {
@@ -61,6 +70,9 @@ class PromotionModel extends ConnectModel
         }
     }
 
+    /**
+     * @return array {status: int, message: string}
+     */
     protected function activatedPromotion(int $promotion): array
     {
         try {
