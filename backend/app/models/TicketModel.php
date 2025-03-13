@@ -10,7 +10,7 @@ use PDO;
 class TicketModel extends ConnectModel
 {
     /**
-     * @return array {status: int, message: string}
+     * @return array {status: int, message: string|void}
      */
     protected function setNewTicket(int $request, string $price, int $numberofinstallment, mixed $dateofpayment, int|bool $paid, mixed $fees): array
     {
@@ -34,7 +34,7 @@ class TicketModel extends ConnectModel
     }
 
     /**
-     * @return array {status: int, message: string}
+     * @return array {status: int, message: array}
      */
     protected function getTickets(int $account): array
     {
@@ -53,7 +53,28 @@ class TicketModel extends ConnectModel
     }
 
     /**
-     * @return array {status: int, message: string}
+     * @return array {status: int, message: array}
+     */
+    protected function getTicket(int $request, int $account): array
+    {
+        try {
+            $sql = $this->connect()->prepare('SELECT * FROM ticket WHERE request = :reques AND id = :account');
+            $sql->bindValue(':reques', $request);
+            $sql->bindValue(':account', $account);
+            $sql->execute();
+
+            if ($sql->rowCount() == 0) {
+                return ['status' => 404, 'message' => 'Nenhum dado encontrado'];
+            }
+
+            return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC)];
+        } catch (Exception $e) {
+            throw new Exception('Erro ao buscar o boleto: ' . $e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * @return array {status: int, message: string|void}
      */
     protected function payinstallment(int $account, int $ticket): array
     {

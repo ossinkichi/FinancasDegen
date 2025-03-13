@@ -10,7 +10,7 @@ use Exception;
 class ConnectModel
 {
 
-    public function connect(): PDO
+    protected function connect(): PDO
     {
         try {
 
@@ -29,7 +29,42 @@ class ConnectModel
         }
     }
 
-    protected function usersTable(): void
+    private function plansTable(): void
+    {
+        try {
+            $database = $this->connect();
+            $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name VARCHAR(200) NOT NULL,
+            describe TEXT,
+            numberofusers INTEGER DEFAULT 5,
+            numberofclients INTEGER DEFAULT 25,
+            price DECIMAL(10,2) NOT NULL,
+            type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\'))
+            );');
+
+            $sql->execute();
+        } catch (PDOException $pe) {
+            throw new PDOException('PlainsTable error: ' . $pe->getMessage());
+        }
+    }
+
+    private function promotionPlansTable(): void
+    {
+        try {
+            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS promotionplans(
+            id INTEGER PRIMARY KEY AUTOINCREMENT ,
+            plan INTEGER,
+            price DECIMAL(10,2) NOT NULL,
+            dateofexpired DATE NOT NULL,
+            status BOOLEAN DEFAULT true,
+            FOREIGN KEY (plan) REFERENCES plans(id) ON DELETE CASCADE)');
+        } catch (PDOException $pe) {
+            throw new PDOException('promotionPlansTable error: ' . $pe->getMessage());
+        }
+    }
+
+    private function usersTable(): void
     {
         try {
             $database = $this->connect();
@@ -56,7 +91,7 @@ class ConnectModel
         }
     }
 
-    protected function companyTable(): void
+    private function companyTable(): void
     {
         try {
             $database = $this->connect();
@@ -74,7 +109,7 @@ class ConnectModel
         }
     }
 
-    protected function clientsTable(): void
+    private function clientsTable(): void
     {
         try {
             $database = $this->connect();
@@ -96,32 +131,16 @@ class ConnectModel
         }
     }
 
-    protected function plansTable(): void
-    {
-        try {
-            $database = $this->connect();
-            $sql = $database->prepare('CREATE TABLE IF NOT EXISTS plans(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            name VARCHAR(200) NOT NULL,
-            describe TEXT,
-            numberofusers INTEGER DEFAULT 5,
-            numberofclients INTEGER DEFAULT 25,
-            price DECIMAL(10,2) NOT NULL,
-            type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\'))
-            );');
 
-            $sql->execute();
-        } catch (PDOException $pe) {
-            throw new PDOException('PlainsTable error: ' . $pe->getMessage());
-        }
-    }
 
-    protected function requestTable(): void
+    private function requestTable(): void
     {
         try {
             $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS requests(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             client INTEGER,
+            name VARCHAR(200) NOT NULL,
+            describe TEXT,
             price DECIMAL(10,2) NOT NULL,
             numberofinstallments INTEGER DEFAULT 1,
             installmentspaid INTEGER DEFAULT 0,
@@ -135,7 +154,7 @@ class ConnectModel
         }
     }
 
-    protected function ticketTable(): void
+    private function ticketTable(): void
     {
         try {
             $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS ticket(
@@ -153,22 +172,8 @@ class ConnectModel
             throw new PDOException('ticketTable error: ' . $pe->getMessage());
         }
     }
-    protected function promotionPlansTable(): void
-    {
-        try {
-            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS promotionplans(
-            id INTEGER PRIMARY KEY AUTOINCREMENT ,
-            plan INTEGER,
-            price DECIMAL(10,2) NOT NULL,
-            dateofexpired DATE NOT NULL,
-            status BOOLEAN DEFAULT true,
-            FOREIGN KEY (plan) REFERENCES plans(id) ON DELETE CASCADE)');
-        } catch (PDOException $pe) {
-            throw new PDOException('promotionPlansTable error: ' . $pe->getMessage());
-        }
-    }
 
-    protected function accordsTable(): void
+    private function accordsTable(): void
     {
         try {
             $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS accords(
@@ -190,7 +195,7 @@ class ConnectModel
         }
     }
 
-    public function createTables(): void
+    protected function createTables(): void
     {
         try {
             $this->usersTable();
