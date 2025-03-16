@@ -25,7 +25,7 @@ class RequestsModel extends ConnectModel
 
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
-            throw new PDOException($pe->getMessage());
+            throw new PDOException($pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -48,7 +48,7 @@ class RequestsModel extends ConnectModel
             }
             return ['status' =>  201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException($pe->getMessage());
+            throw new PDOException($pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -68,7 +68,7 @@ class RequestsModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException($pe->getMessage());
+            throw new PDOException($pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -88,7 +88,7 @@ class RequestsModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException($pe->getMessage());
+            throw new PDOException($pe->getMessage(), $pe->getCode());
         }
     }
 }
