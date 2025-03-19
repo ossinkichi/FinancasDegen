@@ -10,6 +10,7 @@ use PDO;
 class TicketModel extends ConnectModel
 {
     /**
+     * Registra um novo boleto
      * @return array {status: int, message: string|void}
      */
     protected function setNewTicket(int $request, string $price, int $numberofinstallment, mixed $dateofpayment, int|bool $paid, mixed $fees): array
@@ -25,7 +26,7 @@ class TicketModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado'];
+                return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
@@ -34,6 +35,7 @@ class TicketModel extends ConnectModel
     }
 
     /**
+     * Busca todos os boletos de uma conta especifica
      * @return array {status: int, message: array}
      */
     protected function getTickets(int $account): array
@@ -44,7 +46,7 @@ class TicketModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 404, 'message' => 'Nenhum dado encontrado'];
+                return ['status' => 404, 'message' => 'Nenhum dado encontrado', 'error' => $sql->errorInfo()];
             }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC)];
         } catch (PDOException $pe) {
@@ -53,6 +55,7 @@ class TicketModel extends ConnectModel
     }
 
     /**
+     * Busca um boleto especifico
      * @return array {status: int, message: array}
      */
     protected function getTicket(int $request, int $account): array
@@ -64,7 +67,7 @@ class TicketModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 404, 'message' => 'Nenhum dado encontrado'];
+                return ['status' => 404, 'message' => 'Nenhum dado encontrado', 'error' => $sql->errorInfo()];
             }
 
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC)];
@@ -74,6 +77,7 @@ class TicketModel extends ConnectModel
     }
 
     /**
+     * Paga uma parcela de um boleto
      * @return array {status: int, message: string|void}
      */
     protected function payinstallment(int $account, int $ticket): array
@@ -85,7 +89,7 @@ class TicketModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 404, 'message' => 'Houve um erro ao pagar a parcela'];
+                return ['status' => 404, 'message' => 'Houve um erro ao pagar a parcela', 'error' => $sql->errorInfo()];
             }
 
             return ['status' => 201, 'message' => ''];

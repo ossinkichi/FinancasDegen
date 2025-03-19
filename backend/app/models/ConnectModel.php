@@ -40,12 +40,12 @@ class ConnectModel
             numberofusers INTEGER DEFAULT 5,
             numberofclients INTEGER DEFAULT 25,
             price DECIMAL(10,2) NOT NULL,
+            status BOOLEAN DEFAULT false,
             type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\'))
             );');
-
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('PlainsTable error: ' . $pe->getMessage());
+            throw new PDOException('Erro ao criar a tabela de planos: ' . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -60,7 +60,7 @@ class ConnectModel
             status BOOLEAN DEFAULT true,
             FOREIGN KEY (plan) REFERENCES plans(id) ON DELETE CASCADE)');
         } catch (PDOException $pe) {
-            throw new PDOException('promotionPlansTable error: ' . $pe->getMessage());
+            throw new PDOException('Error ao criar a tabela de planos promocionais: ' . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -84,10 +84,9 @@ class ConnectModel
             company VARCHAR(14),
             FOREIGN KEY (company)  REFERENCES companies(cnpj) ON DELETE CASCADE
             );');
-
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException("Users Error: " . $pe->getMessage());
+            throw new PDOException("Erro ao criar a tabela de usuário: " . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -101,11 +100,12 @@ class ConnectModel
             describe TEXT,
             cnpj VARCHAR(14) UNIQUE NOT NULL,
             plan INTEGER,
+            status BOOLEAN DEFAULT false,
             FOREIGN KEY (plan) REFERENCES plans(id)
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('CompanyTable error: ' . $pe->getMessage());
+            throw new PDOException('Erro ao criar a tabela das empresas: ' . $pe->getMessage());
         }
     }
 
@@ -122,16 +122,15 @@ class ConnectModel
             billingaddress VARCHAR(220),
             gender TEXT,
             company VARCHAR(14),
+            deleted BOOLEAN DEFAULT false,
             FOREIGN KEY (company) REFERENCES companies(cnpj) ON DELETE CASCADE
             );');
 
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('ClientsTable error: ' . $pe->getMessage());
+            throw new PDOException('Error ao criar a tabela de clientes: ' . $pe->getMessage(), $pe->getCode());
         }
     }
-
-
 
     private function requestTable(): void
     {
@@ -146,11 +145,12 @@ class ConnectModel
             installmentspaid INTEGER DEFAULT 0,
             status VARCHAR(20) DEFAULT \'pendente\',
             fees VARCHAR(10),
+            deleted BOOLEAN DEFAULT false,
             FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('RequestTable error: ' . $pe->getMessage());
+            throw new PDOException('Erro ao criar a tabela de contas: ' . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -169,7 +169,7 @@ class ConnectModel
             )');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('ticketTable error: ' . $pe->getMessage());
+            throw new PDOException('Erro ao criar a tabela de boletos: ' . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -186,6 +186,7 @@ class ConnectModel
             fees VARCHAR(10),
             requests TEXT NOT NULL,
             tickets TEXT NOT NULL,
+            deleted BOOLEAN DEFAULT false,
             FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
             );');
 
@@ -207,7 +208,7 @@ class ConnectModel
             $this->promotionPlansTable();
             $this->accordsTable();
         } catch (Exception $e) {
-            throw new Exception('Error ao criar as tabelas: ' . $e->getMessage());
+            throw new Exception('Error ao criar as tabelas: ' . $e->getMessage(), $e->getCode());
         }
     }
 }

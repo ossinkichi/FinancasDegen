@@ -10,6 +10,7 @@ class ClientModel extends ConnectModel
 {
 
     /**
+     * Busca todos os clientes de uma empresa
      * @return array {status: number, message: array|string}
      */
     protected function getAllClientsOfCompany(string $company): array
@@ -20,14 +21,14 @@ class ClientModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 400, 'message' => 'Não foi possivel buscar os clientes', 'error' => $sql->errorInfo()];
+                return ['status' => 400, 'message' => 'Não foi possivel buscar as empresas', 'error' => $sql->errorInfo()];
             }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente'];
+                return ['status' => 400, 'message' => 'Não foi possivel buscar as empresas'];
             }
-            throw new PDOException("Erro ao buscar os clientes" . $pe->getMessage());
+            throw new PDOException("Erro ao buscar os clientes" . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -42,15 +43,15 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':company', $client['company']);
             $sql->execute();
             if ($sql->rowCount() == 0) {
-                return ['status' => 403, 'message' => 'Houve um erro ao buscar os clientes', 'error' => $sql->errorInfo()];
+                return ['status' => 403, 'message' => 'Houve um erro ao buscar o cliente', 'error' => $sql->errorInfo()];
             }
 
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente'];
+                return ['status' => 400, 'message' => 'Não foi possivel buscar o cliente'];
             }
-            return throw new PDOException("Erro ao buscar o cliente" . $pe->getMessage());
+            return throw new PDOException("Erro ao buscar o cliente" . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -87,7 +88,7 @@ class ClientModel extends ConnectModel
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente'];
             }
-            throw new PDOException("Register client error: " . $pe->getMessage());
+            throw new PDOException("Erro ao registrar um novo cliente: " . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -122,7 +123,7 @@ class ClientModel extends ConnectModel
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel atualizar os dados do cliente'];
             }
-            throw new PDOException('Update client error: ' . $pe->getMessage());
+            throw new PDOException('Erro ao atualizar os dados da empresa: ' . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -132,8 +133,9 @@ class ClientModel extends ConnectModel
     protected function deleteClientOfCompany(int $client): array
     {
         try {
-            $sql = $this->connect()->prepare('DELETE FROM clients WHERE id = :id');
+            $sql = $this->connect()->prepare('UPDATE clients SET deleted = :status WHERE id = :id');
             $sql->bindValue(':id', $client);
+            $sql->bindValue(':status', true);
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
@@ -144,7 +146,7 @@ class ClientModel extends ConnectModel
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel deletar o cliente'];
             }
-            throw new PDOException("Erro ao deletar: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao deletar a empresa: " . $pe->getMessage(), $pe->getCode());
         }
     }
 }

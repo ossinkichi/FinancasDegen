@@ -29,12 +29,9 @@ class Helper
         echo json_encode($message);
     }
 
-    public function sanitizeArray(array $data)
+    public function sanitizeArray(array $datas)
     {
-        foreach ($data as $key => $value) {
-            $data[$key] = htmlspecialchars($value);
-        }
-        return $data;
+        return array_map('htmlspecialchars', $datas);
     }
 
     public function getData(string $input)
@@ -44,16 +41,38 @@ class Helper
 
     public function arrayValidate(array|string $arrayForValidate, array $keys): void
     {
-        is_string($arrayForValidate) ? $arrayForValidate = $this->getData($arrayForValidate) : null;
-        foreach ($keys as $key) {
+        if (\is_string($arrayForValidate)) {
+            $arrayForValidate = $this->getData($arrayForValidate);
+        }
+
+        \array_walk($keys, function ($key) use ($arrayForValidate) {
             if (!array_key_exists($key, $arrayForValidate)) {
                 $this->message(['message' => 'Dados não informados'], 400);
                 die();
             }
-            $this->arrayValueNotNull($key);
-        }
+            $this->arrayValueNotNull($arrayForValidate[$key]);
+        });
         return;
     }
+
+    public function convertType(array $data, array $types)
+    {
+        $keys = array_keys($data); // Obtém as chaves originais
+
+        return array_combine($keys, array_map(function ($value, $index) use ($types) {
+            if (!isset($types[$index])) {
+                return $value; // Mantém o valor original se não houver um tipo correspondente
+            }
+
+            return match ($types[$index]) {
+                'int' => (int) $value,
+                'float' => (float) $value,
+                'string' => (string) $value,
+                default => $value, // Se o tipo não for reconhecido
+            };
+        }, $data, array_keys($data)));
+    }
+
 
     private function arrayValueNotNull(array|string $dataForValidate): void
     {
