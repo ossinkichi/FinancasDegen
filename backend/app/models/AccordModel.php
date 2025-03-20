@@ -10,12 +10,14 @@ use Exception;
 class AccordModel extends ConnectModel
 {
     /**
+     * Busca os acordo de um cliente
      * @return array {status: number, data: array}
      */
-    protected function getAccords(): array
+    protected function getAccordsOfClient(int $client): array
     {
         try {
-            $sql = $this->connect()->prepare("SELECT * FROM accords");
+            $sql = $this->connect()->prepare("SELECT * FROM accords WHERE client = :client");
+            $sql->bindValue(':client', $client);
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
@@ -28,6 +30,7 @@ class AccordModel extends ConnectModel
     }
 
     /**
+     * Cria um novo acordo
      * @return array {status: number, message: string|void}
      */
     protected function setNewAccord(
@@ -60,6 +63,7 @@ class AccordModel extends ConnectModel
     }
 
     /**
+     * Adiciona o pagamento de uma parcela de um acordo
      * @return array {status: number, message: string|void}
      */
     protected function payInstallmentOfAccord(int $accord, int $installments): array
@@ -81,6 +85,7 @@ class AccordModel extends ConnectModel
     }
 
     /**
+     * Atualiza os status de um acordo
      * @return array {status: number, message: string|void}
      */
     protected function updateStatusOfAccord(int $accord, string $status): array
@@ -98,6 +103,27 @@ class AccordModel extends ConnectModel
             return ['status' => 201, 'message' => ''];
         } catch (Exception $e) {
             throw new Exception('Erro ao atualizar o status do acordo: ' . $e->getMessage(), $e->getCode());
+        }
+    }
+
+    /**
+     * Deleta um acordo
+     * @return array {status: number, message: string|void}
+     */
+    protected function deleteAccord(int $accord): array
+    {
+        try {
+            $sql = $this->connect()->prepare('UPDATE accords SET deleted = true WHERE id = :id');
+            $sql->bindValue(':id', $accord);
+            $sql->execute();
+
+            if ($sql->rowCount() == 0) {
+                return ['status' => 404, 'message' => 'Não foi possivel deletar o acordo', 'error: ' => $sql->errorInfo()];
+            }
+
+            return ['status' => 201, 'message' => ''];
+        } catch (Exception $e) {
+            throw new Exception('Erro ao deletar: ' . $e->getMessage(), $e->getCode());
         }
     }
 }

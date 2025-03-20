@@ -2,9 +2,9 @@
 
 namespace app\models;
 
-use app\models\ConnectModel;
 use \PDO;
 use \PDOException;
+use app\models\ConnectModel;
 
 class RequestsModel extends ConnectModel
 {

@@ -196,6 +196,8 @@ class ConnectModel
         }
     }
 
+    // Adicionar tabela de despesas
+
     protected function createTables(): void
     {
         try {
