@@ -23,7 +23,7 @@ class JwtHelper
         self::$helper = new Helper;
     }
 
-    public function generate(int $time)
+    public function generate(int $time, array|string $data = []): string
     {
         try {
             $payload = [
@@ -31,6 +31,7 @@ class JwtHelper
                 "aud" => "example.com",     // Destinatário do token
                 "iat" => time(),            // Data de criação do token
                 "exp" => time() + $time,     // Data de expiração
+                "data" => $data
             ];
 
             return JWT::encode($payload, self::$key, 'HS256');

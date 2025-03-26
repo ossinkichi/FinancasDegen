@@ -39,16 +39,17 @@ class Helper
         return get_object_vars(json_decode($input));
     }
 
-    public function arrayValidate(array|string $arrayForValidate, array $keys): void
+    public function arrayValidate(array|string $arrayForValidate, array $keys = []): void
     {
         if (\is_string($arrayForValidate)) {
-            $arrayForValidate = $this->getData($arrayForValidate);
+            empty($arrayForValidate) ? $this->message(['message' => 'Dados não informados'], 400) : null;
+            throw new \Exception('Dados não informados');
         }
 
         \array_walk($keys, function ($key) use ($arrayForValidate) {
             if (!array_key_exists($key, $arrayForValidate)) {
                 $this->message(['message' => 'Dados não informados'], 400);
-                die();
+                throw new \Exception('Dados não informados');
             }
             $this->arrayValueNotNull($arrayForValidate[$key]);
         });

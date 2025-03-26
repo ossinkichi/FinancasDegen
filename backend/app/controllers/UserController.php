@@ -48,7 +48,9 @@ class UserController extends UsersModel
         ];
 
         $res = $this->validateLogin($user);
-        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+        return $response->code($res['status'])
+            ->header('Content-Type', 'application/json')
+            ->body(\json_encode($res['message']));
     }
 
     public function register(Request $request, Response $response): Response
@@ -72,18 +74,20 @@ class UserController extends UsersModel
             $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
             $user['userhash'] = $this->createHash($user['cpf']);
 
-            $res = $this->setNewUser($user);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
-            if ($res['status'] == 200) {
-                $this->sendEmail([
-                    'from' => 'exampleemail@gmail.com',
-                    'to' => $user['email'],
-                    'fromName' => 'Example Name',
-                    'toName' => $user['name'],
-                    'subject' => 'Resgistro de novo usuário',
-                    'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
-                ]);
-            }
+            $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['cpf'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone']);
+            return $response->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            // if ($res['status'] == 201) {
+            //     $this->sendEmail([
+            //         'from' => 'exampleemail@gmail.com',
+            //         'to' => $user['email'],
+            //         'fromName' => 'Example Name',
+            //         'toName' => $user['name'],
+            //         'subject' => 'Resgistro de novo usuário',
+            //         'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
+            //     ]);
+            // }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -302,7 +306,7 @@ class UserController extends UsersModel
 
         return [
             'message' => [
-                'user' => $response['message']['userhash'] ?  $response['message']['userhash'] : [],
+                'user' => $response['message']['userhash'] ?? [],
                 'token' => $response['message']['userhash'] ? $this->jwt->generate(60 * 60 * 7) : ''
             ],
             'status' => 200

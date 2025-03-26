@@ -196,7 +196,24 @@ class ConnectModel
         }
     }
 
-    // Adicionar tabela de despesas
+    private function expensesTable(): void
+    {
+        try {
+            $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS expenses(
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            name VARCHAR(200) NOT NULL,
+            describe TEXT,
+            price DECIMAL(10,2) NOT NULL,
+            dateofexpense DATE NOT NULL,
+            status BOOLEAN DEFAULT false,
+            company VARCHAR(14),
+            FOREIGN KEY (company) REFERENCES companies(cnpj) ON DELETE CASCADE
+            );');
+            $sql->execute();
+        } catch (PDOException $pe) {
+            throw new PDOException('Erro ao criar a tabela de despesas: ' . $pe->getMessage(), $pe->getCode());
+        }
+    }
 
     protected function createTables(): void
     {
@@ -209,6 +226,7 @@ class ConnectModel
             $this->ticketTable();
             $this->promotionPlansTable();
             $this->accordsTable();
+            $this->expensesTable();
         } catch (Exception $e) {
             throw new Exception('Error ao criar as tabelas: ' . $e->getMessage(), $e->getCode());
         }

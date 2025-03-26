@@ -21,41 +21,48 @@ class ClientController extends ClientModel
         $this->jwt = new JwtHelper;
     }
 
-    public function get(Request $request, Response $response): void
+    // Busca os clientes de uma empresa
+    public function get(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('GET');
-            $this->jwt->validate();
+            $this->jwt->validate(); // Valida o token
+            $param = $request->param('company'); // Recebe o parametro da empresa
 
-            $company = $request->param();
+            // Verifica se o parametro foi informado
+            $this->helper->arrayValidate($param);
+            $param = $this->helper->convertType([$param], ['string'])[0]; // Converte o tipo do parametro
 
-            if (empty($company) || !isset($company['company'])) {
-                $this->helper->message(['message' => 'empresa não informada'], 400);
+            $clientsOfCompany = $this->getAllClientsOfCompany($param); // Busca os clientes da empresa
+            // Verifica se a mensagem é um array e sanitiza
+            if (is_array($clientsOfCompany['message'])) $clientsOfCompany['message'] = \array_map([$this->helper, 'sanitizeArray'], $clientsOfCompany['message']);
+
+            // Verifica se a mensagem está vazia e retorna 204
+            if (empty($clientsOfCompany) || !isset($clientsOfCompany['message'])) {
+                return $response
+                    ->code(204)
+                    ->header('Content-Type', 'application/json')
+                    ->body();
             }
 
-            $res = $this->getAllClientsOfCompany($company['company']);
-            if (is_array($response['message'])) {
-                foreach ($response['message'] as $key => $value) {
-                    $response['message'][$key] = $this->helper->sanitizeArray($response['message'][$key]);
-                }
-            }
-
-            if (empty($response['message'])) {
-                $this->helper->message(['message' => 'Nenhum cliente cadastrado']);
-                return;
-            }
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            $clientsOfCompany['message'] = \array_map([$this->helper, 'sanitizeArray'], $clientsOfCompany['message']); // Sanitiza a mensagem
+            // Retorna a resposta
+            return $response
+                ->code($clientsOfCompany['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode($clientsOfCompany['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function register(Request $request, Response $response): void
+    // Cadastra um novo cliente em uma empresa
+    public function register(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('POST');
-            $this->jwt->validate();
-            $client = \json_decode($request->body());
+            $this->jwt->validate(); // Valida o token
+            $client = \json_decode($request->body()); // Recebe os dados do cliente
+
+            // Verifica se os campos foram informados
             $this->helper->arrayValidate($client, [
                 'company',
                 'name',
@@ -65,57 +72,100 @@ class ClientController extends ClientModel
                 'shippingaddress',
                 'billingaddress'
             ]);
+            $client = $this->helper->convertType($client, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']); // Converte os tipos dos campos
 
-            $client = $this->helper->getData($client);
-
+            // faz o pedido de cadastro do cliente e recebe a resposta
             $res = $this->setNewClientOfCompany($client['company'], $client['name'], $client['email'], $client['phone'], $client['gender'], $client['shippingaddress'], $client['billingaddress']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
-    }
 
-    public function client(Request $request, Response $response): void
-    {
-        try {
-            $this->helper->verifyMethod('GET');
-            $this->jwt->validate();
-            $client = $request->param();
-            $this->helper->arrayValidate($client, ['id', 'company']);
-            $res = $this->getClient($client);
-
-            $this->helper->arrayValidate($response, ['message', 'status']);
-            if (is_array($response['message'])) {
-                $response['message'] = $this->helper->sanitizeArray($response['message']);
+            // verifica se o retorno é vazio e avisa o front
+            if (empty($res) || !isset($res['message'])) {
+                return $response
+                    ->code(204)
+                    ->header('Content-Type', 'application/json')
+                    ->body();
             }
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+
+            // retorna a resposta
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function delete(Request $request, Response $response): void
+    // Busca um cliente de uma empresa
+    public function searchClient(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('DELETE');
-            $this->jwt->validate();
-            $client = $request->param();
-            $this->helper->arrayValidate($client, ['client']);
+            $this->jwt->validate(); // Valida o token
+            $param = $request->params(['client', 'company']); // Recebe o parametro do cliente
 
-            $res = $this->deleteClientOfCompany($client['client']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            $this->helper->arrayValidate($param, ['id', 'company']); // Verifica se os campos foram informados
+            $param = $this->helper->convertType($param, ['string', 'string']); // Converte os tipos dos campos
+
+            $client = $this->getClient($param); // Busca o cliente
+
+            // Verifica se a mensagem é um array e sanitiza
+            if (is_array($client['message'])) $client['message'] = $this->helper->sanitizeArray($client['message']);
+
+            // Verifica se a mensagem está vazia e retorna 204
+            if (empty($client) || !isset($client['message'])) {
+                return $response
+                    ->code(204)
+                    ->header('Content-Type', 'application/json')
+                    ->body();
+            }
+            // Retorna a resposta
+            return $response
+                ->code($client['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $client['message'], 'error' => $client['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
 
-    public function update(Request $request, Response $response): void
+    // Deleta um cliente de uma empresa
+    public function delete(Request $request, Response $response): Response
     {
         try {
-            $this->helper->verifyMethod('PUT');
-            $this->jwt->validate();
-            $data = \json_decode($request->body());
-            $this->helper->arrayValidate($data, [
+            $this->jwt->validate(); // Valida o token
+            $param = $request->param('client'); // Recebe o parametro do cliente
+
+            $this->helper->arrayValidate($param); // Verifica se o campo foi informado
+            $param = $this->helper->convertType([$param], ['int'])[0]; // Converte o tipo do campo
+
+            // Faz o pedido de exclusão do cliente e recebe a resposta
+            $res = $this->deleteClientOfCompany($param);
+            // Verifica se o retorno é vazio e retorna 204
+            if (empty($res) || empty($res['message'])) {
+                return $response
+                    ->code(204)
+                    ->header('Content-Type', 'application/json')
+                    ->body();
+            }
+
+            // Retorna a resposta
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    // Atualiza um cliente de uma empresa
+    public function update(Request $request, Response $response): Response
+    {
+        try {
+            $this->jwt->validate(); // Valida o token
+            $params = \json_decode($request->body()); // Recebe os dados do cliente
+
+            // Verifica se os campos foram informados
+            $this->helper->arrayValidate($params, [
                 'id',
                 'name',
                 'email',
@@ -124,10 +174,34 @@ class ClientController extends ClientModel
                 'shippingaddress',
                 'billingaddress'
             ]);
-            $data = $this->helper->getData($data);
+            // Converte os tipos dos campos
+            $params = $this->helper->convertType($params, [
+                'int',
+                'string',
+                'string',
+                'string',
+                'string',
+                'string',
+                'string',
+                'string'
+            ]);
 
-            $res = $this->updateDataClientOfCompany($data['id'], $data['name'], $data['email'], $data['phone'], $data['gender'], $data['shippingaddress'], $data['billingaddress']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            // Faz o pedido de atualização do cliente e recebe a resposta
+            $res = $this->updateDataClientOfCompany($params['id'], $params['name'], $params['email'], $params['phone'], $params['gender'], $params['shippingaddress'], $params['billingaddress']);
+
+            // Verifica se o retorno é vazio e retorna 204
+            if (empty($res) || !isset($res['message'])) {
+                return $response
+                    ->code(204)
+                    ->header('Content-Type', 'application/json')
+                    ->body();
+            }
+
+            // Retorna a resposta
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
