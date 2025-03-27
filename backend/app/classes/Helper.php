@@ -3,6 +3,7 @@
 namespace app\classes;
 
 use app\Classes\JwtHelper;
+use InvalidArgumentException;
 
 class Helper
 {
@@ -56,22 +57,24 @@ class Helper
         return;
     }
 
-    public function convertType(array $data, array $types)
+    public function convertType(array $datas, array $types)
     {
-        $keys = array_keys($data); // Obtém as chaves originais
+        if (count($datas) != count($types)) {
+            throw new InvalidArgumentException("O número de valores e tipos não corresponde.");
+        }
 
-        return array_combine($keys, array_map(function ($value, $index) use ($types) {
-            if (!isset($types[$index])) {
-                return $value; // Mantém o valor original se não houver um tipo correspondente
-            }
-
-            return match ($types[$index]) {
+        return \array_combine(\array_keys($datas), array_map(function ($value, $type) {
+            return match ($type) {
                 'int' => (int) $value,
                 'float' => (float) $value,
+                'bool' => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
                 'string' => (string) $value,
-                default => $value, // Se o tipo não for reconhecido
+                'array' => (array) $value,
+                'object' => (object) $value,
+                'decimals' => \bcdiv((float) $value, '1', 2),
+                default => throw new InvalidArgumentException("Tipo inválido: $type"),
             };
-        }, $data, array_keys($data)));
+        }, $datas, $types));
     }
 
 

@@ -8,20 +8,10 @@ use app\controllers\UserController;
 class Ultils extends ConnectModel
 {
 
-    public static function createTables()
+    public function createTables(): void
     {
         $db = new ConnectModel;
         $db->connect();
-        $db->plansTable();
-        $db->companyTable();
-        $db->usersTable();
-        $db->clientsTable();
-        $db->requestTable();
-    }
-
-    public static function seedUsersTable(array $user)
-    {
-        $users = new UserController;
-        // $users->register($user);
+        $db->createTables();
     }
 }

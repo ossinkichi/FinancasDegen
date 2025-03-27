@@ -19,7 +19,7 @@ class PlansModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 400, 'message' => 'Não foi possivel puxar os planos'];
+                return ['status' => 400, 'message' => 'Nenhum plano encontrado', 'error' => $sql->errorInfo()];
             }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
@@ -47,14 +47,14 @@ class PlansModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel registrar um novo plano plano'];
+                return ['status' => 403, 'message' => 'Não foi possivel registrar um novo plano plano', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao registrar um plano: " . $pe->getMessage(), $pe->getCode());
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel registrar um novo plano'];
             }
+            throw new PDOException("Erro ao registrar um plano: " . $pe->getMessage(), $pe->getCode());
         }
     }
 

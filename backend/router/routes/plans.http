@@ -1,4 +1,4 @@
-GET http://localhost:8000/
+GET http://localhost:8000/plan
 
 ###
 
@@ -8,10 +8,10 @@ Content-Type: application/json
 {
     "name" : "Padrão",
     "describe" : "Plano ultilizado por todos",
-    "users" : 24,
-    "clients" : 6,
-    "price" : "22,99",
-    "type" : "anual"
+    "users" : 6,
+    "clients" : 50,
+    "price" : "22.999",
+    "type" : "mensal"
 }
 
 ###
