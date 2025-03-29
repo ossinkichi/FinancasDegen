@@ -18,9 +18,6 @@ class PlansModel extends ConnectModel
             $sql = $this->connect()->prepare('SELECT * FROM plans');
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
-                return ['status' => 400, 'message' => 'Nenhum plano encontrado', 'error' => $sql->errorInfo()];
-            }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
@@ -37,7 +34,7 @@ class PlansModel extends ConnectModel
     protected function setNewPlan(string $planname, string $plandescribe, int $numberofusers, int $numberofclients, string $price, string $type): array
     {
         try {
-            $sql = $this->connect()->prepare('INSERT INTO plans(planname, plandescribe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
+            $sql = $this->connect()->prepare('INSERT INTO plans(name, describe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
             $sql->bindValue(':planname', $planname);
             $sql->bindValue(':plandescribe', $plandescribe);
             $sql->bindValue(':numberofusers', $numberofusers);
@@ -54,7 +51,7 @@ class PlansModel extends ConnectModel
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel registrar um novo plano'];
             }
-            throw new PDOException("Erro ao registrar um plano: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao registrar um plano: " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -91,11 +88,30 @@ class PlansModel extends ConnectModel
      * Desativa um plano existente
      * @return array {status: number, message: string|void}
      */
-    protected function desactivatePlan(int $id): array
+    protected function disablePlan(int $id): array
     {
         try {
             $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
             $sql->bindValue(':status', false);
+            $sql->bindValue(':id', $id);
+            $sql->execute();
+
+            if ($sql->rowCount() == 0) {
+                return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
+            }
+            return ['status' => 201, 'message' => ''];
+        } catch (PDOException $pe) {
+            if ($pe->getCode() == 23000) {
+                return ['status' => 400, 'message' => 'Não foi possivel desativar o plano'];
+            }
+            throw new PDOException("Erro ao desativar o plano: " . $pe->getMessage(), $pe->getCode());
+        }
+    }
+    protected function enabletePlan(int $id): array
+    {
+        try {
+            $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
+            $sql->bindValue(':status', true);
             $sql->bindValue(':id', $id);
             $sql->execute();
 

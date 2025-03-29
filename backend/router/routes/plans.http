@@ -6,12 +6,12 @@ POST  http://localhost:8000/plan/create
 Content-Type: application/json
 
 {
-    "name" : "Padrão",
+    "name" : "premiun",
     "describe" : "Plano ultilizado por todos",
-    "users" : 6,
-    "clients" : 50,
-    "price" : "22.999",
-    "type" : "mensal"
+    "users" : 24,
+    "clients" : 150,
+    "price" : "99.99",
+    "type" : "anual"
 }
 
 ###

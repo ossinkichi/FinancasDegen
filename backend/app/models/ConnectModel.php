@@ -40,7 +40,7 @@ class ConnectModel
             numberofusers INTEGER DEFAULT 5,
             numberofclients INTEGER DEFAULT 25,
             price DECIMAL(10,2) NOT NULL,
-            status BOOLEAN DEFAULT false,
+            status BOOLEAN DEFAULT true,
             type VARCHAR(6) CHECK(type IN (\'anual\', \'mensal\'))
             );');
             $sql->execute();

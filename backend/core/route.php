@@ -22,6 +22,6 @@ require __DIR__ . '/../router/userRouter.php';
 try {
     $klein->dispatch();
 } catch (Exception $e) {
-    error_log("Erro na rota: " . $e->getMessage()); // Log do erro
+    error_log("Erro na rota: " . $e->getMessage() . ', no arquivo: ' . $e->getFile() . ', na linha: ' . $e->getLine()); // Log do erro
     echo json_encode(["error" => "Ocorreu um erro interno"]); // Retorno amigável
 }
