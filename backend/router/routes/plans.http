@@ -2,31 +2,57 @@ GET http://localhost:8000/plan
 
 ###
 
-POST  http://localhost:8000/plan/create
+POST http://localhost:8000/plan/create
 Content-Type: application/json
 
 {
-    "name" : "premiun",
+    "name" : "Light",
     "describe" : "Plano ultilizado por todos",
     "users" : 24,
     "clients" : 150,
-    "price" : "99.99",
+    "price" : "123.49",
     "type" : "anual"
 }
 
 ###
 
-PUT  http://localhost:8000/plan/
+PUT http://localhost:8000/plan/update
 Content-Type: application/json
 
 {
     "id": 1,
-    "name" : "Padrão",
+    "name" : "Light",
     "describe" : "Plano ultilizado por todos",
     "users" : 60,
     "clients" : 200,
-    "price" : "120,59",
+    "price" : "12,59",
     "type" : "mensal"
 }
 
+###
+
+PATCH http://localhost:8000/plan/enable
+Content-Type: application/json
+
+{`
+    "plan": 1
+}
+
+###
+
+PATCH http://localhost:8000/plan/enable
+Content-Type: application/json
+
+{
+    "plan": 3
+}
+
+###
+
+PATCH http://localhost:8000/plan/disable
+Content-Type: application/json
+
+{
+    "plan": 3
+}
 ###

@@ -62,7 +62,7 @@ class PlansModel extends ConnectModel
     protected function updatePlan(int $id, string $planname, string $plandescribe, int $numberofusers, int $numberofclients, string $price, string $type): array
     {
         try {
-            $sql = $this->connect()->prepare('UPDATE plans SET planname = :planname, plandescribe = :plandescribe,  numberofusers = :numberofusers,  numberofclients = :numberofclients,  price = :price, type = :type WHERE id = :id');
+            $sql = $this->connect()->prepare('UPDATE plans SET name = :planname, describe = :plandescribe,  numberofusers = :numberofusers,  numberofclients = :numberofclients,  price = :price, type = :type WHERE id = :id');
             $sql->bindValue(':id', $id);
             $sql->bindValue(':planname', $planname);
             $sql->bindValue(':plandescribe', $plandescribe);
@@ -77,7 +77,7 @@ class PlansModel extends ConnectModel
 
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao atualizar o plano: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao atualizar o plano: " . $pe->getMessage(), (int) $pe->getCode());
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel atualizar o plano o plano'];
             }
@@ -88,11 +88,11 @@ class PlansModel extends ConnectModel
      * Desativa um plano existente
      * @return array {status: number, message: string|void}
      */
-    protected function disablePlan(int $id): array
+    protected function disableThePlan(int $id): array
     {
         try {
             $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
-            $sql->bindValue(':status', false);
+            $sql->bindValue(':status', 0);
             $sql->bindValue(':id', $id);
             $sql->execute();
 
@@ -107,7 +107,7 @@ class PlansModel extends ConnectModel
             throw new PDOException("Erro ao desativar o plano: " . $pe->getMessage(), $pe->getCode());
         }
     }
-    protected function enabletePlan(int $id): array
+    protected function enableThePlan(int $id): array
     {
         try {
             $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');

@@ -22,7 +22,8 @@ Content-Type: application/json
     "cpf": "12122",
     "dateofbirth": "21/12/1910",
     "gender": "masc",
-    "phone": "000000000"
+    "phone": "000000000",
+    "position": "funcionario"
 }
 ###
 

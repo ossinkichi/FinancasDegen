@@ -25,12 +25,29 @@ class UserController extends UsersModel
 
     public function index(Request $request, Response $response): Response
     {
-        $res = $this->getAllUser();
-        if (empty($response)) {
-            return $response->code(400)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum usuario encontrado']));
-        }
+        try {
+            $res = $this->getAllUser(); // Faz o pedido ao banco de dados
 
-        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $response['message'] ? $response['message'] : []]));
+            // Verifica se houve retorno
+            if (empty($res)) {
+                return $response->code(404)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum usuario encontrado']));
+            }
+            // Sanitiza os dados
+            \is_array($res['message']) ?
+                $res['message'] = \array_map(function ($user) {
+                    $user = $this->helper->sanitizeArray($user);
+                    foreach (['id', 'password'] as $chave) {
+                        unset($user[$chave]);
+                    }
+                    return $user;
+                },  $res['message'])
+                : null;
+
+            // Envia uma resposta ao front
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 
     public function login(Request $request, Response $response): Response
@@ -53,11 +70,13 @@ class UserController extends UsersModel
             ->body(\json_encode($res['message']));
     }
 
-    public function register(Request $request, Response $response): Response
+    // Registra um novo usuário
+    public function create(Request $request, Response $response): Response
     {
         try {
-            $data = \json_decode($request->body());
+            $data = \json_decode($request->body(), true); // Recebe os dados do front
 
+            // Verifica se todos os dados necessários foram enviados
             $this->helper->arrayValidate($data, [
                 'name',
                 'email',
@@ -68,26 +87,36 @@ class UserController extends UsersModel
                 'phone'
             ]);
 
+            // Verifica se o usúario já está cadastrado
             $this->userExist(['email' => $data['email']]);
 
+            // Sanitiza os dados
             $user = $this->helper->sanitizeArray($data);
             $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-            $user['userhash'] = $this->createHash($user['cpf']);
+            $user['hash'] = $this->createHash($user['cpf']);
 
-            $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['cpf'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone']);
+            // Converte os tipos dos dados
+            $user = $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
+
+            // Faz o pedido ao banco e recebe sua resposta
+            $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['cpf'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['position']);
+
+            // Dá um retorno ao front
             return $response->code($res['status'])
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
-            // if ($res['status'] == 201) {
-            //     $this->sendEmail([
-            //         'from' => 'exampleemail@gmail.com',
-            //         'to' => $user['email'],
-            //         'fromName' => 'Example Name',
-            //         'toName' => $user['name'],
-            //         'subject' => 'Resgistro de novo usuário',
-            //         'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
-            //     ]);
-            // }
+
+            // Envia um email ao usuário cadastrado
+            /*if ($res['status'] == 201) {
+                $this->sendEmail([
+                    'from' => 'exampleemail@gmail.com',
+                    'to' => $user['email'],
+                    'fromName' => 'Example Name',
+                    'toName' => $user['name'],
+                    'subject' => 'Resgistro de novo usuário',
+                    'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
+                ]);
+            }*/
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

@@ -59,7 +59,7 @@ class Helper
 
     public function convertType(array $datas, array $types)
     {
-        if (count($datas) != count($types)) {
+        if (count($datas) > count($types)) {
             throw new InvalidArgumentException("O número de valores e tipos não corresponde.");
         }
 

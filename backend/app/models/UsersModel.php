@@ -19,12 +19,9 @@ class UsersModel extends ConnectModel
             $sql = $this->connect()->prepare('SELECT * FROM users');
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel buscar os dados'];
-            }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao buscar o usuário " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao buscar o usuário " . $pe->getMessage(),  (int) $pe->getCode());
         }
     }
 
@@ -43,19 +40,19 @@ class UsersModel extends ConnectModel
             }
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao buscar usuário " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao buscar usuário " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
     /**
      * @return array {status: number, message: array|string}
      */
-    protected function setNewUser(string $userhash, string $name, string $email, string $password, string $cpf, $dateofbirth, string $gender, string $phone): array
+    protected function setNewUser(string $userhash, string $name, string $email, string $password, string $cpf, $dateofbirth, string $gender, string $phone, string|null $position): array
     {
         try {
             $sql = $this->connect()->prepare('
-        INSERT INTO users(userhash,name, email, password, cpf, dateofbirth, gender, phone)
-        VALUES(:userhash,:name, :email, :password, :cpf, :dateofbirth, :gender, :phone)
+        INSERT INTO users(userhash,name, email, password, cpf, dateofbirth, gender, phone,position)
+        VALUES(:userhash,:name, :email, :password, :cpf, :dateofbirth, :gender, :phone, :position)
         ');
             $sql->bindValue(':userhash', $userhash);
             $sql->bindValue(':name', $name);
@@ -65,17 +62,18 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':dateofbirth', $dateofbirth);
             $sql->bindValue(':gender', $gender);
             $sql->bindValue(':phone', $phone);
+            $sql->bindValue(':position', $position);
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel cadastrar o usuario'];
+                return ['status' => 403, 'message' => 'Não foi possivel cadastrar o usuario', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
+            throw new PDOException("Erro ao criar o usuário: " . $pe->getMessage(), (int) $pe->getCode());
+            if ((int) $pe->getCode() == 23000) {
                 return ['status' => 500, 'message' => 'Não foi possivel cadastrar o usuario'];
             }
-            throw new PDOException("Erro ao criar o usuário: " . $pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -107,10 +105,10 @@ class UsersModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
+            if ((int) $pe->getCode() == 23000) {
                 return ['status' => 403, 'message' => 'Não foi possivel atualizar os dados do cliente'];
             }
-            throw new PDOException("Erro ao atualizar usuário: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao atualizar usuário: " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -130,7 +128,7 @@ class UsersModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao ativar usuário: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao ativar usuário: " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -149,7 +147,7 @@ class UsersModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao deletar o usuário: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao deletar o usuário: " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -169,10 +167,10 @@ class UsersModel extends ConnectModel
             }
             return ["status" => 201, "message" => ""];
         } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
+            if ((int) $pe->getCode() == 23000) {
                 return ["status" => 400, "message" => "Não foi possivel entrar na empresa!"];
             }
-            throw new PDOException("Erro ao entrar na empresa: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao entrar na empresa: " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -192,7 +190,7 @@ class UsersModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 }

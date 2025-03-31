@@ -71,41 +71,64 @@ class PlansController extends PlansModel
         }
     }
 
+    // Atualiza um plano existente
     public function update(Request $request, Response $response): Response
     {
         try {
-            $planData = \json_decode($request->body(), true);
+            $planData = \json_decode($request->body(), true); // Pega os dados enviados do front
 
-            if (empty($planData)) {
-                return $response->code(403)->header('Content-Type', 'application/json')->body(['message' => 'Dados incompletos']);
-            }
+            // Verifica se todods os dados foram enviados
+            $this->helper->arrayValidate($planData, ['id', 'name', 'describe', 'users', 'clients', 'price', 'type']);
+            // Converte os tipos dos dados
+            $planData = $this->helper->convertType($planData, ['int', 'string', 'string', 'int', 'int', 'decimals', 'string']);
+            $planData = $this->helper->sanitizeArray($planData); // Sanitiza os dados enviados
 
+            // Verifica se o tipo de plano é aceitavel
             if (\strtolower($planData['type']) !== "anual" && \strtolower($planData['type']) !== "mensal") {
                 return $response->code(400)->header('Content-Type', 'application/json')->body(['message' => 'Tipo de plano invalido']);
             }
 
+            // Envia o pedido ao banco de dados e recebe sua resposta
             $res = $this->updatePlan($planData['id'], $planData['name'], $planData['describe'], $planData['users'], $planData['clients'], $planData['price'], $planData['type']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(['message' => $res['message']]);
+            // Envia uma resposta ao front
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
-    }
-
-    public function disable(Request $request, Response $response): Response
-    {
-        try {
-
-
-            return $response->body();
-        } catch (Exception $e) {
-            throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
+            throw new Exception($e->getMessage(), (int) $e->getCode());
         }
     }
 
     public function enable(Request $request, Response $response): Response
     {
         try {
-            return $response->body();
+            $plan = \json_decode($request->body(), true); // Pega os dados enviados
+
+
+            $this->helper->arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
+            $plan = $this->helper->sanitizeArray($plan); // Sanitiza os dados recebidos
+            $plan = $this->helper->convertType($plan, ['int']); // Converte o tipo dos dados
+
+            $res = $this->enableThePlan($plan['plan']); // Envia o pedido ao banco de dados e recebe sua resposta
+
+            // Envia uma resposta ao front
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'erro' => $res['error'] ?? []]));
+        } catch (Exception $e) {
+            throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
+        }
+    }
+
+    public function disable(Request $request, Response $response): Response
+    {
+        try {
+            $plan = \json_decode($request->body(), true); // Pega os dados enviados
+
+            $this->helper->arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
+            $plan = $this->helper->sanitizeArray($plan); // Sanitiza os dados recebidos
+            $plan = $this->helper->convertType($plan, ['int']); // Converte o tipo dos dados
+
+            $res = $this->disableThePlan($plan['plan']); // Envia o pedido ao // Verifica se há um retorno
+
+            // Envia uma resposta ao front
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'erro' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
         }
