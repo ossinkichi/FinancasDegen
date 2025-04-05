@@ -35,9 +35,10 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':user', $user);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
-                return ['status' => 403, 'message' => "Não foi possivel buscar o usuário"];
-            }
+            // if ($sql->fetch() == null) {
+            //     return ['status' => 403, 'message' => "Não foi possivel buscar o usuário", 'error' => $sql->errorInfo()];
+            // }
+
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
             throw new PDOException("Erro ao buscar usuário " . $pe->getMessage(), (int) $pe->getCode());

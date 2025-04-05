@@ -6,8 +6,8 @@ POST http://localhost:8000/user/login
 Content-Type: application/json
 
 {
-    "user": "catea@gmail.com",
-    "password": "1211"
+    "email": "catedrau@gmail.com",
+    "password": "111"
 }
 
 ###
@@ -16,13 +16,13 @@ POST http://localhost:8000/user/register
 Content-Type: application/json
 
 {
-    "name": "Abacate",
-    "email": "catea@gmail.com",
-    "password": "1211",
-    "cpf": "12122",
+    "name": "Avocate",
+    "email": "catedrau@gmail.com",
+    "password": "111",
+    "cpf": "121322",
     "dateofbirth": "21/12/1910",
     "gender": "masc",
-    "phone": "000000000",
+    "phone": "000001000",
     "position": "funcionario"
 }
 ###

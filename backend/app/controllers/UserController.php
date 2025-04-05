@@ -23,6 +23,7 @@ class UserController extends UsersModel
         $this->jwt =  new JwtHelper;
     }
 
+    // Busca todos os usúarios
     public function index(Request $request, Response $response): Response
     {
         try {
@@ -50,24 +51,37 @@ class UserController extends UsersModel
         }
     }
 
-    public function login(Request $request, Response $response): Response
+    // Verifica se o usuario tem uma conta
+    public function login(Request $request, Response $response): Response # Atualmente está dando erro
     {
-        $data = \json_decode($request->body());
+        try {
+            $data = \json_decode($request->body(), true); // Recebe os dados do front
 
-        $this->helper->arrayValidate($data, [
-            'email',
-            'password'
-        ]);
+            // Verifica se todos os campos foram enviados
+            $this->helper->arrayValidate($data, [
+                'email',
+                'password'
+            ]);
+            // Converte os tipos dos dados
+            $data = $this->helper->convertType($data, ['string', 'string']);
 
-        $user = [
-            'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-            'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
-        ];
+            // Sanitiza os dados
+            $user = [
+                'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
+                'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
+            ];
 
-        $res = $this->validateLogin($user);
-        return $response->code($res['status'])
-            ->header('Content-Type', 'application/json')
-            ->body(\json_encode($res['message']));
+            // Valida o usúario
+            $res = $this->validateLogin($user);
+
+            // \dd($data . '=>');
+            // Dá um retorno ao front
+            return $response->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 
     // Registra um novo usuário
@@ -318,11 +332,16 @@ class UserController extends UsersModel
         }
     }
 
+    /**
+     * Undocumented function
+     * @return array {email: string, password: string}
+     */
     private function validateLogin(array $user): array
     {
         $response = $this->getUser($user['email']);
-        if (empty($response['message'])) {
-            return ['message' => 'Usuário não encontrado', 'status' => 404];
+
+        if (empty($response) || isset($response['error'])) {
+            return ['message' => 'Usuário não encontrado', 'status' => 404, 'error' => $response['error']];
         }
 
         if (!password_verify($user['password'], $response['message']['password'])) {
@@ -335,8 +354,8 @@ class UserController extends UsersModel
 
         return [
             'message' => [
-                'user' => $response['message']['userhash'] ?? [],
-                'token' => $response['message']['userhash'] ? $this->jwt->generate(60 * 60 * 7) : ''
+                'user' => $response['message']['userhash'],
+                'token' => $this->jwt->generate(60 * 60 * 7)
             ],
             'status' => 200
         ];
