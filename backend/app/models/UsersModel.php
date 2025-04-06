@@ -144,7 +144,7 @@ class UsersModel extends ConnectModel
             $sql->execute();
 
             if ($sql->rowCount() == 0) {
-                return ['status' => 400, 'message' => 'Não foi possivel deletar a conta do usuario'];
+                return ['status' => 400, 'message' => 'Não foi possivel deletar a conta do usuario', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {

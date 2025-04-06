@@ -113,7 +113,7 @@ class UserController extends UsersModel
             $user = $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
 
             // Faz o pedido ao banco e recebe sua resposta
-            $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['cpf'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['position']);
+            $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['password'], $user['cpf'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['position']);
 
             // Dá um retorno ao front
             return $response->code($res['status'])
@@ -141,27 +141,34 @@ class UserController extends UsersModel
         try {
             $this->jwt->validate();
 
-            $hash = $request->param('user');
-            $this->helper->arrayValidate([$hash], [0]);
+            $hash = $request->param('hash');
+            $this->helper->arrayValidate([$hash]);
+            $hash = $this->helper->convertType([$hash], ['string'])[0];
+            $hash = $this->helper->sanitizeArray([$hash])[0];
+
             $res = $this->getUser($hash);
 
-            if (!$response['message']['emailverify']) {
+            if (!$res['message']['emailverify']) {
                 return $response->code(403)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
             };
 
-            return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body(\json_encode([
-                'message' =>
-                [
-                    'name' => $response['message']['name'],
-                    'email' => $response['message']['email'],
-                    'verify' => $response['message']['emailverify'],
-                    'cargo' => $response['message']['type'],
-                    'cpf' => substr($response['message']['cpf'], 0, 3) . str_repeat('*', 7),
-                    'nascimento' => str_replace('/', '-', $response['message']['dateofbirth']),
-                    'genero' => $response['message']['gender'],
-                    'contato' => $response['message']['phone']
-                ]
-            ]));
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'aplication/json')
+                ->body(\json_encode([
+                    'message' =>
+                    [
+                        'name' => $res['message']['name'],
+                        'email' => $res['message']['email'],
+                        'verify' => $res['message']['emailverify'],
+                        'cargo' => $res['message']['position'],
+                        'cpf' => substr(str_repeat('*', 8) . $res['message']['cpf'],  -3),
+                        'nascimento' => str_replace('/', '-', $res['message']['dateofbirth']),
+                        'genero' => $res['message']['gender'],
+                        'contato' => $res['message']['phone']
+                    ],
+                    'error' => $res['error'] ?? []
+                ]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -171,7 +178,7 @@ class UserController extends UsersModel
     {
         $this->jwt->validate();
 
-        $data = \json_decode($request->body());
+        $data = \json_decode($request->body(), true);
         $this->helper->arrayValidate($data, [
             'hash',
             'name',
@@ -193,15 +200,15 @@ class UserController extends UsersModel
 
     public function delete(Request $request, Response $response): Response
     {
-        $this->helper->verifyMethod('DELETE');
-        $this->jwt->validate();
 
         try {
-            $hash = $request->param('user');
-            $this->helper->arrayValidate($hash, ['user']);
-            $res = $this->deleteUser($hash['user']);
+            $this->jwt->validate();
 
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            $hash = $request->param('user');
+            $hash = $this->helper->convertType([$hash], ['string'])[0];
+            $res = $this->deleteUser($hash);
+
+            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception('Erro ao deletar: ' . $e->getMessage());
         }
@@ -268,12 +275,16 @@ class UserController extends UsersModel
     public function active(Request $request, Response $response): Response
     {
         try {
+            $data = $request->param('hash');
+            $this->helper->arrayValidate([$data], ['0']);
+            $data = $this->helper->convertType([$data], ['string'])[0];
 
-            $data = $request->param('user');
-            $this->helper->arrayValidate($data, [0]);
+            $res = $this->activateAccount($data);
 
-            $res = $this->activateAccount($data['user']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

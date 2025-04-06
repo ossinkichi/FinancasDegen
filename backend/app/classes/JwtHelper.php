@@ -42,14 +42,17 @@ class JwtHelper
 
     public function validate()
     {
-
         try {
+
             $jwt = getallheaders();
-            if (!isset($jwt['Authorization'])) {
+
+            // dd($jwt);
+            if (!isset($jwt['authorization'])) {
                 self::$helper->message(['message' => 'acesso negado'], 401);
                 die();
             }
-            $jwtDecoded = get_object_vars(JWT::decode($jwt['Authorization'], new Key(self::$key, 'HS256')));
+
+            $jwtDecoded = get_object_vars(JWT::decode($jwt['authorization'], new Key(self::$key, 'HS256')));
 
             if (!$jwtDecoded) {
                 self::$helper->message(['message' => 'acesso negado'], 401);
