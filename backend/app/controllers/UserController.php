@@ -204,8 +204,10 @@ class UserController extends UsersModel
         try {
             $this->jwt->validate();
 
-            $hash = $request->param('user');
+            $hash = $request->param('hash');
             $hash = $this->helper->convertType([$hash], ['string'])[0];
+            $hash = $this->helper->sanitizeArray([$hash])[0];
+
             $res = $this->deleteUser($hash);
 
             return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));

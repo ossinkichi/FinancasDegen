@@ -24,13 +24,21 @@ class CompanyController extends CompanyModel
     public function index(Request $request, Response $response): Response
     {
         try {
-
             $this->jwt->validate();
 
             $companies = $this->getAllCompanies();
-            $companies['message'] = \array_map([$this->helper, 'sanitizeArray'], $companies['message']);
 
-            return $response->code($companies['status'])->header('Content-Type', 'aplication/json')->body(['message' => $companies['message']]);
+            if (empty($companies)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
+            }
+
+            \is_array($companies['message']) ? $companies['message'] = \array_map([$this->helper, 'sanitizeArray'], $companies['message'] ?? []) : null;
+
+
+            return $response
+                ->code($companies['status'])
+                ->header('Content-Type', 'aplication/json')
+                ->body(\json_encode(['message' => $companies['message'], 'error' => $companies['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
