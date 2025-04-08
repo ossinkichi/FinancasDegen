@@ -136,22 +136,28 @@ class UserController extends UsersModel
         }
     }
 
+    // Busca um usuário pelo hash
     public function get(Request $request, Response $response): Response
     {
         try {
-            $this->jwt->validate();
+            $this->jwt->validate(); // Verifica se o token é valido
 
-            $hash = $request->param('hash');
-            $this->helper->arrayValidate([$hash]);
-            $hash = $this->helper->convertType([$hash], ['string'])[0];
-            $hash = $this->helper->sanitizeArray([$hash])[0];
+            $hash = $request->param('hash'); // Recebe o hash do usuario
+            $this->helper->arrayValidate([$hash]); // Verifica se o dado foi enviado
+            $hash = $this->helper->convertType([$hash], ['string'])[0]; // Converte o tipo do dado
+            $hash = $this->helper->sanitizeArray([$hash])[0]; // Sanitiza o dado
 
-            $res = $this->getUser($hash);
+            $res = $this->getUser($hash); // Faz o pedido ao banco de dados e recebe sua resposta
 
-            if (!$res['message']['emailverify']) {
-                return $response->code(403)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuario está com a conta inativa, para acessar novamente nossa aplicacao e necessario que ative a sua conta']);
-            };
+            // Verifica se houve retorno
+            if (empty($res)) {
+                return $response
+                    ->code(404)
+                    ->header('Content-Type', 'aplication/json')
+                    ->body(['message' => 'nenhum usuario encontrado']);
+            }
 
+            // Dá um retorno ao front
             return $response
                 ->code($res['status'])
                 ->header('Content-Type', 'aplication/json')
@@ -174,11 +180,13 @@ class UserController extends UsersModel
         }
     }
 
+    // Atualiza os dados do usuário
     public function update(Request $request, Response $response): Response
     {
-        $this->jwt->validate();
+        $this->jwt->validate(); // Verifica se o token é valido
 
-        $data = \json_decode($request->body(), true);
+        $data = \json_decode($request->body(), true); // Recebe os dados do front
+        // Verifica se todos os dados necessários foram enviados
         $this->helper->arrayValidate($data, [
             'hash',
             'name',
@@ -189,28 +197,48 @@ class UserController extends UsersModel
             'phone'
         ]);
 
+        // Sanitiza os dados
         $user = $this->helper->sanitizeArray($data);
         $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-
+        // Converte os tipos dos dados
+        $user =  $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
+        // Verifica se o usúario já está cadastrado
         $this->userExist(['email' => $user['email'], 'hash' => $user['hash']]);
 
+        // Faz o pedido ao banco e recebe sua resposta
         $res = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['hash']);
-        return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+
+        // Dá um retorno ao front
+        return $response
+            ->code($res['status'])
+            ->header('Content-Type', 'application/json')
+            ->body(\json_encode($res['message']));
     }
 
+    // Delete um usuario
     public function delete(Request $request, Response $response): Response
     {
 
         try {
-            $this->jwt->validate();
+            $this->jwt->validate(); // Verifica se o token é valido
 
-            $hash = $request->param('hash');
-            $hash = $this->helper->convertType([$hash], ['string'])[0];
-            $hash = $this->helper->sanitizeArray([$hash])[0];
+            $hash = $request->param('hash'); // Recebe o hash do usuario
+            $this->helper->arrayValidate([$hash], ['0']); // Verifica se o dado foi enviado
+            $hash = $this->helper->sanitizeArray([$hash])[0]; // Sanitiza o dado
+            $hash = $this->helper->convertType([$hash], ['string'])[0]; // Converte o tipo do dado
 
-            $res = $this->deleteUser($hash);
+            $res = $this->deleteUser($hash); // Faz o pedido ao banco de dados e recebe sua resposta
 
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            // Verifica se houve retorno
+            if (empty($res)) {
+                return $response->code(404)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum usuario encontrado']));
+            }
+
+            // Dá um retorno ao front
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception('Erro ao deletar: ' . $e->getMessage());
         }
@@ -274,15 +302,27 @@ class UserController extends UsersModel
         }
     }
 
+    // Ativa a conta do usuário
     public function active(Request $request, Response $response): Response
     {
         try {
-            $data = $request->param('hash');
-            $this->helper->arrayValidate([$data], ['0']);
-            $data = $this->helper->convertType([$data], ['string'])[0];
+            $data = $request->param('hash'); // Recebe o hash do usuario
+            $this->helper->arrayValidate([$data], ['0']); // Verifica se o dado foi enviado
+            $data = $this->helper->convertType([$data], ['string'])[0]; // Converte o tipo do dado
+            $data = $this->helper->sanitizeArray([$data])[0]; // Sanitiza o dado
 
-            $res = $this->activateAccount($data);
+            $res = $this->activateAccount($data); // Faz o pedido ao banco de dados e recebe sua resposta
 
+            // Verifica se houve retorno
+            if (empty($res)) {
+                // Se não houver retorno, retorna um erro 404
+                return $response
+                    ->code(404)
+                    ->header('Content-Type', 'application/json')
+                    ->body(\json_encode(['message' => 'nenhum usuario encontrado']));
+            }
+
+            // Se houver retorno, retorna o status e a mensagem
             return $response
                 ->code($res['status'])
                 ->header('Content-Type', 'application/json')
@@ -292,11 +332,13 @@ class UserController extends UsersModel
         }
     }
 
+    // Cria um hash para o usuario
     private function createHash(string $hash): string
     {
         return hash('sha256', $hash);
     }
 
+    // Configura o email
     private function emailConfig()
     {
         try {
@@ -322,6 +364,11 @@ class UserController extends UsersModel
         }
     }
 
+    /**
+     * Envia um email para um usuário
+     *
+     * @param array $emailData {from: string, to: string, fromName: string, toName: string, subject: string, message: string}
+     */
     private function sendEmail(array $emailData): void
     {
         try {
@@ -346,55 +393,91 @@ class UserController extends UsersModel
     }
 
     /**
-     * Undocumented function
-     * @return array {email: string, password: string}
+     * Validação do login do usuário
+     *
+     * @param array $user {email: string, password: string}
+     * @return array {message: array|string, token: string}
      */
     private function validateLogin(array $user): array
     {
+        // Faz o pedido ao banco de dados e recebe sua resposta
         $response = $this->getUser($user['email']);
 
+        // Verifica se houve retorno
         if (empty($response) || isset($response['error'])) {
             return ['message' => 'Usuário não encontrado', 'status' => 404, 'error' => $response['error']];
         }
 
+        // Verifica se o usuário está ativo
+        if (!$response['message']['emailverify']) {
+            return ['message' => 'Usuário não está ativo', 'status' => 403];
+        }
+
+        // Verifica se a senha está correta
         if (!password_verify($user['password'], $response['message']['password'])) {
             return ['message' => 'Senha ou usuário incorreta', 'status' => 401];
         }
 
+        // Verifica se o retorno tem status 200 e se é um array
         if ($response['status'] == 200 && is_array($response['message'])) {
             $response['message'] = $this->helper->sanitizeArray($response['message']);
         }
 
         return [
             'message' => [
-                'user' => $response['message']['userhash'],
-                'token' => $this->jwt->generate(60 * 60 * 7)
+                'user' => $response['message']['userhash'] ?? $response['message'],
+                'token' => ($response['status'] == 200) ? $this->jwt->generate(60 * 60 * 7) : null
             ],
-            'status' => 200
+            'status' => $response['status'],
+            'error' => $response['error'] ?? []
         ];
     }
 
+
+    /**
+     * Verifica se o usuário já existe no banco de dados
+     *
+     * @param array $user {email: string, hash: string}
+     * @return void
+     */
     private function userExist(array $user): void
     {
         try {
+            // Faz o pedido ao banco de dados e recebe sua resposta
             $response = $this->getUser($user['email']);
 
+            // Verifica se houve retorno
+            if (empty($response)) {
+                $this->helper->message(['message' => 'Não foi possivel executar a ação'], 401);
+                die();
+            }
+
+            // Verifica se o retorno tem status 200 e se é um array
             if (is_array($response['message']) && !empty($response['message'])) {
+                // Verifica se o hash foi criado
                 if (!isset($user['hash'])) {
-                    $this->helper->message(['message' => 'Não foi possivel executar a ação'], 401);
+                    $user['hash'] = $this->createHash($user['cpf']);
+                }
+
+                // Verifica se o hash do usuário é diferente do hash do banco de dados
+                if ($response['message']['userhash'] !== $user['hash']) {
+                    return;
+                }
+
+                // Verifica se o email ou cpf já estão cadastrados
+                if ($response['message']['email'] === $user['email'] || $response['message']['cpf'] === $user['cpf']) {
+                    $this->helper->message(['message' => 'Usuário já cadastrado'], 401);
                     die();
                 }
 
-                if ($response['message']['userhash'] !== $user['hash']) {
-                    $this->helper->message(['message' => 'Não foi possivel atualizar os dados'], 400);
-                    die();
-                }
+                return;
             }
         } catch (Exception $e) {
             $this->helper->message(['message' => 'Não foi possivel atualizar os dados', 'status' => 400]);
         }
     }
 
+    // Testar
     private function sendMessageForForgotPassword($user)
     {
         if (!isset($user['password'])) {
