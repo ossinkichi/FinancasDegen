@@ -21,20 +21,28 @@ class CompanyController extends CompanyModel
         $this->jwt = new JwtHelper;
     }
 
+    // Puxa todas as empresas do banco de dados
     public function index(Request $request, Response $response): Response
     {
         try {
-            $this->jwt->validate();
+            $this->jwt->validate(); // Verifica se o token é válido
 
-            $companies = $this->getAllCompanies();
+            $companies = $this->getAllCompanies(); // Puxa todas as empresas do banco de dados
 
-            if (empty($companies)) {
+            // Verifica se o retorno é um array e se está vazio
+            if (!is_array($companies) || empty($companies)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
             }
 
-            \is_array($companies['message']) ? $companies['message'] = \array_map([$this->helper, 'sanitizeArray'], $companies['message'] ?? []) : null;
+            // Sanitiza os dados retornados
+            \is_array($companies['message']) ? $companies['message'] = \array_map(function ($company) {
+                $company = $this->helper->sanitizeArray($company);
+                unset($company['id']);
+                return $company;
+            }, $companies['message'] ?? []) : null;
 
 
+            // Dá um retorno para o front
             return $response
                 ->code($companies['status'])
                 ->header('Content-Type', 'aplication/json')
@@ -44,53 +52,93 @@ class CompanyController extends CompanyModel
         }
     }
 
+    // Pega os dados de uma empresa específica
     public function get(Request $request, Response $response): Response
     {
         try {
+            $this->jwt->validate(); // Verifica se o token é válido
+            $company = $request->param('company'); // Pega o cnpj da empresa
 
-            $this->jwt->validate();
-            $company = $request->param('company');
+            $this->helper->arrayValidate([$company], [0]); // Verifica se o cnpj foi enviado
+            $company = $this->helper->sanitizeArray([$company])[0]; // Sanitiza o cnpj
+            $company = $this->helper->convertType([$company], ['string'])[0]; // Converte o tipo do dado
 
-            $this->helper->arrayValidate($company, [0]);
-            $res = $this->getCompany($company['cnpj']);
+            $res = $this->getCompany($company); // Puxa os dados da empresa do banco de dados
+
+            // Verifica se o retorno é um array e se está vazio
+            if (!is_array($res) || empty($res)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
+            }
+
             if ($res['status'] == 200) {
                 $res['message'] = $this->helper->sanitizeArray($res['message']);
+                if (is_array($res['message'])) {
+                    unset($res['message']['id']);
+                }
                 if (empty($res['message'])) {
                     $res['message'] = 'Nenhuma empresa encontrada';
                 }
             }
 
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode($res['message']));
         } catch (Exception $e) {
             throw new Exception("company error: " . $e->getMessage());
         }
     }
 
+    // Cadastra uma nova empresa
     public function register(Request $request, Response $response): Response
     {
         try {
-            $this->jwt->validate();
-            $company = \json_decode($request->body());
-            $this->helper->arrayValidate($company, ['name', 'describe', 'cnpj', 'plan', 'value']);
-            $company = $this->helper->getData($company);
+            $this->jwt->validate(); // Verifica se o token é válido
+            $company = !empty($request->body()) ? \json_decode($request->body(), true) : []; // Pega os dados da empresa do body da requisição
 
-            $res = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan'], $company['value']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            $this->helper->arrayValidate($company, ['name', 'describe', 'cnpj', 'plan']); // Verifica se os dados foram enviados
+            $company = $this->helper->sanitizeArray($company); // Sanitiza os dados da empresa
+            $company  = $this->helper->convertType($company, ['string', 'string', 'string', 'decimals']); // Converte o tipo dos dados da empresa
+
+            $res = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan']); // Cadastra a empresa no banco de dados
+
+            // Verifica se o retorno é um array e se está vazio
+            if (!is_array($res) || empty($res)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
+            }
+
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception('register of company error' . $e->getMessage());
         }
     }
 
+    // Deleta uma empresa
     public function delete(Request $request, Response $response): Response
     {
         try {
+            $this->jwt->validate(); // Verifica se o token é válido
+            $company = $request->param('company'); // Pega o cnpj da empresa
 
-            $this->jwt->validate();
-            $company = $request->param('company');
-            $this->helper->arrayValidate($company, [0]);
+            $this->helper->arrayValidate([$company], [0]); // Verifica se o cnpj foi enviado
+            $company = $this->helper->sanitizeArray([$company])[0]; // Sanitiza o cnpj
+            $company = $this->helper->convertType([$company], ['string'])[0]; // Converte o tipo do dado
 
-            $res = $this->deleteCompany(strval($company['cnpj']));
-            return $response->code($response['status'])->header('Content-Type', 'aplication/json')->body($res['message']);
+            $res = $this->deleteCompany($company); // Puxa os dados da empresa do banco de dados
+
+            // Verifica se o retorno é um array e se está vazio
+            if (!is_array($res) || empty($res)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Nenhuma empresa encontrada']));
+            }
+
+            // Dá um retorno para o front
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'aplication/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

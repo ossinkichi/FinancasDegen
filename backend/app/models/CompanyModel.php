@@ -19,12 +19,9 @@ class CompanyModel extends ConnectModel
             $sql = $this->connect()->prepare('SELECT * FROM companies');
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
-                return ['status' => 403, 'message' => 'Nenhuma empresa encontrada', 'error' => $sql->errorInfo()];
-            }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao buscar as empresas: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao buscar as empresas: ' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -39,12 +36,9 @@ class CompanyModel extends ConnectModel
             $sql->bindParam(':cnpj', $cnpj);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
-                return ['status' => 404, 'message' => 'Não foi possivel buscar a empresa', 'error' => $sql->errorInfo()];
-            }
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao buscar uma empresa: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao buscar uma empresa: ' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -57,21 +51,19 @@ class CompanyModel extends ConnectModel
         string $companydescribe,
         string $cnpj,
         int $plan,
-        string $planValue
     ): array {
         try {
             $sql = $this->connect()->prepare('
-                INSERT INTO companies (companyname, companydescribe, cnpj, plan, planvalue)
-                VALUES (:companyname, :companydescribe, :cnpj, :plan, :planvalue)
+                INSERT INTO companies (name, describe, cnpj, plan)
+                VALUES (:companyname, :companydescribe, :cnpj, :plan)
             ');
             $sql->bindValue(':companyname', $companyname);
             $sql->bindValue(':companydescribe', $companydescribe);
             $sql->bindValue(':cnpj', $cnpj);
             $sql->bindValue(':plan', $plan);
-            $sql->bindValue(':planvalue', $planValue);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 405, 'message' => 'Não foi possivel cadastrar a empresa', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -79,7 +71,7 @@ class CompanyModel extends ConnectModel
             if ($pe->getCode() == 23000) {
                 return ['status' => 403, 'message' => 'Empresa já cadastrado, para ingressar na empresa peça permissão ao administrador da mesma!'];
             }
-            throw new PDOException('Erro ao cadastrar a empresa: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao cadastrar a empresa: ' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -95,12 +87,12 @@ class CompanyModel extends ConnectModel
             $sql->bindValue(':planvalue', $planValue);
             $sql->bindValue(':cnpj', $cnpj);
             $sql->execute();
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel atualizar o plano', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao atualizar plano: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao atualizar plano: ' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -115,12 +107,12 @@ class CompanyModel extends ConnectModel
             $sql->bindValue(':cnpj', $cnpj);
             $sql->bindValue(':status', true);
             $sql->execute();
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 200, 'message' => 'Não foi possivel desativar a empresa', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Error ao desativar a empresa: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Error ao desativar a empresa: ' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -136,12 +128,12 @@ class CompanyModel extends ConnectModel
             $sql->bindValue(':cnpj', $cnpj);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['satus' => 404, 'message' => 'Não foi possivel ativar a empresa', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao ativar a empresa: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException("Erro ao ativar a empresa: " . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 
@@ -156,12 +148,12 @@ class CompanyModel extends ConnectModel
             $sql->bindValue(':cnpj', $cnpj);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Não foi possivel deletar a empresa', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao deletar a empresa: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao deletar a empresa: ' . $pe->getMessage(), (int) $pe->getCode());
         }
     }
 }

@@ -19,7 +19,7 @@ class RequestsModel extends ConnectModel
             $sql->bindValue(':client', $client);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel buscar as contas do cliente', 'error' => $sql->errorInfo()];
             }
 
@@ -43,7 +43,7 @@ class RequestsModel extends ConnectModel
             $sql->bindValue(':numberofinstallments', $numberofinstallments);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel emitir esse pedido', 'error' => $sql->errorInfo()];
             }
             return ['status' =>  201, 'message' => ''];
@@ -63,7 +63,7 @@ class RequestsModel extends ConnectModel
             $sql->bindValue(':id', $request);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel modificar o status do pedido', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -83,7 +83,7 @@ class RequestsModel extends ConnectModel
             $sql->bindValue(':installmentspaid', $installment);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 200, 'message' => 'Não foi possivel efetuar o pagamente', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];

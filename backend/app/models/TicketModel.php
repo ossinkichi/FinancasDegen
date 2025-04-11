@@ -25,7 +25,7 @@ class TicketModel extends ConnectModel
             $sql->bindValue(':fees', $fees);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -45,7 +45,7 @@ class TicketModel extends ConnectModel
             $sql->bindValue(':account', $account);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Nenhum dado encontrado', 'error' => $sql->errorInfo()];
             }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC)];
@@ -66,7 +66,7 @@ class TicketModel extends ConnectModel
             $sql->bindValue(':account', $account);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Nenhum dado encontrado', 'error' => $sql->errorInfo()];
             }
 
@@ -88,7 +88,7 @@ class TicketModel extends ConnectModel
             $sql->bindValue(':ticket', $ticket);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Houve um erro ao pagar a parcela', 'error' => $sql->errorInfo()];
             }
 

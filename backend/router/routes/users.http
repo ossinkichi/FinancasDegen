@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "email": "catedrau@gmail.com",
-    "password": "121322"
+    "password": "111"
 }
 
 ###
@@ -50,7 +50,7 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIs
 
 ###
 
-PATCH http://localhost:8000/user/active/40668b33cba2eb66eaeda4f3fbe513b726b32ac99c007d65d6a331ee5d563507
+PATCH http://localhost:8000/user/active/bf515bf88fb9df00a0e224fc4f6a7b4f88010444e8d05615d58530e93b170fc3
 Content-Type: application/json
 Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
 

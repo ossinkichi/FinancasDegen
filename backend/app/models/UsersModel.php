@@ -66,7 +66,7 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':position', $position);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel cadastrar o usuario', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -101,7 +101,7 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':hash', $hash);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel atualizar os dados do cliente'];
             }
             return ['status' => 201, 'message' => ''];
@@ -124,7 +124,7 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':hash', $hash);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['satus' => 403, 'message' => 'Não foi possivel verificar o email'];
             }
             return ['status' => 201, 'message' => ''];
@@ -143,7 +143,7 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':hash', $hash);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 400, 'message' => 'Não foi possivel deletar a conta do usuario', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -186,7 +186,7 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':hash', $hash);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 400, 'message' => 'Não foi possivel atualizar a senha'];
             }
             return ['status' => 201, 'message' => ''];

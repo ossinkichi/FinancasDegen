@@ -20,7 +20,7 @@ class AccordModel extends ConnectModel
             $sql->bindValue(':client', $client);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'data' => 'Nenhum acordo encontrado'];
             }
             return ['status' => 200, 'data' => $sql->fetchAll(PDO::FETCH_ASSOC)];
@@ -53,7 +53,7 @@ class AccordModel extends ConnectModel
             $sql->bindValue(':tickets', $tickets);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Erro ao criar um novo acordo', 'error: ' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -74,7 +74,7 @@ class AccordModel extends ConnectModel
             $sql->bindValue(':id', $accord);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Erro ao pagar a parcela do acordo', 'error: ' => $sql->errorInfo()];
             }
 
@@ -96,7 +96,7 @@ class AccordModel extends ConnectModel
             $sql->bindValue(':id', $accord);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Erro ao atualizar o status do acordo', 'error: ' => $sql->errorInfo()];
             }
 
@@ -117,7 +117,7 @@ class AccordModel extends ConnectModel
             $sql->bindValue(':id', $accord);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Não foi possivel deletar o acordo', 'error: ' => $sql->errorInfo()];
             }
 

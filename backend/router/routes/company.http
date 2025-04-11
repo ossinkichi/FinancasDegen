@@ -1,34 +1,36 @@
 GET http://localhost:8000/company
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0MzM4NDUyLCJleHAiOjE3NDQzNjM2NTIsImRhdGEiOltdfQ.hYwpdF_LYux4pAuhxQZ0IrS6Djpw72qVO0Q7DuM1MIw
 
 ###
+
 GET http://localhost:8000/company/00000000000000
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0MzM4NDUyLCJleHAiOjE3NDQzNjM2NTIsImRhdGEiOltdfQ.hYwpdF_LYux4pAuhxQZ0IrS6Djpw72qVO0Q7DuM1MIw
 
 ###
+
 POST http://localhost:8000/company/register
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0MzM4NDUyLCJleHAiOjE3NDQzNjM2NTIsImRhdGEiOltdfQ.hYwpdF_LYux4pAuhxQZ0IrS6Djpw72qVO0Q7DuM1MIw
 
 {
-    "name": "bacon awards",
+    "name": "bacon hear",
     "describe": "O lugar onde seu bacon é um grande trofeu nosso",
-    "cnpj": "00000000000000",
-    "plan": "1",
-    "value": "120,59"
+    "cnpj": "00000009000000",
+    "plan": "1"
 }
 
 ###
-GET http://localhost:8000/company/delete/123
+
+DELETE  http://localhost:8000/company/delete/00000009000000
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0MzM4NDUyLCJleHAiOjE3NDQzNjM2NTIsImRhdGEiOltdfQ.hYwpdF_LYux4pAuhxQZ0IrS6Djpw72qVO0Q7DuM1MIw
 
 ###
 PATCH http://localhost:8000/company/update/plan
 Content-Type: application/json
-Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0MzM4NDUyLCJleHAiOjE3NDQzNjM2NTIsImRhdGEiOltdfQ.hYwpdF_LYux4pAuhxQZ0IrS6Djpw72qVO0Q7DuM1MIw
 
 {
     "plan": "2",

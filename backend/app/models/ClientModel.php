@@ -20,7 +20,7 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':company', $company);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 400, 'message' => 'Não foi possivel buscar as empresas', 'error' => $sql->errorInfo()];
             }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
@@ -42,7 +42,7 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':id', $client['id']);
             $sql->bindValue(':company', $client['company']);
             $sql->execute();
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Houve um erro ao buscar o cliente', 'error' => $sql->errorInfo()];
             }
 
@@ -80,7 +80,7 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':company', $company);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 400, 'message' => 'Não foi possivel cadastrar o cliente', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -115,7 +115,7 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':billingaddress', $billingaddress);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 400, 'message' => 'Não foi possivel atualizar os dados do cliente', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -138,7 +138,7 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':status', true);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel deletar o cliente', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];

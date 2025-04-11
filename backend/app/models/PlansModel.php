@@ -43,7 +43,7 @@ class PlansModel extends ConnectModel
             $sql->bindValue('type', $type);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel registrar um novo plano plano', 'error' => $sql->errorInfo()];
             }
             return ['status' => 201, 'message' => ''];
@@ -71,7 +71,7 @@ class PlansModel extends ConnectModel
             $sql->bindValue(':price', $price);
             $sql->bindValue(':type', $type);
             $sql->execute();
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 400, 'message' => 'Não foi possivel atualizar os dados do plano'];
             }
 
@@ -96,7 +96,7 @@ class PlansModel extends ConnectModel
             $sql->bindValue(':id', $id);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
             }
             return ['status' => 201, 'message' => ''];
@@ -115,7 +115,7 @@ class PlansModel extends ConnectModel
             $sql->bindValue(':id', $id);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
             }
             return ['status' => 201, 'message' => ''];

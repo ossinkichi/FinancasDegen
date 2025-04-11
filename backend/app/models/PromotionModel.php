@@ -21,7 +21,7 @@ class PromotionModel extends ConnectModel
             $sql->bindValue(':price', $price);
             $sql->bindValue(':expired', $expired);
             $sql->execute();
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado'];
             }
             return ['status' => 201, 'message' => ''];
@@ -40,7 +40,7 @@ class PromotionModel extends ConnectModel
             $sql->bindValue(':plan', $plan);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Nenhum dado encontrado'];
             }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC)];
@@ -61,7 +61,7 @@ class PromotionModel extends ConnectModel
             $sql->bindValue(':plan', $promotion);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'A promoção não pode ser destivada'];
             }
             return ['status' => 201, 'message' => ''];
@@ -80,7 +80,7 @@ class PromotionModel extends ConnectModel
             $sql->bindValue(':plan', $promotion);
             $sql->execute();
 
-            if ($sql->rowCount() == 0) {
+            if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'A promoção não pode ser ativada'];
             }
             return ['status' => 201, 'message' => ''];
