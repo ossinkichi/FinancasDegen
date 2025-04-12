@@ -144,7 +144,8 @@ class CompanyController extends CompanyModel
         }
     }
 
-    public function plan(Request $request, Response $response): Response
+
+    public function changeOfPlan(Request $request, Response $response): Response
     {
         try {
             $this->jwt->validate();
@@ -157,4 +158,6 @@ class CompanyController extends CompanyModel
             throw new Exception('newPlan error' . $e->getMessage());
         }
     }
+
+    public function update(Request $request, Response $response) {}
 }
