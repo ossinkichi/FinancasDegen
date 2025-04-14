@@ -12,6 +12,11 @@
 			"email": "carlosandrerfjunior@gmail.com"
 		}
 	],
+	"scripts": {
+		"run": [
+			"php -S localhost:8000 -t public/"
+		]
+	},
 	"require": {
 		"vlucas/phpdotenv": "^5.6",
 		"firebase/php-jwt": "^6.10",
