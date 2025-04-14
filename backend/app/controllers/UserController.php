@@ -247,15 +247,23 @@ class UserController extends UsersModel
     public function forgotPassword(Request $request, Response $response): Response
     {
         try {
-            $data = \json_decode($request->body());
+            $data = \json_decode($request->body(), true);  // Recebe os dados do front
             $this->helper->arrayValidate($data, ['user']);
-            $data = $this->helper->getData($data);
+            $data = $this->helper->sanitizeArray($data); // Sanitiza os dados
+            $data = $this->helper->convertType($data, ['string']); // Converte os tipos dos dados
 
-            $this->sendMessageForForgotPassword($data);
-            $this->helper->arrayValidate($data, ['user', 'password']);
+            $this->sendMessageForForgotPassword($data); // Envia um email ao usuário cadastrado
+            $this->helper->arrayValidate($data, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
+            $data = $this->helper->sanitizeArray($data); // Sanitiza os dados
+            $data = $this->helper->convertType($data, ['string', 'string']); // Converte os tipos dos dados
 
-            $res = $this->getUser($data['user']);
+            $res = $this->getUser($data['user']); // Faz o pedido ao banco e recebe sua resposta
+            // Verifica se houve retorno
+            if (empty($res) || !\is_array($res)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuário não encontrado']);
+            }
 
+            // Verifica se A senha é igual a anterior
             if (password_verify($data['password'], $response['message']['password'])) {
                 return $response->code(401)->header('Content-Type', 'aplication/json')->body(['message' => 'A nova senha não pode ser igual a anterior']);
             }
@@ -287,16 +295,30 @@ class UserController extends UsersModel
         return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body([]);
     }
 
+    // Ingresa o usuário a uma empresa
     public function join(Request $request, Response $response): Response
     {
         try {
+            $this->jwt->validate(); // Verifica se o token é valido
+            $data = $request->params(['company', 'user']); // Recebe os dados do front
 
-            $this->jwt->validate();
-            $data = \json_decode($request->body());
-            $this->helper->arrayValidate($data, ['user', 'company']);
+            $this->helper->arrayValidate($data, ['user', 'company']); // Verifica se todos os dados necessários foram enviados
+            $data = $this->helper->sanitizeArray($data); // Sanitiza os dados
+            $data = $this->helper->convertType($data, ['string', 'string']); // Converte os tipos dos dados
 
-            $res = $this->setCompany(intval($data['company']), $data['user']);
-            return $response->code($res['status'])->header('Content-type', 'aplication/json')->body($res['message']);
+            // Faz o pedido ao banco e recebe sua resposta
+            $res = $this->setCompany($data['company'], $data['user']);
+
+            // Verifica se houve retorno
+            if (empty($res) || !\is_array($res)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Não foi possivel ingressar na empresa!']));
+            }
+
+            // Dá um retorno ao front
+            return $response
+                ->code($res['status'])
+                ->header('Content-type', 'aplication/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -480,6 +502,7 @@ class UserController extends UsersModel
     // Testar
     private function sendMessageForForgotPassword($user)
     {
+        return;
         if (!isset($user['password'])) {
             $response = $this->getUser($user['user']);
             if ($response['status'] == 200) {

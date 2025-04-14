@@ -163,7 +163,7 @@ class UsersModel extends ConnectModel
             $sql->bindValue(':hash', $hash);
             $sql->execute();
 
-            if (!$sql->execute()) {
+            if ($sql->rowCount() === 0) {
                 return ["status" => 400, "message" => "Erro ao entrar na empresa"];
             }
             return ["status" => 201, "message" => ""];
