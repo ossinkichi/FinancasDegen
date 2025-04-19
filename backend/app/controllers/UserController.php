@@ -202,8 +202,11 @@ class UserController extends UsersModel
         $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
         // Converte os tipos dos dados
         $user =  $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
-        // Verifica se o usúario já está cadastrado
-        $this->userExist(['email' => $user['email'], 'hash' => $user['hash']]);
+        // Verifica se o usúario existe
+        $userData = $this->userExist($user['hash']);
+
+        if (empty($userData)) {
+        }
 
         // Faz o pedido ao banco e recebe sua resposta
         $res = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['hash']);
@@ -244,20 +247,20 @@ class UserController extends UsersModel
         }
     }
 
-    public function forgotPassword(Request $request, Response $response): Response
+    public function forgoatPassword(Request $request, Response $response): Response
     {
         try {
-            $data = \json_decode($request->body(), true);  // Recebe os dados do front
-            $this->helper->arrayValidate($data, ['user']);
-            $data = $this->helper->sanitizeArray($data); // Sanitiza os dados
-            $data = $this->helper->convertType($data, ['string']); // Converte os tipos dos dados
+            $body = \json_decode($request->body(), true);  // Recebe os dados do front
+            $this->helper->arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
+            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
+            $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
 
-            $this->sendMessageForForgotPassword($data); // Envia um email ao usuário cadastrado
-            $this->helper->arrayValidate($data, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
-            $data = $this->helper->sanitizeArray($data); // Sanitiza os dados
-            $data = $this->helper->convertType($data, ['string', 'string']); // Converte os tipos dos dados
+            // $this->sendMessageForForgotPassword($data); // Envia um email ao usuário cadastrado
+            $this->helper->arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
+            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
+            $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
 
-            $res = $this->getUser($data['user']); // Faz o pedido ao banco e recebe sua resposta
+            $res = $this->getUser($body['user']); // Faz o pedido ao banco e recebe sua resposta
             // Verifica se houve retorno
             if (empty($res) || !\is_array($res)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuário não encontrado']);
@@ -462,62 +465,93 @@ class UserController extends UsersModel
      * @param array $user {email: string, hash: string}
      * @return void
      */
-    private function userExist(array $user): void
+    private function userExist(string $user): array
     {
         try {
-            // Faz o pedido ao banco de dados e recebe sua resposta
-            $response = $this->getUser($user['email']);
-
-            // Verifica se houve retorno
-            if (empty($response)) {
-                $this->helper->message(['message' => 'Não foi possivel executar a ação'], 401);
+            // Verifica se o usuário foi enviado
+            if (empty($user)) {
+                $this->helper->message(['message' => 'Usuário não informado'], 400);
                 die();
             }
 
-            // Verifica se o retorno tem status 200 e se é um array
-            if (is_array($response['message']) && !empty($response['message'])) {
-                // Verifica se o hash foi criado
-                if (!isset($user['hash'])) {
-                    $user['hash'] = $this->createHash($user['cpf']);
-                }
+            // Faz o pedido ao banco de dados e recebe sua resposta
+            $userData = $this->getUser($user);
 
-                // Verifica se o hash do usuário é diferente do hash do banco de dados
-                if ($response['message']['userhash'] !== $user['hash']) {
-                    return;
-                }
-
-                // Verifica se o email ou cpf já estão cadastrados
-                if ($response['message']['email'] === $user['email'] || $response['message']['cpf'] === $user['cpf']) {
-                    $this->helper->message(['message' => 'Usuário já cadastrado'], 401);
-                    die();
-                }
-
-                return;
+            // Verifica se houve retorno
+            if (empty($userData) || !\is_array($userData)) {
+                $this->helper->message(['message' => 'Usúario não encontrado'], 401);
+                die();
             }
+
+            // Verifica se os dados do usuário foram retornados
+            if (!\is_array($userData['message']) && \is_string($userData['message'])) {
+                $this->helper->message(['message' => $userData['message'], 'error' => $userData['error'] ?? []], $userData['status']);
+                die();
+            }
+
+            // Retorna os dados do usuário
+            return $userData['message'];
+
+
+
+            // // Verifica se o retorno tem status 200 e se é um array
+            // if (is_array($response['message']) || !empty($response)) {
+            //     // Verifica se o hash foi criado
+            //     if (!isset($user['hash'])) {
+            //         $user['hash'] = $this->createHash($user['cpf']);
+            //     }
+
+            //     // Verifica se o hash do usuário é diferente do hash do banco de dados
+            //     if ($response['message']['userhash'] !== $user['hash']) {
+            //         return;
+            //     }
+
+            //     // Verifica se o email ou cpf já estão cadastrados
+            //     if ($response['message']['email'] === $user['email'] || $response['message']['cpf'] === $user['cpf']) {
+            //         $this->helper->message(['message' => 'Usuário já cadastrado'], 401);
+            //         die();
+            //     }
+
+            //     return;
+            // }
         } catch (Exception $e) {
-            $this->helper->message(['message' => 'Não foi possivel atualizar os dados', 'status' => 400]);
+            throw new Exception($e->getMessage());
         }
     }
 
-    // Testar
-    private function sendMessageForForgotPassword($user)
+    // Envia um email para o usuário com o link para alterar a senha
+    public function sendMessageForForgoatPassword(Request $request, Response $response): void
     {
-        return;
-        if (!isset($user['password'])) {
-            $response = $this->getUser($user['user']);
-            if ($response['status'] == 200) {
-                $this->sendEmail([
-                    'from' => 'exampleemail@gmail.com',
-                    'to' => $response['message']['email'],
-                    'fromName' => 'Example Name',
-                    'toName' => $response['message']['name'],
-                    'subject' => 'Alterar senha do usuario',
-                    'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
-                ]);
-            } else {
-                $this->helper->message(['message' => $response['message']], $response['status']);
-                die();
-            }
-        }
+        $user = \json_decode($request->body(), true); // Recebe os dados do front
+        $this->helper->arrayValidate($user, ['user', 'message']); // Verifica se todos os dados necessários foram enviados
+        $user = $this->helper->sanitizeArray($user); // Sanitiza os dados
+        $user = $this->helper->convertType($user, ['string']); // Converte os tipos dos dados
+
+        $this->userExist($user['user']); // Verifica se o usúario já está cadastrado
+
+        // Faz o pedido ao banco de dados e recebe sua resposta
+        $response = $this->getUser($user['user']);
+
+        //     // Verifica se houve retorno
+        //     if (empty($response))
+        // {
+        //     return;
+        //     if (!isset($user['password'])) {
+        //         $response = $this->getUser($user['user']);
+        //         if ($response['status'] == 200) {
+        //             $this->sendEmail([
+        //                 'from' => 'exampleemail@gmail.com',
+        //                 'to' => $response['message']['email'],
+        //                 'fromName' => 'Example Name',
+        //                 'toName' => $response['message']['name'],
+        //                 'subject' => 'Alterar senha do usuario',
+        //                 'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
+        //             ]);
+        //         } else {
+        //             $this->helper->message(['message' => $response['message']], $response['status']);
+        //             die();
+        //         }
+        //     }
+        // }
     }
 }

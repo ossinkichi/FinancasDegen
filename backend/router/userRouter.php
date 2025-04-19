@@ -11,6 +11,8 @@ $klein->respond('POST', '/user/register', [$users, 'create']);
 $klein->respond('PUT', '/user/update', [$users, 'update']);
 $klein->respond('DELETE', '/user/delete/[h:hash]', [$users, 'delete']);
 $klein->respond('PATCH', '/user/active/[h:hash]', [$users, 'active']);
-$klein->respond('PATCH', '/user/forgoat', [$users, 'forgotPassword']);
-$klein->respond('PATCH', '/user/join/[i:company]/[h:user]', [$users, 'join']); // testar rota após teste de rotas das companmias
+$klein->respond('POST', '/user/forgoat', [$users, 'sendMessageForForgoatPassword']);
+$klein->respond('PATCH', '/user/forgoat', [$users, 'forgoatPassword']);
+$klein->respond('PATCH', '/user/join/[i:company]/[h:user]', [$users, 'join']);
+
 // Adicionar rota de convite para a compania
