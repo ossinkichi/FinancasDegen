@@ -88,26 +88,32 @@ class UserController extends UsersModel
     public function create(Request $request, Response $response): Response
     {
         try {
-            $data = \json_decode($request->body(), true); // Recebe os dados do front
+            $body = \json_decode($request->body(), true); // Recebe os dados do front
 
             // Verifica se todos os dados necessários foram enviados
-            $this->helper->arrayValidate($data, [
+            $this->helper->arrayValidate($body, [
                 'name',
                 'email',
                 'password',
                 'cpf',
                 'dateofbirth',
                 'gender',
-                'phone'
+                'phone',
+                'position'
             ]);
 
+            // Busca se o usúario já existe
+            $userExist = $this->userExist($body['email']);
+
             // Verifica se o usúario já está cadastrado
-            $this->userExist(['email' => $data['email']]);
+            if ($userExist) {
+                return $response->code(401)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Usuário já cadastrado']));
+            }
 
             // Sanitiza os dados
-            $user = $this->helper->sanitizeArray($data);
-            $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-            $user['hash'] = $this->createHash($user['cpf']);
+            $user = $this->helper->sanitizeArray($body);
+            $user['email'] = filter_var($body['email'], FILTER_SANITIZE_EMAIL);
+            $user['hash'] = $this->createHash($user['cpf']); // Cria um hash para o usuário
 
             // Converte os tipos dos dados
             $user = $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
@@ -203,9 +209,10 @@ class UserController extends UsersModel
         // Converte os tipos dos dados
         $user =  $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
         // Verifica se o usúario existe
-        $userData = $this->userExist($user['hash']);
+        $userExist = $this->userExist($user['hash']);
 
-        if (empty($userData)) {
+        if ($userExist) {
+            return $response->code(401)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Usuário não encontrado']));
         }
 
         // Faz o pedido ao banco e recebe sua resposta
@@ -215,7 +222,7 @@ class UserController extends UsersModel
         return $response
             ->code($res['status'])
             ->header('Content-Type', 'application/json')
-            ->body(\json_encode($res['message']));
+            ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
     }
 
     // Delete um usuario
@@ -255,10 +262,11 @@ class UserController extends UsersModel
             $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
             $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
 
-            // $this->sendMessageForForgotPassword($data); // Envia um email ao usuário cadastrado
-            $this->helper->arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
-            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
-            $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
+            $userExist = $this->userExist($body['user']); // Verifica se o usúario já está cadastrado
+
+            if (!$userExist) {
+                return $response->code(401)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuário não encontrado']);
+            }
 
             $res = $this->getUser($body['user']); // Faz o pedido ao banco e recebe sua resposta
             // Verifica se houve retorno
@@ -267,12 +275,15 @@ class UserController extends UsersModel
             }
 
             // Verifica se A senha é igual a anterior
-            if (password_verify($data['password'], $response['message']['password'])) {
+            if (password_verify($body['password'], $response['message']['password'])) {
                 return $response->code(401)->header('Content-Type', 'aplication/json')->body(['message' => 'A nova senha não pode ser igual a anterior']);
             }
 
-            $res = $this->setNewPassword($data['user'], $data['password']);
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode($res['message']));
+            $res = $this->setNewPassword($body['user'], $body['password']);
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -470,50 +481,19 @@ class UserController extends UsersModel
         try {
             // Verifica se o usuário foi enviado
             if (empty($user)) {
-                $this->helper->message(['message' => 'Usuário não informado'], 400);
-                die();
+                return [];
             }
 
             // Faz o pedido ao banco de dados e recebe sua resposta
-            $userData = $this->getUser($user);
+            $userData = $this->getUser((string) $user);
 
             // Verifica se houve retorno
-            if (empty($userData) || !\is_array($userData)) {
-                $this->helper->message(['message' => 'Usúario não encontrado'], 401);
-                die();
-            }
-
-            // Verifica se os dados do usuário foram retornados
-            if (!\is_array($userData['message']) && \is_string($userData['message'])) {
-                $this->helper->message(['message' => $userData['message'], 'error' => $userData['error'] ?? []], $userData['status']);
-                die();
+            if (empty($userData) || !\is_array($userData) || !\is_array($userData['message'])) {
+                return [];
             }
 
             // Retorna os dados do usuário
             return $userData['message'];
-
-
-
-            // // Verifica se o retorno tem status 200 e se é um array
-            // if (is_array($response['message']) || !empty($response)) {
-            //     // Verifica se o hash foi criado
-            //     if (!isset($user['hash'])) {
-            //         $user['hash'] = $this->createHash($user['cpf']);
-            //     }
-
-            //     // Verifica se o hash do usuário é diferente do hash do banco de dados
-            //     if ($response['message']['userhash'] !== $user['hash']) {
-            //         return;
-            //     }
-
-            //     // Verifica se o email ou cpf já estão cadastrados
-            //     if ($response['message']['email'] === $user['email'] || $response['message']['cpf'] === $user['cpf']) {
-            //         $this->helper->message(['message' => 'Usuário já cadastrado'], 401);
-            //         die();
-            //     }
-
-            //     return;
-            // }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
