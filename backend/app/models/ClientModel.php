@@ -20,9 +20,9 @@ class ClientModel extends ConnectModel
             $sql->bindValue(':company', $company);
             $sql->execute();
 
-            if ($sql->rowCount() === 0) {
-                return ['status' => 400, 'message' => 'Não foi possivel buscar as empresas', 'error' => $sql->errorInfo()];
-            }
+            // if ($sql->rowCount() === 0) {
+            //     return ['status' => 400, 'message' => 'Não foi possivel buscar os clientes', 'error' => $sql->errorInfo()];
+            // }
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
@@ -130,11 +130,12 @@ class ClientModel extends ConnectModel
     /**
      * @return array {status: number, message: string|void}
      */
-    protected function deleteClientOfCompany(int $client): array
+    protected function deleteClientOfCompany(int $client, string $company): array
     {
         try {
-            $sql = $this->connect()->prepare('UPDATE clients SET deleted = :status WHERE id = :id');
+            $sql = $this->connect()->prepare('UPDATE clients SET deleted = :status WHERE id = :id AND company = :company');
             $sql->bindValue(':id', $client);
+            $sql->bindValue(':company', $company);
             $sql->bindValue(':status', true);
             $sql->execute();
 
@@ -143,10 +144,10 @@ class ClientModel extends ConnectModel
             }
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
+            throw new PDOException("Erro ao deletar a empresa: " . $pe->getMessage(), $pe->getCode());
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel deletar o cliente'];
             }
-            throw new PDOException("Erro ao deletar a empresa: " . $pe->getMessage(), $pe->getCode());
         }
     }
 }

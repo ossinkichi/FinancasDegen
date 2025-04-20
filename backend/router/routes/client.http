@@ -1,36 +1,37 @@
-GET http://localhost:8000/client/00000000000000
+GET http://localhost:8000/client/00000009000000
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
 
 ###
 
 POST  http://localhost:8000/client/register
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
 
 {
     "name": "Bob esponja",
     "gender": "masc",
+    "email": "example@gmail.com",
     "phone": "000000000",
     "shippingaddress": "Fenda do biquini",
     "billingaddress": "Abacaxi",
-    "company": "00000000000000"
+    "company": "00000009000000"
 }
 ###
 
 DELETE  http://localhost:8000/client/delete
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
 
 {
     "client": 1,
-    "company": 132
+    "company": 00000009000000
 }
 ###
 
 PUT  http://localhost:8000/client/update
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
 
 {
     "name": "Bob Marley",

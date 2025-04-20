@@ -42,6 +42,7 @@ class Helper
 
     public function arrayValidate(array|string $arrayForValidate, array $keys = []): void
     {
+
         if (\is_string($arrayForValidate)) {
             empty($arrayForValidate) ? $this->message(['message' => 'Dados não informados'], 400) : null;
             throw new \Exception('Dados não informados');
