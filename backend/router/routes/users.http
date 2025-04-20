@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "email": "catedrau@gmail.com",
-    "password": "111"
+    "password": "1290"
 }
 
 ###
@@ -17,9 +17,9 @@ Content-Type: application/json
 
 {
     "name": "Avocate",
-    "email": "catedrau@gmail.com",
-    "password": "111",
-    "cpf": "11322",
+    "email": "catecea4@gmail.com",
+    "password": "1121",
+    "cpf": "13232",
     "dateofbirth": "21/12/1910",
     "gender": "masc",
     "phone": "002001000",
@@ -56,12 +56,12 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIs
 
 ###
 
-PATCH http://localhost:8000/user/forgoat
+PATCH  http://localhost:8000/user/forgoat
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU4MzIxLCJleHAiOjE3NDUxODM1MjEsImRhdGEiOltdfQ.n8WQDSGuXofuDDFgrZdJ8t-VR1xeB5FY54XCvv7i9-g
 
 {
-    "user":"29b55714f046d82a8c8d2ad096b561aed5a8189128eda52865c10ee0b9b35338",
+    "user":"bf515bf88fb9df00a0e224fc4f6a7b4f88010444e8d05615d58530e93b170fc3",
     "password": "1290"
 }
 

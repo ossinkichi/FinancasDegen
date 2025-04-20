@@ -55,26 +55,25 @@ class UserController extends UsersModel
     public function login(Request $request, Response $response): Response # Atualmente está dando erro
     {
         try {
-            $data = \json_decode($request->body(), true); // Recebe os dados do front
+            $body = \json_decode($request->body(), true); // Recebe os dados do front
 
             // Verifica se todos os campos foram enviados
-            $this->helper->arrayValidate($data, [
+            $this->helper->arrayValidate($body, [
                 'email',
                 'password'
             ]);
             // Converte os tipos dos dados
-            $data = $this->helper->convertType($data, ['string', 'string']);
+            $body = $this->helper->convertType($body, ['string', 'string']);
 
             // Sanitiza os dados
             $user = [
-                'email' => filter_var($data['email'], FILTER_SANITIZE_EMAIL),
-                'password' => filter_var($data['password'], FILTER_SANITIZE_SPECIAL_CHARS)
+                'email' => filter_var($body['email'], FILTER_SANITIZE_EMAIL),
+                'password' => filter_var($body['password'], FILTER_SANITIZE_SPECIAL_CHARS)
             ];
 
             // Valida o usúario
-            $res = $this->validateLogin($user);
+            $res = $this->validateLogin($body);
 
-            // \dd($data . '=>');
             // Dá um retorno ao front
             return $response->code($res['status'])
                 ->header('Content-Type', 'application/json')
@@ -258,6 +257,7 @@ class UserController extends UsersModel
     {
         try {
             $body = \json_decode($request->body(), true);  // Recebe os dados do front
+
             $this->helper->arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
             $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
             $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
@@ -265,21 +265,17 @@ class UserController extends UsersModel
             $userExist = $this->userExist($body['user']); // Verifica se o usúario já está cadastrado
 
             if (!$userExist) {
-                return $response->code(401)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuário não encontrado']);
+                return $response->code(401)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Usuário não encontrado']));
             }
 
-            $res = $this->getUser($body['user']); // Faz o pedido ao banco e recebe sua resposta
-            // Verifica se houve retorno
-            if (empty($res) || !\is_array($res)) {
-                return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Usuário não encontrado']);
-            }
 
             // Verifica se A senha é igual a anterior
-            if (password_verify($body['password'], $response['message']['password'])) {
-                return $response->code(401)->header('Content-Type', 'aplication/json')->body(['message' => 'A nova senha não pode ser igual a anterior']);
+            if (password_verify($body['password'], $userExist['password'])) {
+                return $response->code(401)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'A nova senha não pode ser igual a anterior']));
             }
 
             $res = $this->setNewPassword($body['user'], $body['password']);
+            // \dd($body);
             return $response
                 ->code($res['status'])
                 ->header('Content-Type', 'application/json')
@@ -436,8 +432,14 @@ class UserController extends UsersModel
      */
     private function validateLogin(array $user): array
     {
+        // \dd($user['email']);
+
         // Faz o pedido ao banco de dados e recebe sua resposta
         $response = $this->getUser($user['email']);
+
+        if ($response['status'] !== 200) {
+            return ['message' => 'Usuário não encontrado', 'status' => $response['status'], 'error' => $response['error'] ?? []];
+        }
 
         // Verifica se houve retorno
         if (empty($response) || isset($response['error'])) {
@@ -446,7 +448,7 @@ class UserController extends UsersModel
 
         // Verifica se o usuário está ativo
         if (!$response['message']['emailverify']) {
-            return ['message' => 'Usuário não está ativo', 'status' => 403];
+            return (array) ['message' => 'Usuário não está ativo', 'status' => 403];
         }
 
         // Verifica se a senha está correta
