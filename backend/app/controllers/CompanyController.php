@@ -180,6 +180,7 @@ class CompanyController extends CompanyModel
 
     public function update(Request $request, Response $response) {}
 
+    // Verifica se o empresa existe
     private function companyExist(string $cnpj): array
     {
         // Verifica se o cnpj foi enviado

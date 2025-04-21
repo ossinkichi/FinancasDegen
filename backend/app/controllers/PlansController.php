@@ -97,6 +97,7 @@ class PlansController extends PlansModel
         }
     }
 
+    // Ativa um plano
     public function enable(Request $request, Response $response): Response
     {
         try {
@@ -116,6 +117,7 @@ class PlansController extends PlansModel
         }
     }
 
+    // Desativa um plano
     public function disable(Request $request, Response $response): Response
     {
         try {
