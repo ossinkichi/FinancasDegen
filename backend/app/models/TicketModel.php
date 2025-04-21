@@ -13,7 +13,7 @@ class TicketModel extends ConnectModel
      * Registra um novo boleto
      * @return array {status: int, message: string|void}
      */
-    protected function setNewTicket(int $request, string $price, int $numberofinstallment, mixed $dateofpayment, int|bool $paid, mixed $fees): array
+    protected function setNewTicket(int $request, string $price, int $numberofinstallment, mixed $dateofpayment, mixed $fees): array
     {
         try {
             $sql = $this->connect()->prepare('INSERT INTO ticket(request, price, numberofinstallment, dateofpayment, paid, fees) VALUE(:request, :price, :numberofinstallment, :dateofpayment, :paid, :fees)');
@@ -21,7 +21,7 @@ class TicketModel extends ConnectModel
             $sql->bindValue(':price', $price);
             $sql->bindValue(':numberofinstallment', $numberofinstallment);
             $sql->bindValue(':dateofpayment', $dateofpayment);
-            $sql->bindValue(':paid', $paid);
+            $sql->bindValue(':paid', false);
             $sql->bindValue(':fees', $fees);
             $sql->execute();
 
@@ -80,11 +80,12 @@ class TicketModel extends ConnectModel
      * Paga uma parcela de um boleto
      * @return array {status: int, message: string|void}
      */
-    protected function payinstallment(int $account, int $ticket): array
+    protected function payinstallment(int $account, int $ticket, int $paid): array
     {
         try {
-            $sql = $this->connect()->prepare('UPDATE ticket SET paid = 1 WHERE request = :account AND id = :ticket');
+            $sql = $this->connect()->prepare('UPDATE ticket SET paid = :paid WHERE request = :account AND id = :ticket');
             $sql->bindValue(':account', $account);
+            $sql->bindValue(':paid', $paid);
             $sql->bindValue(':ticket', $ticket);
             $sql->execute();
 

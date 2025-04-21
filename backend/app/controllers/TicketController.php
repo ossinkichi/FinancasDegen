@@ -31,6 +31,25 @@ class TicketController extends TicketModel
             $this->helper->arrayValidate([$param], [0]);
             $param = $this->helper->sanitizeArray([$param])[0];
             $param = $this->helper->convertType([$param], ['int'])[0];
+
+            $res = $this->getTickets($param);
+
+            if (empty($res)) {
+                return $response
+                    ->code(400)
+                    ->header('Content-Type', 'application/json')
+                    ->body(\json_encode([
+                        'message' => 'Não foi encontrado nenhum boleto!',
+                    ]));
+            }
+
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode([
+                    'message' => $res['message'],
+                    'error' => $res['error'] ?? [],
+                ]));
         } catch (Exception $e) {
             throw new Exception('Controler Error: ' . $e->getMessage());
         }
@@ -39,6 +58,18 @@ class TicketController extends TicketModel
     public function create(Request $request, Response $response)
     {
         try {
+            $this->jwt->validate();
+            $body = \json_decode($request->body(), true);
+
+            $this->helper->arrayValidate($body, [
+                'request',
+                'price',
+                'numberofinstallment',
+                'dateofpayment',
+                'fees'
+            ]);
+            $body = $this->helper->sanitizeArray($body);
+            $body = $this->helper->convertType($body, ['int', 'string', 'int', 'string', 'int']);
         } catch (Exception $e) {
             throw new Exception('Controler Error: ' . $e->getMessage());
         }
