@@ -40,7 +40,7 @@ class Helper
         return get_object_vars(json_decode($input));
     }
 
-    public function arrayValidate(array|string $arrayForValidate, array $keys = []): void
+    public function arrayValidate(array|string $arrayForValidate, array|null $keys = [0]): void
     {
 
         if (\is_string($arrayForValidate)) {

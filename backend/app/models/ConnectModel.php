@@ -138,13 +138,15 @@ class ConnectModel
             $sql = $this->connect()->prepare('CREATE TABLE IF NOT EXISTS requests(
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             client INTEGER,
-            name VARCHAR(200) NOT NULL,
+            title VARCHAR(200) NOT NULL,
             describe TEXT,
             price DECIMAL(10,2) NOT NULL,
             numberofinstallments INTEGER DEFAULT 1,
             installmentspaid INTEGER DEFAULT 0,
             status VARCHAR(20) DEFAULT \'pendente\',
             fees VARCHAR(10),
+            dateofrequest DATE default CURRENT_TIMESTAMP,
+            dateofpayment DATE,
             deleted BOOLEAN DEFAULT false,
             FOREIGN KEY (client) REFERENCES clients(id) ON DELETE CASCADE
             );');

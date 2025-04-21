@@ -79,17 +79,18 @@ class CompanyModel extends ConnectModel
      * Troca o plano da empresa
      * @return array {status: number, message: string|void}
      */
-    protected function updateTheCompanysPlan(string $cnpj, int $plan, string $planValue): array
+    protected function updateTheCompanysPlan(string $cnpj, int $plan): array
     {
         try {
-            $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan, planvalue = :planvalue WHERE cnpj = :cnpj');
+            $sql  = $this->connect()->prepare('UPDATE companies SET plan = :plan WHERE cnpj = :cnpj');
             $sql->bindValue(':plan', $plan);
-            $sql->bindValue(':planvalue', $planValue);
             $sql->bindValue(':cnpj', $cnpj);
             $sql->execute();
+
             if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel atualizar o plano', 'error' => $sql->errorInfo()];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             throw new PDOException('Erro ao atualizar plano: ' . $pe->getMessage(), (int) $pe->getCode());

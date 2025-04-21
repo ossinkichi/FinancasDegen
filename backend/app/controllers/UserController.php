@@ -432,8 +432,6 @@ class UserController extends UsersModel
      */
     private function validateLogin(array $user): array
     {
-        // \dd($user['email']);
-
         // Faz o pedido ao banco de dados e recebe sua resposta
         $response = $this->getUser($user['email']);
 
@@ -442,7 +440,7 @@ class UserController extends UsersModel
         }
 
         // Verifica se houve retorno
-        if (empty($response) || isset($response['error'])) {
+        if (empty($response) || isset($response['error']) || !\is_array($response['message'])) {
             return ['message' => 'Usuário não encontrado', 'status' => 404, 'error' => $response['error']];
         }
 

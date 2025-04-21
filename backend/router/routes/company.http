@@ -1,18 +1,18 @@
 GET http://localhost:8000/company
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk2NzkzLCJleHAiOjE3NDUyMjE5OTMsImRhdGEiOltdfQ.iEgv4uETpobey6fiRp5CaGHVEgtoGvaZdO6xffrytNQ
 
 ###
 
-GET http://localhost:8000/company/00000000000000
+GET http://localhost:8000/company/00000009000000
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0NjYyNTU5LCJleHAiOjE3NDQ2ODc3NTksImRhdGEiOltdfQ.e8ZH0dap46Y78EH7klKjqsEctUZm5-X4uFlMbT32nyo
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk2NzkzLCJleHAiOjE3NDUyMjE5OTMsImRhdGEiOltdfQ.iEgv4uETpobey6fiRp5CaGHVEgtoGvaZdO6xffrytNQ
 
 ###
 
 POST http://localhost:8000/company/register
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0NjYyNTU5LCJleHAiOjE3NDQ2ODc3NTksImRhdGEiOltdfQ.e8ZH0dap46Y78EH7klKjqsEctUZm5-X4uFlMbT32nyo
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk2NzkzLCJleHAiOjE3NDUyMjE5OTMsImRhdGEiOltdfQ.iEgv4uETpobey6fiRp5CaGHVEgtoGvaZdO6xffrytNQ
 
 {
     "name": "bacon hear",
@@ -25,16 +25,16 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIs
 
 DELETE  http://localhost:8000/company/delete/00000009000000
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0NjYyNTU5LCJleHAiOjE3NDQ2ODc3NTksImRhdGEiOltdfQ.e8ZH0dap46Y78EH7klKjqsEctUZm5-X4uFlMbT32nyo
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk2NzkzLCJleHAiOjE3NDUyMjE5OTMsImRhdGEiOltdfQ.iEgv4uETpobey6fiRp5CaGHVEgtoGvaZdO6xffrytNQ
 
 ###
+
 PATCH http://localhost:8000/company/update/plan
 Content-Type: application/json
-Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ0NjYyNTU5LCJleHAiOjE3NDQ2ODc3NTksImRhdGEiOltdfQ.e8ZH0dap46Y78EH7klKjqsEctUZm5-X4uFlMbT32nyo
+Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk2NzkzLCJleHAiOjE3NDUyMjE5OTMsImRhdGEiOltdfQ.iEgv4uETpobey6fiRp5CaGHVEgtoGvaZdO6xffrytNQ
 
 {
-    "plan": "2",
-    "cnpj": "00000000000000",
-    "value": "120,59"
+    "plan": "1",
+    "cnpj": "00000009000000"
 }
 ###

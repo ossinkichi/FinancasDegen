@@ -1,17 +1,54 @@
-GET http://localhost:8000/request/
+GET http://localhost:8000/request/1
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzM5Mzg5NTg1LCJleHAiOjE3Mzk0MTQ3ODV9.0VMz5VnnTsdE1K8_NtvadyakqpmNd5W9gZI0W4EpRg8
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk1NzM4LCJleHAiOjE3NDUyMjA5MzgsImRhdGEiOltdfQ.IEa5eOD-xHCBfOcn6xNBGr_UqyhBzHerW4naJAeqwgI
 
 ###
 
-GET http://localhost:8000/request
+POST  http://localhost:8000/request/create
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk1NzM4LCJleHAiOjE3NDUyMjA5MzgsImRhdGEiOltdfQ.IEa5eOD-xHCBfOcn6xNBGr_UqyhBzHerW4naJAeqwgI
+
+{
+    "client": 1,
+    "title": "New Request",
+    "describe": "This is a new request",
+    "price": "198,00",
+    "installments": 3,
+    "fees": "10,00"
+
+}
 
 ###
 
-GET http://localhost:8000/request
+PUT http://localhost:8000/request/discard
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk1NzM4LCJleHAiOjE3NDUyMjA5MzgsImRhdGEiOltdfQ.IEa5eOD-xHCBfOcn6xNBGr_UqyhBzHerW4naJAeqwgI
+
+{
+    "client": 1,
+    "account": 2
+}
 
 ###
 
-GET http://localhost:8000/request
+PUT http://localhost:8000/request/accept
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk1NzM4LCJleHAiOjE3NDUyMjA5MzgsImRhdGEiOltdfQ.IEa5eOD-xHCBfOcn6xNBGr_UqyhBzHerW4naJAeqwgI
+
+{
+    "client": 1,
+    "account": 3
+}
+
+###
+
+PUT http://localhost:8000/request/pay
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTk1NzM4LCJleHAiOjE3NDUyMjA5MzgsImRhdGEiOltdfQ.IEa5eOD-xHCBfOcn6xNBGr_UqyhBzHerW4naJAeqwgI
+
+{
+    "id": 1,
+    "installments": 3
+}
 
 ###

@@ -144,20 +144,60 @@ class CompanyController extends CompanyModel
         }
     }
 
-
+    // Atualiza o plano de uma empresa
     public function changeOfPlan(Request $request, Response $response): Response
     {
         try {
-            $this->jwt->validate();
-            $company = \json_decode($request->body());
-            $this->helper->arrayValidate($company, ['cnpj', 'plan', 'value']);
+            $this->jwt->validate(); // Verifica se o token é válido
+            $body = \json_decode($request->body(), true); // Pega os dados do body da requisição
 
-            $res = $this->updateTheCompanysPlan($company['cnpj'], $company['plan'], $company['value']);
-            return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body($res['message']);
+            $this->helper->arrayValidate($body, ['cnpj', 'plan']); // Verifica se os dados foram enviados
+            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados da empresa
+            $body = $this->helper->convertType($body, ['string', 'int']); // Converte o tipo dos dados da empresa
+
+            // Verifica se o cnpj é válido
+            $exist = $this->companyExist($body['cnpj']);
+
+            // Verifica se alguma empresa foi encontrada
+            if (empty($exist)) {
+                return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
+            }
+
+            // Faz o pedido ao banco e recebe sua resposta
+            $res = $this->updateTheCompanysPlan($body['cnpj'], $body['plan']);
+
+            \dd($res);
+
+            // Dá um retorno para o front
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'aplication/json')
+                ->body(['message' => $res['message'], 'error' => $res['error'] ?? []]);
         } catch (Exception $e) {
-            throw new Exception('newPlan error' . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 
     public function update(Request $request, Response $response) {}
+
+    private function companyExist(string $cnpj): array
+    {
+        // Verifica se o cnpj foi enviado
+        if (empty($cnpj)) {
+            return [];
+        }
+
+        // Faz o pedido ao banco e recebe sua resposta
+        $company = $this->getCompany($cnpj);
+
+        // Verifica se o retorno é um array e se está vazio
+        if (!empty($company) || $company['status'] != 200 || !is_array($company)) {
+            throw new Exception($company['message'] ?? ['message' => 'Nenhuma empresa encontrada']);
+            $this->helper->mensagem(['message' => 'Nenhuma empresa encontrada', 'error' => $company['error'] ?? []], 404);
+            return [];
+        }
+
+        // Dá um retorno a funçaõ
+        return $company['message'];
+    }
 }

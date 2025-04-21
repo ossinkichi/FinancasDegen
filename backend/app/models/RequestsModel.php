@@ -19,9 +19,9 @@ class RequestsModel extends ConnectModel
             $sql->bindValue(':client', $client);
             $sql->execute();
 
-            if ($sql->rowCount() === 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel buscar as contas do cliente', 'error' => $sql->errorInfo()];
-            }
+            // if ($sql->rowCount() === 0) {
+            //     return ['status' => 403, 'message' => 'Não foi possivel buscar as contas do cliente', 'error' => $sql->errorInfo()];
+            // }
 
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
@@ -32,15 +32,16 @@ class RequestsModel extends ConnectModel
     /**
      * @return array {status: number, message: string|void}
      */
-    public function setNewRequest(int $client, string $name, string $describe, string $price, int $numberofinstallments): array
+    public function setNewRequest(int $client, string $title, string $describe, string $price, int $numberofinstallments, string $fees): array
     {
         try {
-            $sql = $this->connect()->prepare('INSERT INTO requests(client, name, describe, price, numberofinstallments) VALUES(:client, :name, :describe, :price, :numberofinstallments)');
+            $sql = $this->connect()->prepare('INSERT INTO requests(client, title, describe, price, numberofinstallments, fees) VALUES(:client, :title, :describe, :price, :numberofinstallments,:fees)');
             $sql->bindValue(':client', $client);
-            $sql->bindValue(':name', $name);
+            $sql->bindValue(':title', $title);
             $sql->bindValue(':describe', $describe);
             $sql->bindValue(':price', $price);
             $sql->bindValue(':numberofinstallments', $numberofinstallments);
+            $sql->bindValue(':fees', $fees);
             $sql->execute();
 
             if ($sql->rowCount() === 0) {

@@ -6,8 +6,8 @@ POST http://localhost:8000/user/login
 Content-Type: application/json
 
 {
-    "email": "catedrau@gmail.com",
-    "password": "1290"
+    "email": "catecea4@gmail.com",
+    "password": "1121"
 }
 
 ###
@@ -50,9 +50,8 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIs
 
 ###
 
-PATCH http://localhost:8000/user/active/bf515bf88fb9df00a0e224fc4f6a7b4f88010444e8d05615d58530e93b170fc3
+PATCH http://localhost:8000/user/active/ce22191277eef4735bf5dce2d0bcc6b7c526cb36f3795c20f2aa8c29cb16d236
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
 
 ###
 
