@@ -103,15 +103,12 @@ class ClientController extends ClientModel
     {
         try {
             $this->jwt->validate(); // Valida o token
-            $param = $request->params(['client', 'company']); // Recebe o parametro do cliente
+            $param = $request->params(['id', 'company']); // Recebe o parametro do cliente
 
             $this->helper->arrayValidate($param, ['id', 'company']); // Verifica se os campos foram informados
-            $param = $this->helper->convertType($param, ['string', 'string']); // Converte os tipos dos campos
+            $param = $this->helper->convertType($param, ['int', 'string']); // Converte os tipos dos campos
 
-            $client = $this->getClient($param); // Busca o cliente
-
-            // Verifica se a mensagem é um array e sanitiza
-            if (is_array($client['message'])) $client['message'] = $this->helper->sanitizeArray($client['message']);
+            $client = $this->getClient($param['id'], $param['company']); // Busca o cliente
 
             // Verifica se a mensagem está vazia e retorna 204
             if (empty($client) || !isset($client['message'])) {
@@ -120,6 +117,9 @@ class ClientController extends ClientModel
                     ->header('Content-Type', 'application/json')
                     ->body();
             }
+            // Verifica se a mensagem é um array e sanitiza
+            if (is_array($client['message'])) $client['message'] = $this->helper->sanitizeArray($client['message']);
+
             // Retorna a resposta
             return $response
                 ->code($client['status'])
@@ -166,10 +166,10 @@ class ClientController extends ClientModel
     {
         try {
             $this->jwt->validate(); // Valida o token
-            $params = \json_decode($request->body()); // Recebe os dados do cliente
+            $body = \json_decode($request->body(), true); // Recebe os dados do cliente
 
             // Verifica se os campos foram informados
-            $this->helper->arrayValidate($params, [
+            $this->helper->arrayValidate($body, [
                 'id',
                 'name',
                 'email',
@@ -179,7 +179,7 @@ class ClientController extends ClientModel
                 'billingaddress'
             ]);
             // Converte os tipos dos campos
-            $params = $this->helper->convertType($params, [
+            $body = $this->helper->convertType($body, [
                 'int',
                 'string',
                 'string',
@@ -187,11 +187,10 @@ class ClientController extends ClientModel
                 'string',
                 'string',
                 'string',
-                'string'
             ]);
 
             // Faz o pedido de atualização do cliente e recebe a resposta
-            $res = $this->updateDataClientOfCompany($params['id'], $params['name'], $params['email'], $params['phone'], $params['gender'], $params['shippingaddress'], $params['billingaddress']);
+            $res = $this->updateDataClientOfCompany($body['id'], $body['name'], $body['email'], $body['phone'], $body['gender'], $body['shippingaddress'], $body['billingaddress']);
 
             // Verifica se o retorno é vazio e retorna 204
             if (empty($res) || !isset($res['message'])) {
@@ -205,7 +204,7 @@ class ClientController extends ClientModel
             return $response
                 ->code($res['status'])
                 ->header('Content-Type', 'application/json')
-                ->body(\json_encode($res['message']));
+                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

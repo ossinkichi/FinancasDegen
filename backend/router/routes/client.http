@@ -19,25 +19,34 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIs
 }
 ###
 
-DELETE  http://localhost:8000/client/delete
-Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
-
-{
-    "client": 1,
-    "company": 00000009000000
-}
-###
-
 PUT  http://localhost:8000/client/update
 Content-Type: application/json
 Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
 
 {
+    "id": "1",
+    "email": "bobexample@gmail.com",
     "name": "Bob Marley",
     "gender": "masc",
     "phone": "000000000",
     "shippingaddress": "Para brisa",
     "billingaddress": "Verdinha"
+}
+###
+
+GET http://localhost:8000/client/00000009000000/1
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
+
+
+###
+
+DELETE  http://localhost:8000/client/delete
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MTU5ODkzLCJleHAiOjE3NDUxODUwOTMsImRhdGEiOltdfQ.h2kTeoJp76iafcq3ULF7p-XAZmQgnm43QiMlIm6fuZk
+
+{
+    "client": "1",
+    "company": "00000009000000"
 }
 ###

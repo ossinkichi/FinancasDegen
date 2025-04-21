@@ -35,23 +35,24 @@ class ClientModel extends ConnectModel
     /**
      * @return array {status: number, message: array|string}
      */
-    protected function getClient(array $client): array
+    protected function getClient(int $client, string $company): array
     {
         try {
             $sql = $this->connect()->prepare('SELECT * FROM clients WHERE id = :id AND company = :company');
-            $sql->bindValue(':id', $client['id']);
-            $sql->bindValue(':company', $client['company']);
+            $sql->bindValue(':id', $client);
+            $sql->bindValue(':company', $company);
             $sql->execute();
-            if ($sql->rowCount() === 0) {
-                return ['status' => 403, 'message' => 'Houve um erro ao buscar o cliente', 'error' => $sql->errorInfo()];
-            }
+
+            // if ($sql->rowCount() === 0) {
+            //     return ['status' => 403, 'message' => 'Houve um erro ao buscar o cliente', 'error' => $sql->errorInfo()];
+            // }
 
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC) ?? []];
         } catch (PDOException $pe) {
+            throw new PDOException("Erro ao buscar o cliente" . $pe->getMessage(), $pe->getCode());
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel buscar o cliente'];
             }
-            return throw new PDOException("Erro ao buscar o cliente" . $pe->getMessage(), $pe->getCode());
         }
     }
 
