@@ -43,12 +43,14 @@ class TicketController extends TicketModel
                     ]));
             }
 
+            \is_array($res['message']) ? $res['message'] = \array_map([$this->helper, 'sanitizeArray'], $res['message']) : null;
+
             return $response
                 ->code($res['status'])
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode([
                     'message' => $res['message'],
-                    'error' => $res['error'] ?? [],
+                    'error' => $res['error'] ?? []
                 ]));
         } catch (Exception $e) {
             throw new Exception('Controler Error: ' . $e->getMessage());
@@ -69,7 +71,26 @@ class TicketController extends TicketModel
                 'fees'
             ]);
             $body = $this->helper->sanitizeArray($body);
-            $body = $this->helper->convertType($body, ['int', 'string', 'int', 'string', 'int']);
+            $body = $this->helper->convertType($body, ['int', 'decimals', 'int', 'string', 'int']);
+
+            $res = $this->setNewTicket($body['request'], $body['price'], $body['numberofinstallment'], $body['dateofpayment'], $body['fees']);
+
+            if (empty($res)) {
+                return $response
+                    ->code(400)
+                    ->header('Content-Type', 'application/json')
+                    ->body(\json_encode([
+                        'message' => 'Não foi possível criar o boleto!',
+                    ]));
+            }
+
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode([
+                    'message' => $res['message'],
+                    'error' => $res['error'] ?? [],
+                ]));
         } catch (Exception $e) {
             throw new Exception('Controler Error: ' . $e->getMessage());
         }
@@ -78,6 +99,34 @@ class TicketController extends TicketModel
     public function paid(Request $request, Response $response)
     {
         try {
+            $this->jwt->validate();
+            $body = \json_decode($request->body(), true);
+
+            $this->helper->arrayValidate($body, [
+                'request',
+                'account'
+            ]);
+            $body = $this->helper->sanitizeArray($body);
+            $body = $this->helper->convertType($body, ['int', 'int']);
+
+            $res = $this->payinstallment($body['request'], $body['account']);
+
+            if (empty($res)) {
+                return $response
+                    ->code(400)
+                    ->header('Content-Type', 'application/json')
+                    ->body(\json_encode([
+                        'message' => 'Não foi possível criar o boleto!',
+                    ]));
+            }
+
+            return $response
+                ->code($res['status'])
+                ->header('Content-Type', 'application/json')
+                ->body(\json_encode([
+                    'message' => $res['message'],
+                    'error' => $res['error'] ?? [],
+                ]));
         } catch (Exception $e) {
             throw new Exception('Controler Error: ' . $e->getMessage());
         }

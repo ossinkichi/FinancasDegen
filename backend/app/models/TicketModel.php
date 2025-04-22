@@ -80,12 +80,12 @@ class TicketModel extends ConnectModel
      * Paga uma parcela de um boleto
      * @return array {status: int, message: string|void}
      */
-    protected function payinstallment(int $account, int $ticket, int $paid): array
+    protected function payinstallment(int $account, int $ticket): array
     {
         try {
             $sql = $this->connect()->prepare('UPDATE ticket SET paid = :paid WHERE request = :account AND id = :ticket');
             $sql->bindValue(':account', $account);
-            $sql->bindValue(':paid', $paid);
+            $sql->bindValue(':paid', true);
             $sql->bindValue(':ticket', $ticket);
             $sql->execute();
 
