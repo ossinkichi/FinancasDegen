@@ -18,6 +18,7 @@ require __DIR__ . '/../router/companyRouter.php';
 require __DIR__ . '/../router/plansRouter.php';
 require __DIR__ . '/../router/requestRouter.php';
 require __DIR__ . '/../router/userRouter.php';
+require __DIR__ . '/../router/ticketRouter.php';
 
 try {
     $klein->dispatch();

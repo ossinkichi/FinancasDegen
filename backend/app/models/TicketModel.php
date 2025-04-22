@@ -13,7 +13,7 @@ class TicketModel extends ConnectModel
      * Registra um novo boleto
      * @return array {status: int, message: string|void}
      */
-    protected function setNewTicket(int $request, string $price, int $numberofinstallment, mixed $dateofpayment, mixed $fees): array
+    protected function setNewTicket(int $request, string $price, int $numberofinstallment, string $dateofpayment, int $fees): array
     {
         try {
             $sql = $this->connect()->prepare('INSERT INTO ticket(request, price, numberofinstallment, dateofpayment, paid, fees) VALUE(:request, :price, :numberofinstallment, :dateofpayment, :paid, :fees)');

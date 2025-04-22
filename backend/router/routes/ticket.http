@@ -1,0 +1,15 @@
+GET http://localhost:8000/ticket/
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MzQ4ODQwLCJleHAiOjE3NDUzNzQwNDAsImRhdGEiOltdfQ._SkfDB6RGwOCaTHeubS76tF8sbbpH4M7GZz2gPm-BX4
+###
+
+POST http://localhost:8000/ticket/create
+Content-Type: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ1MzQ4ODQwLCJleHAiOjE3NDUzNzQwNDAsImRhdGEiOltdfQ._SkfDB6RGwOCaTHeubS76tF8sbbpH4M7GZz2gPm-BX4
+
+{
+    "request": 1,
+    "price": "100,09",
+    "numberofinstallment": 1,
+    "dateofpayment": "06/10",
+    "fees": "0,00"
+}

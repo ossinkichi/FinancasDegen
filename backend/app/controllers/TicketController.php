@@ -73,7 +73,7 @@ class TicketController extends TicketModel
             $body = $this->helper->sanitizeArray($body);
             $body = $this->helper->convertType($body, ['int', 'decimals', 'int', 'string', 'int']);
 
-            $res = $this->setNewTicket($body['request'], $body['price'], $body['numberofinstallment'], $body['dateofpayment'], $body['fees']);
+            $res = $this->setNewTicket($body['request'], (string) $body['price'], $body['numberofinstallment'], $body['dateofpayment'], $body['fees']);
 
             if (empty($res)) {
                 return $response
@@ -127,14 +127,6 @@ class TicketController extends TicketModel
                     'message' => $res['message'],
                     'error' => $res['error'] ?? [],
                 ]));
-        } catch (Exception $e) {
-            throw new Exception('Controler Error: ' . $e->getMessage());
-        }
-    }
-
-    public function ticketFinalized(Request $request, Response $response)
-    {
-        try {
         } catch (Exception $e) {
             throw new Exception('Controler Error: ' . $e->getMessage());
         }
