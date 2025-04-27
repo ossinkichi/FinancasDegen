@@ -1,14 +1,13 @@
 <?php
 
-namespace app\Controllers;
+namespace App\Controllers;
 
+use App\Models\PromotionModel;
 use Klein\Request;
 use Klein\Response;
-use app\Models\PromotionModel;
 
 class PromotionController extends PromotionModel
 {
-
     public function __construct() {}
 
     public function create(Request $request, Response $response) {}

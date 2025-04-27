@@ -1,16 +1,17 @@
 <?php
 
-namespace app\Models;
+namespace App\Models;
 
-use \Exception;
-use \PDOException;
-use app\models\ConnectModel;
+use App\models\ConnectModel;
+use Exception;
 use PDO;
+use PDOException;
 
 class TicketModel extends ConnectModel
 {
     /**
      * Registra um novo boleto
+     *
      * @return array {status: int, message: string|void}
      */
     protected function setNewTicket(int $request, string $price, int $numberofinstallment, string $dateofpayment, int $fees): array
@@ -28,14 +29,16 @@ class TicketModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado', 'error' => $sql->errorInfo()];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao Criar o boleto: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao Criar o boleto: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
     /**
      * Busca todos os boletos de uma conta especifica
+     *
      * @return array {status: int, message: array}
      */
     protected function getTickets(int $account): array
@@ -48,14 +51,16 @@ class TicketModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Nenhum dado encontrado', 'error' => $sql->errorInfo()];
             }
+
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC)];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao buscar os boletos: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao buscar os boletos: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
     /**
      * Busca um boleto especifico
+     *
      * @return array {status: int, message: array}
      */
     protected function getTicket(int $request, int $account): array
@@ -72,12 +77,13 @@ class TicketModel extends ConnectModel
 
             return ['status' => 200, 'message' => $sql->fetch(PDO::FETCH_ASSOC)];
         } catch (Exception $e) {
-            throw new Exception('Erro ao buscar o boleto: ' . $e->getMessage(), $e->getCode());
+            throw new Exception('Erro ao buscar o boleto: '.$e->getMessage(), $e->getCode());
         }
     }
 
     /**
      * Paga uma parcela de um boleto
+     *
      * @return array {status: int, message: string|void}
      */
     protected function payinstallment(int $account, int $ticket): array
@@ -95,7 +101,7 @@ class TicketModel extends ConnectModel
 
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao pagar a parcela: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao pagar a parcela: '.$pe->getMessage(), $pe->getCode());
         }
     }
 }

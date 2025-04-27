@@ -1,31 +1,33 @@
 <?php
 
-namespace app\models;
+namespace App\models;
 
-use \PDO;
-use \PDOException;
 use Dotenv\Dotenv;
 use Exception;
+use PDO;
+use PDOException;
 
 class ConnectModel
 {
-
     protected function connect(): PDO
     {
         try {
 
-            $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+            $dotenv = Dotenv::createImmutable(__DIR__.'/../../');
             $dotenv->load();
 
-            if (!defined('DATABASE')) define('DATABASE', __DIR__ . '/' . $_ENV['DATABASE']);
+            if (! defined('DATABASE')) {
+                define('DATABASE', __DIR__.'/'.$_ENV['DATABASE']);
+            }
 
-            $db = new PDO('sqlite:' . DATABASE);
+            $db = new PDO('sqlite:'.DATABASE);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             $db->exec('PRAGMA foreign_keys = ON;');
+
             return $db;
         } catch (PDOException $pe) {
-            throw new PDOException('Error ao conectar: ' . $pe->getMessage());
+            throw new PDOException('Error ao conectar: '.$pe->getMessage());
         }
     }
 
@@ -45,7 +47,7 @@ class ConnectModel
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao criar a tabela de planos: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao criar a tabela de planos: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -60,7 +62,7 @@ class ConnectModel
             status BOOLEAN DEFAULT true,
             FOREIGN KEY (plan) REFERENCES plans(id) ON DELETE CASCADE)');
         } catch (PDOException $pe) {
-            throw new PDOException('Error ao criar a tabela de planos promocionais: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Error ao criar a tabela de planos promocionais: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -86,7 +88,7 @@ class ConnectModel
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao criar a tabela de usuário: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao criar a tabela de usuário: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -105,7 +107,7 @@ class ConnectModel
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao criar a tabela das empresas: ' . $pe->getMessage());
+            throw new PDOException('Erro ao criar a tabela das empresas: '.$pe->getMessage());
         }
     }
 
@@ -128,7 +130,7 @@ class ConnectModel
 
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('Error ao criar a tabela de clientes: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Error ao criar a tabela de clientes: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -152,7 +154,7 @@ class ConnectModel
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao criar a tabela de contas: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao criar a tabela de contas: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -171,7 +173,7 @@ class ConnectModel
             )');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao criar a tabela de boletos: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao criar a tabela de boletos: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -194,7 +196,7 @@ class ConnectModel
 
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('RequestTable error: ' . $pe->getMessage());
+            throw new PDOException('RequestTable error: '.$pe->getMessage());
         }
     }
 
@@ -213,7 +215,7 @@ class ConnectModel
             );');
             $sql->execute();
         } catch (PDOException $pe) {
-            throw new PDOException('Erro ao criar a tabela de despesas: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao criar a tabela de despesas: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
@@ -230,7 +232,7 @@ class ConnectModel
             $this->accordsTable();
             $this->expensesTable();
         } catch (Exception $e) {
-            throw new Exception('Error ao criar as tabelas: ' . $e->getMessage(), $e->getCode());
+            throw new Exception('Error ao criar as tabelas: '.$e->getMessage(), $e->getCode());
         }
     }
 }

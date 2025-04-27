@@ -1,26 +1,25 @@
 <?php
 
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\classes\Helper;
-use app\Classes\JwtHelper;
-use \Exception;
+use App\models\TicketModel;
+use App\Shared\Helper;
+use App\Shared\JWT;
+use Exception;
 use Klein\Request;
 use Klein\Response;
-use app\models\TicketModel;
 
 class TicketController extends TicketModel
 {
-
     private Helper $helper;
-    private JwtHelper $jwt;
+
+    private JWT $jwt;
 
     public function __construct()
     {
-        $this->helper = new Helper();
-        $this->jwt = new JwtHelper();
+        $this->helper = new Helper;
+        $this->jwt = new JWT;
     }
-
 
     public function getTicketsForRequest(Request $request, Response $response)
     {
@@ -28,9 +27,9 @@ class TicketController extends TicketModel
             $this->jwt->validate();
             $param = $request->param('account');
 
-            $this->helper->arrayValidate([$param], [0]);
-            $param = $this->helper->sanitizeArray([$param])[0];
-            $param = $this->helper->convertType([$param], ['int'])[0];
+            arrayValidate([$param], [0]);
+            $param = sanitizeArray([$param])[0];
+            $param = convertType([$param], ['int'])[0];
 
             $res = $this->getTickets($param);
 
@@ -50,10 +49,10 @@ class TicketController extends TicketModel
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode([
                     'message' => $res['message'],
-                    'error' => $res['error'] ?? []
+                    'error' => $res['error'] ?? [],
                 ]));
         } catch (Exception $e) {
-            throw new Exception('Controler Error: ' . $e->getMessage());
+            throw new Exception('Controler Error: '.$e->getMessage());
         }
     }
 
@@ -63,15 +62,15 @@ class TicketController extends TicketModel
             $this->jwt->validate();
             $body = \json_decode($request->body(), true);
 
-            $this->helper->arrayValidate($body, [
+            arrayValidate($body, [
                 'request',
                 'price',
                 'numberofinstallment',
                 'dateofpayment',
-                'fees'
+                'fees',
             ]);
-            $body = $this->helper->sanitizeArray($body);
-            $body = $this->helper->convertType($body, ['int', 'decimals', 'int', 'string', 'int']);
+            $body = sanitizeArray($body);
+            $body = convertType($body, ['int', 'decimals', 'int', 'string', 'int']);
 
             $res = $this->setNewTicket($body['request'], (string) $body['price'], $body['numberofinstallment'], $body['dateofpayment'], $body['fees']);
 
@@ -92,7 +91,7 @@ class TicketController extends TicketModel
                     'error' => $res['error'] ?? [],
                 ]));
         } catch (Exception $e) {
-            throw new Exception('Controler Error: ' . $e->getMessage());
+            throw new Exception('Controler Error: '.$e->getMessage());
         }
     }
 
@@ -102,12 +101,12 @@ class TicketController extends TicketModel
             $this->jwt->validate();
             $body = \json_decode($request->body(), true);
 
-            $this->helper->arrayValidate($body, [
+            arrayValidate($body, [
                 'request',
-                'account'
+                'account',
             ]);
-            $body = $this->helper->sanitizeArray($body);
-            $body = $this->helper->convertType($body, ['int', 'int']);
+            $body = sanitizeArray($body);
+            $body = convertType($body, ['int', 'int']);
 
             $res = $this->payinstallment($body['request'], $body['account']);
 
@@ -128,7 +127,7 @@ class TicketController extends TicketModel
                     'error' => $res['error'] ?? [],
                 ]));
         } catch (Exception $e) {
-            throw new Exception('Controler Error: ' . $e->getMessage());
+            throw new Exception('Controler Error: '.$e->getMessage());
         }
     }
 }

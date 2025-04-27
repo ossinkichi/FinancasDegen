@@ -1,26 +1,27 @@
 <?php
 
-namespace app\controllers;
+namespace App\controllers;
 
-use \Exception;
+use App\models\UsersModel;
+use App\Shared\Helper;
+use App\Shared\JWT;
 use Dotenv\Dotenv;
+use Exception;
 use Klein\Request;
 use Klein\Response;
-use app\classes\Helper;
-use app\classes\JwtHelper;
-use app\models\UsersModel;
-use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class UserController extends UsersModel
 {
     private Helper $helper;
-    private JwtHelper $jwt;
+
+    private JWT $jwt;
 
     public function __construct()
     {
-        $this->helper =  new Helper;
-        $this->jwt =  new JwtHelper;
+        $this->helper = new Helper;
+        $this->jwt = new JWT;
     }
 
     // Busca todos os usúarios
@@ -36,12 +37,13 @@ class UserController extends UsersModel
             // Sanitiza os dados
             \is_array($res['message']) ?
                 $res['message'] = \array_map(function ($user) {
-                    $user = $this->helper->sanitizeArray($user);
+                    $user = sanitizeArray($user);
                     foreach (['id', 'password'] as $chave) {
                         unset($user[$chave]);
                     }
+
                     return $user;
-                },  $res['message'])
+                }, $res['message'])
                 : null;
 
             // Envia uma resposta ao front
@@ -52,23 +54,23 @@ class UserController extends UsersModel
     }
 
     // Verifica se o usuario tem uma conta
-    public function login(Request $request, Response $response): Response # Atualmente está dando erro
+    public function login(Request $request, Response $response): Response // Atualmente está dando erro
     {
         try {
             $body = \json_decode($request->body(), true); // Recebe os dados do front
 
             // Verifica se todos os campos foram enviados
-            $this->helper->arrayValidate($body, [
+            arrayValidate($body, [
                 'email',
-                'password'
+                'password',
             ]);
             // Converte os tipos dos dados
-            $body = $this->helper->convertType($body, ['string', 'string']);
+            $body = convertType($body, ['string', 'string']);
 
             // Sanitiza os dados
             $user = [
                 'email' => filter_var($body['email'], FILTER_SANITIZE_EMAIL),
-                'password' => filter_var($body['password'], FILTER_SANITIZE_SPECIAL_CHARS)
+                'password' => filter_var($body['password'], FILTER_SANITIZE_SPECIAL_CHARS),
             ];
 
             // Valida o usúario
@@ -90,7 +92,7 @@ class UserController extends UsersModel
             $body = \json_decode($request->body(), true); // Recebe os dados do front
 
             // Verifica se todos os dados necessários foram enviados
-            $this->helper->arrayValidate($body, [
+            arrayValidate($body, [
                 'name',
                 'email',
                 'password',
@@ -98,7 +100,7 @@ class UserController extends UsersModel
                 'dateofbirth',
                 'gender',
                 'phone',
-                'position'
+                'position',
             ]);
 
             // Busca se o usúario já existe
@@ -110,12 +112,12 @@ class UserController extends UsersModel
             }
 
             // Sanitiza os dados
-            $user = $this->helper->sanitizeArray($body);
+            $user = sanitizeArray($body);
             $user['email'] = filter_var($body['email'], FILTER_SANITIZE_EMAIL);
             $user['hash'] = $this->createHash($user['cpf']); // Cria um hash para o usuário
 
             // Converte os tipos dos dados
-            $user = $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
+            $user = convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
 
             // Faz o pedido ao banco e recebe sua resposta
             $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['password'], $user['cpf'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['position']);
@@ -148,9 +150,9 @@ class UserController extends UsersModel
             $this->jwt->validate(); // Verifica se o token é valido
 
             $hash = $request->param('hash'); // Recebe o hash do usuario
-            $this->helper->arrayValidate([$hash]); // Verifica se o dado foi enviado
-            $hash = $this->helper->convertType([$hash], ['string'])[0]; // Converte o tipo do dado
-            $hash = $this->helper->sanitizeArray([$hash])[0]; // Sanitiza o dado
+            arrayValidate([$hash]); // Verifica se o dado foi enviado
+            $hash = convertType([$hash], ['string'])[0]; // Converte o tipo do dado
+            $hash = sanitizeArray([$hash])[0]; // Sanitiza o dado
 
             $res = $this->getUser($hash); // Faz o pedido ao banco de dados e recebe sua resposta
 
@@ -167,18 +169,17 @@ class UserController extends UsersModel
                 ->code($res['status'])
                 ->header('Content-Type', 'aplication/json')
                 ->body(\json_encode([
-                    'message' =>
-                    [
+                    'message' => [
                         'name' => $res['message']['name'],
                         'email' => $res['message']['email'],
                         'verify' => $res['message']['emailverify'],
                         'cargo' => $res['message']['position'],
-                        'cpf' => substr(str_repeat('*', 8) . $res['message']['cpf'],  -3),
+                        'cpf' => substr(str_repeat('*', 8).$res['message']['cpf'], -3),
                         'nascimento' => str_replace('/', '-', $res['message']['dateofbirth']),
                         'genero' => $res['message']['gender'],
-                        'contato' => $res['message']['phone']
+                        'contato' => $res['message']['phone'],
                     ],
-                    'error' => $res['error'] ?? []
+                    'error' => $res['error'] ?? [],
                 ]));
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -192,21 +193,21 @@ class UserController extends UsersModel
 
         $data = \json_decode($request->body(), true); // Recebe os dados do front
         // Verifica se todos os dados necessários foram enviados
-        $this->helper->arrayValidate($data, [
+        arrayValidate($data, [
             'hash',
             'name',
             'email',
             'password',
             'dateofbirth',
             'gender',
-            'phone'
+            'phone',
         ]);
 
         // Sanitiza os dados
-        $user = $this->helper->sanitizeArray($data);
+        $user = sanitizeArray($data);
         $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
         // Converte os tipos dos dados
-        $user =  $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
+        $user = convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
         // Verifica se o usúario existe
         $userExist = $this->userExist($user['hash']);
 
@@ -232,9 +233,9 @@ class UserController extends UsersModel
             $this->jwt->validate(); // Verifica se o token é valido
 
             $hash = $request->param('hash'); // Recebe o hash do usuario
-            $this->helper->arrayValidate([$hash], ['0']); // Verifica se o dado foi enviado
-            $hash = $this->helper->sanitizeArray([$hash])[0]; // Sanitiza o dado
-            $hash = $this->helper->convertType([$hash], ['string'])[0]; // Converte o tipo do dado
+            arrayValidate([$hash], ['0']); // Verifica se o dado foi enviado
+            $hash = sanitizeArray([$hash])[0]; // Sanitiza o dado
+            $hash = convertType([$hash], ['string'])[0]; // Converte o tipo do dado
 
             $res = $this->deleteUser($hash); // Faz o pedido ao banco de dados e recebe sua resposta
 
@@ -249,7 +250,7 @@ class UserController extends UsersModel
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
-            throw new Exception('Erro ao deletar: ' . $e->getMessage());
+            throw new Exception('Erro ao deletar: '.$e->getMessage());
         }
     }
 
@@ -258,16 +259,15 @@ class UserController extends UsersModel
         try {
             $body = \json_decode($request->body(), true);  // Recebe os dados do front
 
-            $this->helper->arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
-            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
-            $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
+            arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
+            $body = sanitizeArray($body); // Sanitiza os dados
+            $body = convertType($body, ['string', 'string']); // Converte os tipos dos dados
 
             $userExist = $this->userExist($body['user']); // Verifica se o usúario já está cadastrado
 
-            if (!$userExist) {
+            if (! $userExist) {
                 return $response->code(401)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Usuário não encontrado']));
             }
-
 
             // Verifica se A senha é igual a anterior
             if (password_verify($body['password'], $userExist['password'])) {
@@ -275,6 +275,7 @@ class UserController extends UsersModel
             }
 
             $res = $this->setNewPassword($body['user'], $body['password']);
+
             // \dd($body);
             return $response
                 ->code($res['status'])
@@ -290,8 +291,8 @@ class UserController extends UsersModel
 
         $this->jwt->validate();
         $invite = \json_decode($request->body());
-        $this->helper->arrayValidate($invite, ['invite', 'company']);
-        $this->helper->getData($invite);
+        arrayValidate($invite, ['invite', 'company']);
+        getData($invite);
 
         $res = $this->getUser($invite);
         $this->sendEmail([
@@ -300,8 +301,9 @@ class UserController extends UsersModel
             'fromName' => 'Example Name',
             'toName' => $res['message']['name'],
             'subject' => 'Alterar senha do usuario',
-            'message' => 'Olá ' . ['name'] . ', você foi convidado a entrar na enpresa **, para ingressar click no link a seguir!'
+            'message' => 'Olá '.['name'].', você foi convidado a entrar na enpresa **, para ingressar click no link a seguir!',
         ]);
+
         return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body([]);
     }
 
@@ -312,15 +314,15 @@ class UserController extends UsersModel
             $this->jwt->validate(); // Verifica se o token é valido
             $data = $request->params(['company', 'user']); // Recebe os dados do front
 
-            $this->helper->arrayValidate($data, ['user', 'company']); // Verifica se todos os dados necessários foram enviados
-            $data = $this->helper->sanitizeArray($data); // Sanitiza os dados
-            $data = $this->helper->convertType($data, ['string', 'string']); // Converte os tipos dos dados
+            arrayValidate($data, ['user', 'company']); // Verifica se todos os dados necessários foram enviados
+            $data = sanitizeArray($data); // Sanitiza os dados
+            $data = convertType($data, ['string', 'string']); // Converte os tipos dos dados
 
             // Faz o pedido ao banco e recebe sua resposta
             $res = $this->setCompany($data['company'], $data['user']);
 
             // Verifica se houve retorno
-            if (empty($res) || !\is_array($res)) {
+            if (empty($res) || ! \is_array($res)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Não foi possivel ingressar na empresa!']));
             }
 
@@ -339,9 +341,9 @@ class UserController extends UsersModel
     {
         try {
             $data = $request->param('hash'); // Recebe o hash do usuario
-            $this->helper->arrayValidate([$data], ['0']); // Verifica se o dado foi enviado
-            $data = $this->helper->convertType([$data], ['string'])[0]; // Converte o tipo do dado
-            $data = $this->helper->sanitizeArray([$data])[0]; // Sanitiza o dado
+            arrayValidate([$data], ['0']); // Verifica se o dado foi enviado
+            $data = convertType([$data], ['string'])[0]; // Converte o tipo do dado
+            $data = sanitizeArray([$data])[0]; // Sanitiza o dado
 
             $res = $this->activateAccount($data); // Faz o pedido ao banco de dados e recebe sua resposta
 
@@ -374,11 +376,11 @@ class UserController extends UsersModel
     private function emailConfig()
     {
         try {
-            $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
+            $dotenv = Dotenv::createImmutable(__DIR__.'/../../');
             $dotenv->load();
 
             // Looking to send emails in production? Check out our Email API/SMTP product!
-            $phpmailer = new PHPMailer();
+            $phpmailer = new PHPMailer;
             $phpmailer->isSMTP();
             $phpmailer->Host = $_ENV['EMAILHOST'];
             $phpmailer->SMTPAuth = true;
@@ -389,45 +391,45 @@ class UserController extends UsersModel
 
             return $phpmailer;
         } catch (PHPMailerException $pme) {
-            $this->helper->message(['message' => 'Erro ao configurar o email'], 403);
+            message(['message' => 'Erro ao configurar o email'], 403);
             throw new PHPMailerException($pme->errorMessage());
         } catch (Exception $e) {
-            $this->helper->message(['message' => 'Erro ao configurar o email'], 403);
+            message(['message' => 'Erro ao configurar o email'], 403);
         }
     }
 
     /**
      * Envia um email para um usuário
      *
-     * @param array $emailData {from: string, to: string, fromName: string, toName: string, subject: string, message: string}
+     * @param  array  $emailData  {from: string, to: string, fromName: string, toName: string, subject: string, message: string}
      */
     private function sendEmail(array $emailData): void
     {
         try {
             $mail = $this->emailConfig();
 
-            //Recipients
+            // Recipients
             $mail->setFrom($emailData['from'], $emailData['fromName']);
             $mail->addAddress($emailData['to'], $emailData['toName']);
 
-            //Content
+            // Content
             $mail->isHTML(true);
             $mail->Subject = $emailData['subject'];
-            $mail->Body    = $emailData['message'];
+            $mail->Body = $emailData['message'];
 
             $mail->send();
         } catch (PHPMailerException $pme) {
             throw new PHPMailerException($pme->errorMessage());
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
-            // $this->helper->message(['message' => 'Não foi possivel enviar o email'], 403);
+            // message(['message' => 'Não foi possivel enviar o email'], 403);
         }
     }
 
     /**
      * Validação do login do usuário
      *
-     * @param array $user {email: string, password: string}
+     * @param  array  $user  {email: string, password: string}
      * @return array {message: array|string, token: string}
      */
     private function validateLogin(array $user): array
@@ -440,40 +442,39 @@ class UserController extends UsersModel
         }
 
         // Verifica se houve retorno
-        if (empty($response) || isset($response['error']) || !\is_array($response['message'])) {
+        if (empty($response) || isset($response['error']) || ! \is_array($response['message'])) {
             return ['message' => 'Usuário não encontrado', 'status' => 404, 'error' => $response['error']];
         }
 
         // Verifica se o usuário está ativo
-        if (!$response['message']['emailverify']) {
+        if (! $response['message']['emailverify']) {
             return (array) ['message' => 'Usuário não está ativo', 'status' => 403];
         }
 
         // Verifica se a senha está correta
-        if (!password_verify($user['password'], $response['message']['password'])) {
+        if (! password_verify($user['password'], $response['message']['password'])) {
             return ['message' => 'Senha ou usuário incorreta', 'status' => 401];
         }
 
         // Verifica se o retorno tem status 200 e se é um array
         if ($response['status'] == 200 && is_array($response['message'])) {
-            $response['message'] = $this->helper->sanitizeArray($response['message']);
+            $response['message'] = sanitizeArray($response['message']);
         }
 
         return [
             'message' => [
                 'user' => $response['message']['userhash'] ?? $response['message'],
-                'token' => ($response['status'] == 200) ? $this->jwt->generate(60 * 60 * 7) : null
+                'token' => ($response['status'] == 200) ? $this->jwt->generate(60 * 60 * 7) : null,
             ],
             'status' => $response['status'],
-            'error' => $response['error'] ?? []
+            'error' => $response['error'] ?? [],
         ];
     }
-
 
     /**
      * Verifica se o usuário já existe no banco de dados
      *
-     * @param array $user {email: string, hash: string}
+     * @param  array  $user  {email: string, hash: string}
      * @return void
      */
     private function userExist(string $user): array
@@ -488,7 +489,7 @@ class UserController extends UsersModel
             $userData = $this->getUser((string) $user);
 
             // Verifica se houve retorno
-            if (empty($userData) || !\is_array($userData) || !\is_array($userData['message'])) {
+            if (empty($userData) || ! \is_array($userData) || ! \is_array($userData['message'])) {
                 return [];
             }
 
@@ -503,9 +504,9 @@ class UserController extends UsersModel
     public function sendMessageForForgoatPassword(Request $request, Response $response): void
     {
         $user = \json_decode($request->body(), true); // Recebe os dados do front
-        $this->helper->arrayValidate($user, ['user', 'message']); // Verifica se todos os dados necessários foram enviados
-        $user = $this->helper->sanitizeArray($user); // Sanitiza os dados
-        $user = $this->helper->convertType($user, ['string']); // Converte os tipos dos dados
+        arrayValidate($user, ['user', 'message']); // Verifica se todos os dados necessários foram enviados
+        $user = sanitizeArray($user); // Sanitiza os dados
+        $user = convertType($user, ['string']); // Converte os tipos dos dados
 
         $this->userExist($user['user']); // Verifica se o usúario já está cadastrado
 
@@ -528,7 +529,7 @@ class UserController extends UsersModel
         //                 'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
         //             ]);
         //         } else {
-        //             $this->helper->message(['message' => $response['message']], $response['status']);
+        //             message(['message' => $response['message']], $response['status']);
         //             die();
         //         }
         //     }

@@ -1,15 +1,15 @@
 <?php
 
-namespace app\models;
+namespace App\models;
 
-use \PDO;
-use \PDOException;
-use app\models\ConnectModel;
+use PDO;
+use PDOException;
 
 class PlansModel extends ConnectModel
 {
     /**
      * Busca todos os planos existentes
+     *
      * @return array {status: number, message: array|string}
      */
     protected function getPlans(): array
@@ -23,12 +23,13 @@ class PlansModel extends ConnectModel
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel buscar os planos'];
             }
-            throw new PDOException('Erro ao buscar os planos: ' . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao buscar os planos: '.$pe->getMessage(), $pe->getCode());
         }
     }
 
     /**
      * Registra um novo plano
+     *
      * @return array {status: number, message: string|void}
      */
     protected function setNewPlan(string $planname, string $plandescribe, int $numberofusers, int $numberofclients, string $price, string $type): array
@@ -46,17 +47,19 @@ class PlansModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel registrar um novo plano plano', 'error' => $sql->errorInfo()];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel registrar um novo plano'];
             }
-            throw new PDOException("Erro ao registrar um plano: " . $pe->getMessage(), (int) $pe->getCode());
+            throw new PDOException('Erro ao registrar um plano: '.$pe->getMessage(), (int) $pe->getCode());
         }
     }
 
     /**
      * Atualiza os dados de um plano existente
+     *
      * @return array {status: number, message: string|void}
      */
     protected function updatePlan(int $id, string $planname, string $plandescribe, int $numberofusers, int $numberofclients, string $price, string $type): array
@@ -77,7 +80,7 @@ class PlansModel extends ConnectModel
 
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException("Erro ao atualizar o plano: " . $pe->getMessage(), (int) $pe->getCode());
+            throw new PDOException('Erro ao atualizar o plano: '.$pe->getMessage(), (int) $pe->getCode());
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel atualizar o plano o plano'];
             }
@@ -86,6 +89,7 @@ class PlansModel extends ConnectModel
 
     /**
      * Desativa um plano existente
+     *
      * @return array {status: number, message: string|void}
      */
     protected function disableThePlan(int $id): array
@@ -99,14 +103,16 @@ class PlansModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel desativar o plano'];
             }
-            throw new PDOException("Erro ao desativar o plano: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao desativar o plano: '.$pe->getMessage(), $pe->getCode());
         }
     }
+
     protected function enableThePlan(int $id): array
     {
         try {
@@ -118,12 +124,13 @@ class PlansModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel desativar o plano'];
             }
-            throw new PDOException("Erro ao desativar o plano: " . $pe->getMessage(), $pe->getCode());
+            throw new PDOException('Erro ao desativar o plano: '.$pe->getMessage(), $pe->getCode());
         }
     }
 }
