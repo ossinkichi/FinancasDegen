@@ -1,24 +1,24 @@
 <?php
 
-namespace app\controllers;
+namespace App\controllers;
 
-use \Exception;
+use App\models\CompanyModel;
+use App\Shared\Helper;
+use App\Shared\JWT;
+use Exception;
 use Klein\Request;
 use Klein\Response;
-use app\classes\Helper;
-use app\classes\JwtHelper;
-use app\models\CompanyModel;
 
 class CompanyController extends CompanyModel
 {
-
     private Helper $helper;
-    private JwtHelper $jwt;
+
+    private JWT $jwt;
 
     public function __construct()
     {
         $this->helper = new Helper;
-        $this->jwt = new JwtHelper;
+        $this->jwt = new JWT;
     }
 
     // Puxa todas as empresas do banco de dados
@@ -30,17 +30,17 @@ class CompanyController extends CompanyModel
             $companies = $this->getAllCompanies(); // Puxa todas as empresas do banco de dados
 
             // Verifica se o retorno é um array e se está vazio
-            if (!is_array($companies) || empty($companies)) {
+            if (! is_array($companies) || empty($companies)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
             }
 
             // Sanitiza os dados retornados
             \is_array($companies['message']) ? $companies['message'] = \array_map(function ($company) {
-                $company = $this->helper->sanitizeArray($company);
+                $company = sanitizeArray($company);
                 unset($company['id']);
+
                 return $company;
             }, $companies['message'] ?? []) : null;
-
 
             // Dá um retorno para o front
             return $response
@@ -59,19 +59,19 @@ class CompanyController extends CompanyModel
             $this->jwt->validate(); // Verifica se o token é válido
             $company = $request->param('company'); // Pega o cnpj da empresa
 
-            $this->helper->arrayValidate([$company], [0]); // Verifica se o cnpj foi enviado
-            $company = $this->helper->sanitizeArray([$company])[0]; // Sanitiza o cnpj
-            $company = $this->helper->convertType([$company], ['string'])[0]; // Converte o tipo do dado
+            arrayValidate([$company], [0]); // Verifica se o cnpj foi enviado
+            $company = sanitizeArray([$company])[0]; // Sanitiza o cnpj
+            $company = convertType([$company], ['string'])[0]; // Converte o tipo do dado
 
             $res = $this->getCompany($company); // Puxa os dados da empresa do banco de dados
 
             // Verifica se o retorno é um array e se está vazio
-            if (!is_array($res) || empty($res)) {
+            if (! is_array($res) || empty($res)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
             }
 
             if ($res['status'] == 200) {
-                $res['message'] = $this->helper->sanitizeArray($res['message']);
+                $res['message'] = sanitizeArray($res['message']);
                 if (is_array($res['message'])) {
                     unset($res['message']['id']);
                 }
@@ -85,7 +85,7 @@ class CompanyController extends CompanyModel
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode($res['message']));
         } catch (Exception $e) {
-            throw new Exception("company error: " . $e->getMessage());
+            throw new Exception('company error: '.$e->getMessage());
         }
     }
 
@@ -94,16 +94,16 @@ class CompanyController extends CompanyModel
     {
         try {
             $this->jwt->validate(); // Verifica se o token é válido
-            $company = !empty($request->body()) ? \json_decode($request->body(), true) : []; // Pega os dados da empresa do body da requisição
+            $company = ! empty($request->body()) ? \json_decode($request->body(), true) : []; // Pega os dados da empresa do body da requisição
 
-            $this->helper->arrayValidate($company, ['name', 'describe', 'cnpj', 'plan']); // Verifica se os dados foram enviados
-            $company = $this->helper->sanitizeArray($company); // Sanitiza os dados da empresa
-            $company  = $this->helper->convertType($company, ['string', 'string', 'string', 'decimals']); // Converte o tipo dos dados da empresa
+            arrayValidate($company, ['name', 'describe', 'cnpj', 'plan']); // Verifica se os dados foram enviados
+            $company = sanitizeArray($company); // Sanitiza os dados da empresa
+            $company = convertType($company, ['string', 'string', 'string', 'decimals']); // Converte o tipo dos dados da empresa
 
             $res = $this->setNewCompany($company['name'], $company['describe'], $company['cnpj'], $company['plan']); // Cadastra a empresa no banco de dados
 
             // Verifica se o retorno é um array e se está vazio
-            if (!is_array($res) || empty($res)) {
+            if (! is_array($res) || empty($res)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(['message' => 'Nenhuma empresa encontrada']);
             }
 
@@ -112,7 +112,7 @@ class CompanyController extends CompanyModel
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
-            throw new Exception('register of company error' . $e->getMessage());
+            throw new Exception('register of company error'.$e->getMessage());
         }
     }
 
@@ -123,14 +123,14 @@ class CompanyController extends CompanyModel
             $this->jwt->validate(); // Verifica se o token é válido
             $company = $request->param('company'); // Pega o cnpj da empresa
 
-            $this->helper->arrayValidate([$company], [0]); // Verifica se o cnpj foi enviado
-            $company = $this->helper->sanitizeArray([$company])[0]; // Sanitiza o cnpj
-            $company = $this->helper->convertType([$company], ['string'])[0]; // Converte o tipo do dado
+            arrayValidate([$company], [0]); // Verifica se o cnpj foi enviado
+            $company = sanitizeArray([$company])[0]; // Sanitiza o cnpj
+            $company = convertType([$company], ['string'])[0]; // Converte o tipo do dado
 
             $res = $this->deleteCompany($company); // Puxa os dados da empresa do banco de dados
 
             // Verifica se o retorno é um array e se está vazio
-            if (!is_array($res) || empty($res)) {
+            if (! is_array($res) || empty($res)) {
                 return $response->code(404)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Nenhuma empresa encontrada']));
             }
 
@@ -151,9 +151,9 @@ class CompanyController extends CompanyModel
             $this->jwt->validate(); // Verifica se o token é válido
             $body = \json_decode($request->body(), true); // Pega os dados do body da requisição
 
-            $this->helper->arrayValidate($body, ['cnpj', 'plan']); // Verifica se os dados foram enviados
-            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados da empresa
-            $body = $this->helper->convertType($body, ['string', 'int']); // Converte o tipo dos dados da empresa
+            arrayValidate($body, ['cnpj', 'plan']); // Verifica se os dados foram enviados
+            $body = sanitizeArray($body); // Sanitiza os dados da empresa
+            $body = convertType($body, ['string', 'int']); // Converte o tipo dos dados da empresa
 
             // Verifica se o cnpj é válido
             $exist = $this->companyExist($body['cnpj']);
@@ -192,9 +192,10 @@ class CompanyController extends CompanyModel
         $company = $this->getCompany($cnpj);
 
         // Verifica se o retorno é um array e se está vazio
-        if (!empty($company) || $company['status'] != 200 || !is_array($company)) {
+        if (! empty($company) || $company['status'] != 200 || ! is_array($company)) {
             throw new Exception($company['message'] ?? ['message' => 'Nenhuma empresa encontrada']);
-            $this->helper->mensagem(['message' => 'Nenhuma empresa encontrada', 'error' => $company['error'] ?? []], 404);
+            mensagem(['message' => 'Nenhuma empresa encontrada', 'error' => $company['error'] ?? []], 404);
+
             return [];
         }
 

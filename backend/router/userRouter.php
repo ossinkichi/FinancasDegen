@@ -1,6 +1,6 @@
 <?php
 
-use app\controllers\UserController;
+use App\controllers\UserController;
 
 $users = new UserController;
 

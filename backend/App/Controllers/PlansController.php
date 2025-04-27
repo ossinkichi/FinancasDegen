@@ -1,16 +1,15 @@
 <?php
 
-namespace app\controllers;
+namespace App\controllers;
 
+use App\models\PlansModel;
+use App\Shared\Helper;
 use Exception;
 use Klein\Request;
 use Klein\Response;
-use app\classes\Helper;
-use app\models\PlansModel;
 
 class PlansController extends PlansModel
 {
-
     private Helper $helper;
 
     public function __construct()
@@ -40,7 +39,7 @@ class PlansController extends PlansModel
                 ->header('Content-Type', 'application/json')
                 ->body(\json_encode(['message' => $plans['message'], 'error' => $plans['error'] ?? []]));
         } catch (Exception $e) {
-            throw new Exception('Planos não encontrados: ' . $e->getMessage(), (int) $e->getCode());
+            throw new Exception('Planos não encontrados: '.$e->getMessage(), (int) $e->getCode());
         }
     }
 
@@ -50,14 +49,14 @@ class PlansController extends PlansModel
         try {
             $planParams = \json_decode($request->body(), true); // Pega os dados do body
 
-            $this->helper->arrayValidate($planParams, ['name', 'describe', 'users', 'clients', 'price', 'type']); // Valida se os campos foram enviados
-            $planParams = $this->helper->sanitizeArray($planParams); // Sanitiza os dados dos campos
-            $planParams = $this->helper->convertType($planParams, ['string', 'string', 'int', 'int', 'decimals', 'string']); // Converte os tipos
+            arrayValidate($planParams, ['name', 'describe', 'users', 'clients', 'price', 'type']); // Valida se os campos foram enviados
+            $planParams = sanitizeArray($planParams); // Sanitiza os dados dos campos
+            $planParams = convertType($planParams, ['string', 'string', 'int', 'int', 'decimals', 'string']); // Converte os tipos
 
             // return \print_r(\gettype($planParams['users']));
 
             // Verifica se o typo do plano é aceitavel
-            if (\strtolower($planParams['type']) !== "anual" && strtolower($planParams['type']) !== "mensal") {
+            if (\strtolower($planParams['type']) !== 'anual' && strtolower($planParams['type']) !== 'mensal') {
                 return $response->code(422)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Tipo de plano invalido']));
             }
 
@@ -78,18 +77,19 @@ class PlansController extends PlansModel
             $planData = \json_decode($request->body(), true); // Pega os dados enviados do front
 
             // Verifica se todods os dados foram enviados
-            $this->helper->arrayValidate($planData, ['id', 'name', 'describe', 'users', 'clients', 'price', 'type']);
+            arrayValidate($planData, ['id', 'name', 'describe', 'users', 'clients', 'price', 'type']);
             // Converte os tipos dos dados
-            $planData = $this->helper->convertType($planData, ['int', 'string', 'string', 'int', 'int', 'decimals', 'string']);
-            $planData = $this->helper->sanitizeArray($planData); // Sanitiza os dados enviados
+            $planData = convertType($planData, ['int', 'string', 'string', 'int', 'int', 'decimals', 'string']);
+            $planData = sanitizeArray($planData); // Sanitiza os dados enviados
 
             // Verifica se o tipo de plano é aceitavel
-            if (\strtolower($planData['type']) !== "anual" && \strtolower($planData['type']) !== "mensal") {
+            if (\strtolower($planData['type']) !== 'anual' && \strtolower($planData['type']) !== 'mensal') {
                 return $response->code(400)->header('Content-Type', 'application/json')->body(['message' => 'Tipo de plano invalido']);
             }
 
             // Envia o pedido ao banco de dados e recebe sua resposta
             $res = $this->updatePlan($planData['id'], $planData['name'], $planData['describe'], $planData['users'], $planData['clients'], $planData['price'], $planData['type']);
+
             // Envia uma resposta ao front
             return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
         } catch (Exception $e) {
@@ -103,17 +103,16 @@ class PlansController extends PlansModel
         try {
             $plan = \json_decode($request->body(), true); // Pega os dados enviados
 
-
-            $this->helper->arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
-            $plan = $this->helper->sanitizeArray($plan); // Sanitiza os dados recebidos
-            $plan = $this->helper->convertType($plan, ['int']); // Converte o tipo dos dados
+            arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
+            $plan = sanitizeArray($plan); // Sanitiza os dados recebidos
+            $plan = convertType($plan, ['int']); // Converte o tipo dos dados
 
             $res = $this->enableThePlan($plan['plan']); // Envia o pedido ao banco de dados e recebe sua resposta
 
             // Envia uma resposta ao front
             return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'erro' => $res['error'] ?? []]));
         } catch (Exception $e) {
-            throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
+            throw new Exception('Erro ao executar o pedido: '.$e->getMessage(), (int) $e->getCode());
         }
     }
 
@@ -123,16 +122,16 @@ class PlansController extends PlansModel
         try {
             $plan = \json_decode($request->body(), true); // Pega os dados enviados
 
-            $this->helper->arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
-            $plan = $this->helper->sanitizeArray($plan); // Sanitiza os dados recebidos
-            $plan = $this->helper->convertType($plan, ['int']); // Converte o tipo dos dados
+            arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
+            $plan = sanitizeArray($plan); // Sanitiza os dados recebidos
+            $plan = convertType($plan, ['int']); // Converte o tipo dos dados
 
             $res = $this->disableThePlan($plan['plan']); // Envia o pedido ao // Verifica se há um retorno
 
             // Envia uma resposta ao front
             return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'erro' => $res['error'] ?? []]));
         } catch (Exception $e) {
-            throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
+            throw new Exception('Erro ao executar o pedido: '.$e->getMessage(), (int) $e->getCode());
         }
     }
 }

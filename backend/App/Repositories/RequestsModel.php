@@ -1,14 +1,12 @@
 <?php
 
-namespace app\models;
+namespace App\models;
 
-use \PDO;
-use \PDOException;
-use app\models\ConnectModel;
+use PDO;
+use PDOException;
 
 class RequestsModel extends ConnectModel
 {
-
     /**
      * @return array {status: number, message: string|void}
      */
@@ -47,7 +45,8 @@ class RequestsModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel emitir esse pedido', 'error' => $sql->errorInfo()];
             }
-            return ['status' =>  201, 'message' => ''];
+
+            return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             throw new PDOException($pe->getMessage(), $pe->getCode());
         }
@@ -59,7 +58,7 @@ class RequestsModel extends ConnectModel
     public function updateStatus(int $request, string $status): array
     {
         try {
-            $sql =  $this->connect()->prepare('UPDATE requests SET status = :status WHERE id = :id');
+            $sql = $this->connect()->prepare('UPDATE requests SET status = :status WHERE id = :id');
             $sql->bindValue(':status', $status);
             $sql->bindValue(':id', $request);
             $sql->execute();
@@ -67,6 +66,7 @@ class RequestsModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 403, 'message' => 'Não foi possivel modificar o status do pedido', 'error' => $sql->errorInfo()];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             throw new PDOException($pe->getMessage(), $pe->getCode());
@@ -87,6 +87,7 @@ class RequestsModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 200, 'message' => 'Não foi possivel efetuar o pagamente', 'error' => $sql->errorInfo()];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
             throw new PDOException($pe->getMessage(), $pe->getCode());

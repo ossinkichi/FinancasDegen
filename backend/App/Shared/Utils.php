@@ -1,13 +1,11 @@
 <?php
 
-namespace app\classes;
+namespace App\Shared;
 
-use app\models\ConnectModel;
-use app\controllers\UserController;
+use App\models\ConnectModel;
 
-class Ultils extends ConnectModel
+class Utils extends ConnectModel
 {
-
     public function createTables(): void
     {
         $db = new ConnectModel;

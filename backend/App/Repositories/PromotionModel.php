@@ -1,15 +1,14 @@
 <?php
 
-namespace app\Models;
+namespace App\Models;
 
-use app\models\ConnectModel;
-use \Exception;
+use App\models\ConnectModel;
+use Exception;
 use PDO;
 use PDOException;
 
 class PromotionModel extends ConnectModel
 {
-
     /**
      * @return array {status: int, message: string}
      */
@@ -24,9 +23,10 @@ class PromotionModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Houve um erro ao buscar o dado'];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Promotion error: ' . $pe->getMessage());
+            throw new PDOException('Promotion error: '.$pe->getMessage());
         }
     }
 
@@ -43,11 +43,12 @@ class PromotionModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'Nenhum dado encontrado'];
             }
+
             return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC)];
         } catch (PDOException $pe) {
-            throw new PDOException('Promotion error: ' . $pe->getMessage());
+            throw new PDOException('Promotion error: '.$pe->getMessage());
         } catch (Exception $e) {
-            throw new PDOException('Promotion error: ' . $e->getMessage());
+            throw new PDOException('Promotion error: '.$e->getMessage());
         }
     }
 
@@ -64,9 +65,10 @@ class PromotionModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'A promoção não pode ser destivada'];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Promotion error: ' . $pe->getMessage());
+            throw new PDOException('Promotion error: '.$pe->getMessage());
         }
     }
 
@@ -83,9 +85,10 @@ class PromotionModel extends ConnectModel
             if ($sql->rowCount() === 0) {
                 return ['status' => 404, 'message' => 'A promoção não pode ser ativada'];
             }
+
             return ['status' => 201, 'message' => ''];
         } catch (PDOException $pe) {
-            throw new PDOException('Promotion error: ' . $pe->getMessage());
+            throw new PDOException('Promotion error: '.$pe->getMessage());
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-use app\Controllers\TicketController;
+use App\Controllers\TicketController;
 
 $ticket = new TicketController;
 $klein->respond('GET', '/ticket/[i:account]', [$ticket, 'getTicketsForRequest']);
