@@ -22,5 +22,8 @@
 		"firebase/php-jwt": "^6.10",
 		"phpmailer/phpmailer": "^6.9",
 		"klein/klein": "^2.1"
+	},
+	"require-dev": {
+		"laravel/pint": "^1.22"
 	}
 }
