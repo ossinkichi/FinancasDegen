@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Classes;
+namespace App\Classes;
 
 use \Exception;
 use Dotenv\Dotenv;
@@ -8,19 +8,19 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use app\Classes\Helper;
 use Firebase\JWT\ExpiredException;
+use Klein\Response;
 
 class JwtHelper
 {
+    use Helper;
 
     private static string $key;
-    private static Helper $helper;
 
     public function __construct()
     {
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
         $dotenv->load();
         self::$key = $_ENV['TOKEN'];
-        self::$helper = new Helper;
     }
 
     public function generate(int $time, array|string $data = []): string
@@ -40,29 +40,27 @@ class JwtHelper
         }
     }
 
-    public function validate()
+    public function validate(Response $response =  Response::class)
     {
         try {
 
             $jwt = getallheaders();
-
-            // dd($jwt);
             if (!isset($jwt['authorization'])) {
-                self::$helper->message(['message' => 'acesso negado'], 401);
+                $this->message(['message' => 'acesso negado'], 401);
                 die();
             }
 
             $jwtDecoded = get_object_vars(JWT::decode($jwt['authorization'], new Key(self::$key, 'HS256')));
 
             if (!$jwtDecoded) {
-                self::$helper->message(['message' => 'acesso negado'], 401);
+                $this->message(['message' => 'acesso negado'], 401);
                 die();
             }
         } catch (ExpiredException  $e) {
-            self::$helper->message(['message' => 'Acesso negado'], 401);
+            $this->message(['message' => 'Acesso negado'], 401);
             die();
         } catch (Exception $e) { {
-                self::$helper->message(['message' => 'token inválido'], 401);
+                $this->message(['message' => 'token inválido'], 401);
                 die();
             }
         }
