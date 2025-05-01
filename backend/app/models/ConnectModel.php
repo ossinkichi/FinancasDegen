@@ -1,13 +1,14 @@
 <?php
 
-namespace app\models;
+namespace App\models;
 
-use \PDOException;
 use Exception;
+use \PDOException;
+use App\Concern\InteractsWithDatabase;
 
 class ConnectModel
 {
-    use \app\Concern\InteractsWithDatabase;
+    use InteractsWithDatabase;
 
     private function plansTable(): void
     {

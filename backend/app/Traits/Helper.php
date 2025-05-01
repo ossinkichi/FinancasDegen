@@ -1,8 +1,8 @@
 <?php
 
-namespace app\classes;
+namespace App\Traits;
 
-use app\Classes\JwtHelper;
+use App\Classes\JwtHelper;
 use InvalidArgumentException;
 
 trait Helper
