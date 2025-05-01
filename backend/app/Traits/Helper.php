@@ -5,23 +5,9 @@ namespace app\classes;
 use app\Classes\JwtHelper;
 use InvalidArgumentException;
 
-class Helper
+trait Helper
 {
     private JwtHelper $jwt;
-
-    public function verifyMethod(string $method)
-    {
-        cors($method);
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-            http_response_code(204);
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== $method) {
-            $this->message(['error' => 'Método não permitido'], 405);
-            die();
-        }
-    }
 
     public function message(array $message, int $code = 200): void
     {
@@ -33,11 +19,6 @@ class Helper
     public function sanitizeArray(array $datas)
     {
         return array_map('htmlspecialchars', $datas);
-    }
-
-    public function getData(string $input)
-    {
-        return get_object_vars(json_decode($input));
     }
 
     public function arrayValidate(array|string $arrayForValidate, array|null $keys = [0]): void
