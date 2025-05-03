@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Controllers;
+namespace App\Controllers;
 
 use Klein\Request;
 use Klein\Response;

@@ -1,13 +1,13 @@
 <?php
 
-namespace app\controllers;
+namespace App\Controllers;
 
 use Exception;
 use Klein\Request;
 use Klein\Response;
-use app\classes\Helper;
-use App\controllers\BaseController;
-use App\DTO\m\PlansDto;
+use App\Controllers\BaseController;
+use App\DTO\PlansDto;
+use App\Entities\PlansEntity;
 use App\Repositories\PlansRepository;
 
 class PlansController extends BaseController
@@ -26,29 +26,13 @@ class PlansController extends BaseController
     {
         try {
             $plans = $this->repository->getPlans(); // Envia um pedido ao banco e recebe sua resposta
-
-            // Verifica se tem alguma resposta
-            /*if (empty($plans)) {
-                return $response->code(203)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum plano encontrado']));
-            }
-
-            // Verifica se é um array e sanitiza
-            if (is_array($plans['message'])) {
-                $plans['message'] = \array_map([$this, 'sanitizeArray'], $plans['message']);
-            }
-
-            // retorna a resposta final ao front
-            return $response
-                ->code($plans['status'])
-                ->header('Content-Type', 'application/json')
-                ->body(\json_encode(['message' => $plans['message'], 'error' => $plans['error'] ?? []]));
-                */
             return $this->successRequest(response: $response, payload: $plans);
         } catch (Exception $e) {
-            throw new Exception('Planos não encontrados: ' . $e->getMessage(), (int) $e->getCode());
+            return $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
     }
 
+    /*
     // Registra um novo plano
     public function register(Request $request, Response $response)
     {
@@ -140,4 +124,5 @@ class PlansController extends BaseController
             throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
         }
     }
+*/
 }

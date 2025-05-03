@@ -1,6 +1,6 @@
 <?php
 
-use app\controllers\ClientController;
+use App\Controllers\ClientController;
 
 $client = new ClientController;
 

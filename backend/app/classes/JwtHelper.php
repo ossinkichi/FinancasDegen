@@ -4,11 +4,11 @@ namespace App\Classes;
 
 use \Exception;
 use Dotenv\Dotenv;
+use Klein\Response;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use app\Classes\Helper;
 use Firebase\JWT\ExpiredException;
-use Klein\Response;
+use App\Traits\Helper;
 
 class JwtHelper
 {
@@ -40,7 +40,7 @@ class JwtHelper
         }
     }
 
-    public function validate(Response $response =  Response::class)
+    public function validate(Response $response)
     {
         try {
 

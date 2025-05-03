@@ -3,7 +3,7 @@
 namespace app\classes;
 
 use app\models\ConnectModel;
-use app\controllers\UserController;
+use App\Controllers\UserController;
 
 class Ultils extends ConnectModel
 {

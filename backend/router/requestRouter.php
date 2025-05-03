@@ -1,6 +1,6 @@
 <?php
 
-use app\controllers\RequestsController;
+use App\Controllers\RequestsController;
 
 $request = new RequestsController;
 

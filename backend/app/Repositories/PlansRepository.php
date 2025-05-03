@@ -4,7 +4,9 @@ namespace App\Repositories;
 
 use \PDO;
 use \PDOException;
-use \App\Concern\InteractsWithDatabase;
+use App\Concern\InteractsWithDatabase;
+use App\Entities\PlansEntity;
+use App\Exceptions\RepositoryException;
 
 class PlansRepository
 {
@@ -23,7 +25,12 @@ class PlansRepository
             $sql = $this->connect()->prepare('SELECT * FROM plans');
             $sql->execute();
 
-            return ['status' => 200, 'message' => $sql->fetchAll(PDO::FETCH_ASSOC) ?? []];
+            if ($sql->rowCount() === 0) {
+                throw RepositoryException::entityNotFound('plans', 'plans');
+            }
+
+            return \array_map(fn($model) => PlansEntity::make($model), $sql->fetchAll(PDO::FETCH_ASSOC));
+            $sql->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $pe) {
             if ($pe->getCode() == 23000) {
                 return ['status' => 400, 'message' => 'Não foi possivel buscar os planos'];

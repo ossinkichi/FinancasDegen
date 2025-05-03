@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Controllers;
+namespace App\Controllers;
 
 use app\classes\Helper;
 use app\Classes\JwtHelper;

@@ -2,12 +2,10 @@
 
 namespace App\Traits;
 
-use App\Classes\JwtHelper;
 use InvalidArgumentException;
 
 trait Helper
 {
-    private JwtHelper $jwt;
 
     public function message(array $message, int $code = 200): void
     {

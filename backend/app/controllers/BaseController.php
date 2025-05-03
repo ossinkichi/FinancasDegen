@@ -1,6 +1,6 @@
 <?php
 
-namespace App\controllers;
+namespace App\Controllers;
 
 use App\Traits\Helper;
 use App\Classes\JwtHelper;
@@ -11,11 +11,11 @@ class BaseController
 {
     use Helper;
 
-    protected JwtHelper $jwt;
+    protected JwtHelper $jwtHelper;
 
     public function __construct()
     {
-        $this->jwt = new JwtHelper;
+        $this->jwtHelper = new JwtHelper(); // Instancia o helper de JWT
     }
 
     public function successRequest(Response $response, array $payload, int $statusCode = 200)
@@ -23,7 +23,7 @@ class BaseController
         return $response
             ->code($statusCode)
             ->header('Content-Type', 'application/json')
-            ->body(\json_encode($payload));
+            ->body($payload);
     }
 
     public function errorRequest(Response $response, Throwable $throwable, array $context = [])

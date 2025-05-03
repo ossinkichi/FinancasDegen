@@ -1,6 +1,6 @@
 <?php
 
-use app\controllers\PlansController;
+use App\Controllers\PlansController;
 
 $plans = new PlansController;
 

@@ -1,6 +1,6 @@
 <?php
 
-use app\controllers\CompanyController;
+use App\Controllers\CompanyController;
 
 $company = new CompanyController;
 
