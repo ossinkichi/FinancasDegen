@@ -16,7 +16,7 @@ trait InteractsWithDatabase
             $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
             $dotenv->load();
 
-            if (!defined('DATABASE')) define('DATABASE', __DIR__ . '/' . $_ENV['DATABASE']);
+            if (!defined('DATABASE')) define('DATABASE', __DIR__ . 'backend/../' . $_ENV['DATABASE']);
 
             $db = new PDO('sqlite:' . DATABASE);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

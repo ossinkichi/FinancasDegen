@@ -12,16 +12,14 @@ class PlansRepository
 {
     use InteractsWithDatabase;
 
-    private $plansDatabase;
-    public function __construct() {}
-
     /**
      * Busca todos os planos existentes
      * @return array {status: number, message: array|string}
      */
-    public function getPlans(): array
+    public function getPlans(): array|object
     {
         try {
+            return $this->connect();
             $sql = $this->connect()->prepare('SELECT * FROM plans');
             $sql->execute();
 
@@ -30,11 +28,7 @@ class PlansRepository
             }
 
             return \array_map(fn($model) => PlansEntity::make($model), $sql->fetchAll(PDO::FETCH_ASSOC));
-            $sql->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel buscar os planos'];
-            }
             throw new PDOException('Erro ao buscar os planos: ' . $pe->getMessage(), $pe->getCode());
         }
     }

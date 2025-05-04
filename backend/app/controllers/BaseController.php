@@ -29,11 +29,12 @@ class BaseController
     public function errorRequest(Response $response, Throwable $throwable, array $context = [])
     {
         return $response
-            ->code($throwable->getCode())
+            ->code(500)
             ->header('Content-Type', 'application/json')
             ->body(\json_encode([
                 'error' => $throwable->getMessage(),
                 'code' => $throwable->getCode(),
+                'file' => $throwable->getFile(),
                 'line' => $throwable->getLine(),
                 'context' => $context,
             ]));

@@ -1,17 +1,15 @@
 <?php
 
-namespace app\classes;
+namespace App\Classes;
 
-use app\models\ConnectModel;
-use App\Controllers\UserController;
+use App\Concern\InteractsWithDatabase;
+use App\Models\ConnectModel;
 
 class Ultils extends ConnectModel
 {
 
     public function createTables(): void
     {
-        $db = new ConnectModel;
-        $db->connect();
-        $db->createTables();
+        $this->tablesInicialization();
     }
 }

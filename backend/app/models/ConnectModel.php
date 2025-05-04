@@ -198,7 +198,7 @@ class ConnectModel
         }
     }
 
-    protected function createTables(): void
+    protected function tablesInicialization(): void
     {
         try {
             $this->usersTable();
