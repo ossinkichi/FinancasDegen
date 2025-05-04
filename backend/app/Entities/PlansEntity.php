@@ -11,8 +11,9 @@ class PlansEntity
         public string|null $describe,
         public int $numberofusers,
         public int $numberofclients,
-        public float $price,
-        public string $type
+        public string $price,
+        public string $type,
+        public bool $status
     ) {}
 
     public static function make(mixed $model): self
@@ -24,7 +25,8 @@ class PlansEntity
             price: $model['price'],
             type: $model['type'],
             numberofusers: $model['numberofusers'],
-            numberofclients: $model['numberofclients']
+            numberofclients: $model['numberofclients'],
+            status: $model['status']
         );
     }
 
@@ -37,7 +39,8 @@ class PlansEntity
             'price' => $this->price,
             'type' => $this->type,
             'numberofusers' => $this->numberofusers,
-            'numberofclients' => $this->numberofclients
+            'numberofclients' => $this->numberofclients,
+            'status' => $this->status
         ];
     }
 }

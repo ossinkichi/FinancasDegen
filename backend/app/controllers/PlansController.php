@@ -70,23 +70,18 @@ class PlansController extends BaseController
     }
 
 
-    /*/ Ativa um plano
+    // Ativa um plano
     public function enable(Request $request, Response $response): Response
     {
         try {
-            $plan = \json_decode($request->body(), true); // Pega os dados enviados
+            $planId = $request->param('plan'); // Pega os dados enviados
 
-
-            $this->arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
-            $plan = $this->sanitizeArray($plan); // Sanitiza os dados recebidos
-            $plan = $this->convertType($plan, ['int']); // Converte o tipo dos dados
-
-            $res = $this->enableThePlan($plan['plan']); // Envia o pedido ao banco de dados e recebe sua resposta
+            $this->repository->enableThePlan($planId); // Envia o pedido ao banco de dados e recebe sua resposta
 
             // Envia uma resposta ao front
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'erro' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Verifica se há um retorno
         } catch (Exception $e) {
-            throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
+            return $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
     }
 
@@ -94,19 +89,14 @@ class PlansController extends BaseController
     public function disable(Request $request, Response $response): Response
     {
         try {
-            $plan = \json_decode($request->body(), true); // Pega os dados enviados
+            $planId = $request->param('plan'); // Pega os dados enviados
 
-            $this->arrayValidate($plan, ['plan']); // Verifica se os dados foram enviados
-            $plan = $this->sanitizeArray($plan); // Sanitiza os dados recebidos
-            $plan = $this->convertType($plan, ['int']); // Converte o tipo dos dados
-
-            $res = $this->disableThePlan($plan['plan']); // Envia o pedido ao // Verifica se há um retorno
+            $this->repository->disableThePlan($planId); // Envia o pedido ao // Verifica se há um retorno
 
             // Envia uma resposta ao front
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'erro' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201);
         } catch (Exception $e) {
-            throw new Exception('Erro ao executar o pedido: ' . $e->getMessage(), (int) $e->getCode());
+            return $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
     }
-*/
 }

@@ -23,33 +23,20 @@ Content-Type: application/json
     "id": 1,
     "name" : "Light",
     "describe" : "Plano ultilizado por todos",
-    "users" : 60,
-    "clients" : 200,
-    "price" : "12,59",
+    "numberofusers" : 60,
+    "numberofclients" : 200,
+    "price" : "12.59",
     "type" : "mensal"
 }
 
 ###
 
-PATCH http://localhost:8000/plan/enable
+PATCH http://localhost:8000/plan/enable/1
 Content-Type: application/json
-
-{`
-    "plan": 1
-}
 
 ###
 
-PATCH http://localhost:8000/plan/enable
-Content-Type: application/json
-
-{
-    "plan": 3
-}
-
-###
-
-PATCH http://localhost:8000/plan/disable
+PATCH http://localhost:8000/plan/disable/1
 Content-Type: application/json
 
 {

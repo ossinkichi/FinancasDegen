@@ -78,42 +78,27 @@ class PlansRepository
      * Desativa um plano existente
      * @return array {status: number, message: string|void}
      */
-    public function disableThePlan(int $id): array
+    public function disableThePlan(int $id): void
     {
-        try {
-            $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
-            $sql->bindValue(':status', 0);
-            $sql->bindValue(':id', $id);
-            $sql->execute();
+        $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
+        $sql->bindValue(':status', 0);
+        $sql->bindValue(':id', $id);
+        $sql->execute();
 
-            if ($sql->rowCount() === 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
-            }
-            return ['status' => 201, 'message' => ''];
-        } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel desativar o plano'];
-            }
-            throw new PDOException("Erro ao desativar o plano: " . $pe->getMessage(), $pe->getCode());
+        if ($sql->rowCount() === 0) {
+            throw RepositoryException::entityNotFound('plans', $id);
         }
     }
-    public function enableThePlan(int $id): array
+    public function enableThePlan(int $id): void
     {
-        try {
-            $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
-            $sql->bindValue(':status', true);
-            $sql->bindValue(':id', $id);
-            $sql->execute();
 
-            if ($sql->rowCount() === 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel desativar os dados do plano'];
-            }
-            return ['status' => 201, 'message' => ''];
-        } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel desativar o plano'];
-            }
-            throw new PDOException("Erro ao desativar o plano: " . $pe->getMessage(), $pe->getCode());
+        $sql = $this->connect()->prepare('UPDATE plans SET status = :status WHERE id = :id');
+        $sql->bindValue(':status', true);
+        $sql->bindValue(':id', $id);
+        $sql->execute();
+
+        if ($sql->rowCount() === 0) {
+            throw RepositoryException::entityNotFound('plans', $id);
         }
     }
 }
