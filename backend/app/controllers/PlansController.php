@@ -26,7 +26,8 @@ class PlansController extends BaseController
     {
         try {
             $plans = $this->repository->getPlans(); // Envia um pedido ao banco e recebe sua resposta
-            return $this->successRequest(response: $response, payload: $plans);
+
+            return $this->successRequest(response: $response, payload: $plans); // Envia a resposta ao front
         } catch (Exception $e) {
             return $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
