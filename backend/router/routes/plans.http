@@ -8,9 +8,9 @@ Content-Type: application/json
 {
     "name" : "Light",
     "describe" : "Plano ultilizado por todos",
-    "users" : 24,
-    "clients" : 150,
-    "price" : "123.49",
+    "numberofusers" : 24,
+    "numberofclients" : 150,
+    "price" : "123.00",
     "type" : "anual"
 }
 

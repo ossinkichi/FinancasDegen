@@ -1,13 +1,14 @@
 <?php
 
-namespace App\DTO\m;
+namespace App\DTO;
 
 class PlansDto
 {
 
     public function __construct(
+        public int|null $id,
         public string $name,
-        public string $description,
+        public string $describe,
         public string $price,
         public string $type,
         public int $numberofusers,
@@ -17,12 +18,13 @@ class PlansDto
     public static function make(array $planPayload): self
     {
         return new self(
-            name: $planPayload['name'] ?? '',
-            description: $planPayload['description'] ?? '',
-            price: $planPayload['price'] ?? '',
-            type: $planPayload['type'] ?? '',
-            numberofusers: $planPayload['numberofusers'] ?? 0,
-            numberofclients: $planPayload['numberofclients'] ?? 0
+            id: $planPayload['id'],
+            name: $planPayload['name'],
+            describe: $planPayload['describe'],
+            price: $planPayload['price'],
+            type: $planPayload['type'],
+            numberofusers: $planPayload['numberofusers'],
+            numberofclients: $planPayload['numberofclients']
         );
     }
 }

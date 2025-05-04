@@ -14,11 +14,14 @@ class PlansController extends BaseController
 {
 
     private PlansRepository $repository;
+    private PlansEntity $entity;
+    // private PlansDto $dto;
 
     public function __construct()
     {
         parent::__construct(); // Chama o construtor da classe pai
         $this->repository = new PlansRepository(); // Instancia o repositório de planos
+        // $this->dto = new PlansDto(); // Instancia o DTO de planos
     }
 
     // Puxa todos os planos
@@ -27,37 +30,27 @@ class PlansController extends BaseController
         try {
             $plans = $this->repository->getPlans(); // Envia um pedido ao banco e recebe sua resposta
 
-            return $this->successRequest(response: $response, payload: $plans); // Envia a resposta ao front
+            return $this->successRequest(response: $response, payload: [
+                'data' => array_map(fn($model) => $model->JsonSerialize(), $plans), // Converte os dados para o formato JSON
+                'message' => 'Planos encontrados com sucesso',
+            ]); // Envia a resposta ao front
         } catch (Exception $e) {
             return $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
     }
 
-    /*
     // Registra um novo plano
     public function register(Request $request, Response $response)
     {
         try {
-            $planParams = \json_decode($request->body(), true); // Pega os dados do body
+            $plansPayload = \json_decode($request->body(), true); // Pega os dados do body
+            $plansDto = PlansDto::make($plansPayload); // Cria um novo DTO de planos
 
-            $this->arrayValidate($planParams, ['name', 'describe', 'users', 'clients', 'price', 'type']); // Valida se os campos foram enviados
-            $planParams = $this->sanitizeArray($planParams); // Sanitiza os dados dos campos
-            $planParams = $this->convertType($planParams, ['string', 'string', 'int', 'int', 'decimals', 'string']); // Converte os tipos
+            $this->repository->setNewPlan($plansDto); // Envia um pedido ao banco de dados e recebe sua resposta
 
-            // return \print_r(\gettype($planParams['users']));
-
-            // Verifica se o typo do plano é aceitavel
-            if (\strtolower($planParams['type']) !== "anual" && strtolower($planParams['type']) !== "mensal") {
-                return $response->code(422)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Tipo de plano invalido']));
-            }
-
-            $res = $this->setNewPlan($planParams['name'], $planParams['describe'], $planParams['users'], $planParams['clients'], $planParams['price'], $planParams['type']); // Envia um pedido ao banco de dados e recebe sua resposta
-
-            // Envia a resposta final ao front
-            return $response->code(\intval($res['status']))->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Envia uma resposta ao front
         } catch (Exception $e) {
-            // \var_dump($e->getCode());
-            throw new Exception($e->getMessage());
+            $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
     }
 
@@ -65,29 +58,19 @@ class PlansController extends BaseController
     public function update(Request $request, Response $response): Response
     {
         try {
-            $planData = \json_decode($request->body(), true); // Pega os dados enviados do front
-
-            // Verifica se todods os dados foram enviados
-            $this->arrayValidate($planData, ['id', 'name', 'describe', 'users', 'clients', 'price', 'type']);
-            // Converte os tipos dos dados
-            $planData = $this->convertType($planData, ['int', 'string', 'string', 'int', 'int', 'decimals', 'string']);
-            $planData = $this->sanitizeArray($planData); // Sanitiza os dados enviados
-
-            // Verifica se o tipo de plano é aceitavel
-            if (\strtolower($planData['type']) !== "anual" && \strtolower($planData['type']) !== "mensal") {
-                return $response->code(400)->header('Content-Type', 'application/json')->body(['message' => 'Tipo de plano invalido']);
-            }
+            $planPayload = \json_decode($request->body(), true); // Pega os dados enviados do front
+            $planDto = PlansDto::make($planPayload); // Cria um novo DTO de planos
 
             // Envia o pedido ao banco de dados e recebe sua resposta
-            $res = $this->updatePlan($planData['id'], $planData['name'], $planData['describe'], $planData['users'], $planData['clients'], $planData['price'], $planData['type']);
-            // Envia uma resposta ao front
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            $this->repository->updatePlan($planDto);
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Envia uma resposta ao front
         } catch (Exception $e) {
-            throw new Exception($e->getMessage(), (int) $e->getCode());
+            return $this->errorRequest(response: $response, throwable: $e, context: ['Erro ao executar o pedido']);
         }
     }
 
-    // Ativa um plano
+
+    /*/ Ativa um plano
     public function enable(Request $request, Response $response): Response
     {
         try {

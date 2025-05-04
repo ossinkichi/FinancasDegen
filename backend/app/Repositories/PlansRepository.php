@@ -5,6 +5,7 @@ namespace App\Repositories;
 use \PDO;
 use \PDOException;
 use App\Concern\InteractsWithDatabase;
+use App\DTO\PlansDto;
 use App\Entities\PlansEntity;
 use App\Exceptions\RepositoryException;
 
@@ -19,13 +20,12 @@ class PlansRepository
     public function getPlans(): array|object
     {
         try {
-            return $this->connect();
             $sql = $this->connect()->prepare('SELECT * FROM plans');
             $sql->execute();
 
-            if ($sql->rowCount() === 0) {
-                throw RepositoryException::entityNotFound('plans', 'plans');
-            }
+            // if ($sql->rowCount() == 0) {
+            //     throw RepositoryException::entityNotFound('plans', 'plans');
+            // }
 
             return \array_map(fn($model) => PlansEntity::make($model), $sql->fetchAll(PDO::FETCH_ASSOC));
         } catch (PDOException $pe) {
@@ -37,27 +37,19 @@ class PlansRepository
      * Registra um novo plano
      * @return array {status: number, message: string|void}
      */
-    public function setNewPlan(string $planname, string $plandescribe, int $numberofusers, int $numberofclients, string $price, string $type): array
+    public function setNewPlan(PlansDto $plansDto): void
     {
-        try {
-            $sql = $this->connect()->prepare('INSERT INTO plans(name, describe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
-            $sql->bindValue(':planname', $planname);
-            $sql->bindValue(':plandescribe', $plandescribe);
-            $sql->bindValue(':numberofusers', $numberofusers);
-            $sql->bindValue(':numberofclients', $numberofclients);
-            $sql->bindValue(':price', $price);
-            $sql->bindValue('type', $type);
-            $sql->execute();
+        $sql = $this->connect()->prepare('INSERT INTO plans(name, describe, numberofusers, numberofclients, price, type) VALUES(:planname, :plandescribe, :numberofusers, :numberofclients, :price, :type)');
+        $sql->bindValue(':planname', $plansDto->name);
+        $sql->bindValue(':plandescribe', $plansDto->describe);
+        $sql->bindValue(':numberofusers', $plansDto->numberofusers);
+        $sql->bindValue(':numberofclients', $plansDto->numberofclients);
+        $sql->bindValue(':price', $plansDto->price);
+        $sql->bindValue('type', $plansDto->type);
+        $sql->execute();
 
-            if ($sql->rowCount() === 0) {
-                return ['status' => 403, 'message' => 'Não foi possivel registrar um novo plano plano', 'error' => $sql->errorInfo()];
-            }
-            return ['status' => 201, 'message' => ''];
-        } catch (PDOException $pe) {
-            if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel registrar um novo plano'];
-            }
-            throw new PDOException("Erro ao registrar um plano: " . $pe->getMessage(), (int) $pe->getCode());
+        if ($sql->rowCount() == 0) {
+            throw RepositoryException::entityNotFound('plans', $plansDto->name);
         }
     }
 
@@ -65,28 +57,20 @@ class PlansRepository
      * Atualiza os dados de um plano existente
      * @return array {status: number, message: string|void}
      */
-    public function updatePlan(int $id, string $planname, string $plandescribe, int $numberofusers, int $numberofclients, string $price, string $type): array
+    public function updatePlan(PlansDto $plansDto): void
     {
-        try {
-            $sql = $this->connect()->prepare('UPDATE plans SET name = :planname, describe = :plandescribe,  numberofusers = :numberofusers,  numberofclients = :numberofclients,  price = :price, type = :type WHERE id = :id');
-            $sql->bindValue(':id', $id);
-            $sql->bindValue(':planname', $planname);
-            $sql->bindValue(':plandescribe', $plandescribe);
-            $sql->bindValue(':numberofusers', $numberofusers);
-            $sql->bindValue(':numberofclients', $numberofclients);
-            $sql->bindValue(':price', $price);
-            $sql->bindValue(':type', $type);
-            $sql->execute();
-            if ($sql->rowCount() === 0) {
-                return ['status' => 400, 'message' => 'Não foi possivel atualizar os dados do plano'];
-            }
+        $sql = $this->connect()->prepare('UPDATE plans SET name = :planname, describe = :plandescribe,  numberofusers = :numberofusers,  numberofclients = :numberofclients,  price = :price, type = :type WHERE id = :id');
+        $sql->bindValue(':id', $plansDto->id);
+        $sql->bindValue(':planname', $plansDto->name);
+        $sql->bindValue(':plandescribe', $plansDto->describe);
+        $sql->bindValue(':numberofusers', $plansDto->numberofusers);
+        $sql->bindValue(':numberofclients', $plansDto->numberofclients);
+        $sql->bindValue(':price', $plansDto->price);
+        $sql->bindValue(':type', $plansDto->type);
+        $sql->execute();
 
-            return ['status' => 201, 'message' => ''];
-        } catch (PDOException $pe) {
-            throw new PDOException("Erro ao atualizar o plano: " . $pe->getMessage(), (int) $pe->getCode());
-            if ($pe->getCode() == 23000) {
-                return ['status' => 400, 'message' => 'Não foi possivel atualizar o plano o plano'];
-            }
+        if ($sql->rowCount() == 0) {
+            throw RepositoryException::entityNotFound('plans', $plansDto->id);
         }
     }
 

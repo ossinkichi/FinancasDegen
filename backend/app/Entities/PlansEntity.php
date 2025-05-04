@@ -8,7 +8,7 @@ class PlansEntity
     public function __construct(
         public int $id,
         public string $name,
-        public string $describe,
+        public string|null $describe,
         public int $numberofusers,
         public int $numberofclients,
         public float $price,

@@ -23,7 +23,7 @@ class BaseController
         return $response
             ->code($statusCode)
             ->header('Content-Type', 'application/json')
-            ->body($payload);
+            ->body(\json_encode($payload));
     }
 
     public function errorRequest(Response $response, Throwable $throwable, array $context = [])
