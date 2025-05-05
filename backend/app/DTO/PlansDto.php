@@ -6,7 +6,7 @@ class PlansDto
 {
 
     public function __construct(
-        public int|null $id,
+        public ?int $id = null,
         public string $name,
         public string $describe,
         public string $price,
@@ -18,7 +18,7 @@ class PlansDto
     public static function make(array $planPayload): self
     {
         return new self(
-            id: $planPayload['id'],
+            id: $planPayload['id'] ?? null,
             name: $planPayload['name'],
             describe: $planPayload['describe'],
             price: $planPayload['price'],

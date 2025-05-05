@@ -19,18 +19,10 @@ class PlansRepository
      */
     public function getPlans(): array|object
     {
-        try {
-            $sql = $this->connect()->prepare('SELECT * FROM plans');
-            $sql->execute();
+        $sql = $this->connect()->prepare('SELECT * FROM plans');
+        $sql->execute();
 
-            // if ($sql->rowCount() == 0) {
-            //     throw RepositoryException::entityNotFound('plans', 'plans');
-            // }
-
-            return \array_map(fn($model) => PlansEntity::make($model), $sql->fetchAll(PDO::FETCH_ASSOC));
-        } catch (PDOException $pe) {
-            throw new PDOException('Erro ao buscar os planos: ' . $pe->getMessage(), $pe->getCode());
-        }
+        return \array_map(fn($model) => PlansEntity::make($model), $sql->fetchAll(PDO::FETCH_ASSOC));
     }
 
     /**

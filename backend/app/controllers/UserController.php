@@ -6,78 +6,54 @@ use \Exception;
 use Dotenv\Dotenv;
 use Klein\Request;
 use Klein\Response;
-use app\classes\Helper;
-use app\classes\JwtHelper;
-use app\models\UsersModel;
 use PHPMailer\PHPMailer\PHPMailer;
+use App\Controllers\BaseController;
+use App\DTO\UserDto;
+use App\Repositories\UserRepository;
+use App\Repositories\UsersRepository;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
-class UserController extends UsersModel
+class UserController extends BaseController
 {
-    private Helper $helper;
-    private JwtHelper $jwt;
+
+    private UsersRepository $repository;
 
     public function __construct()
     {
-        $this->helper =  new Helper;
-        $this->jwt =  new JwtHelper;
+        parent::__construct();
+        $this->repository = new UsersRepository(); // Instancia o repositório de usuários
     }
 
     // Busca todos os usúarios
     public function index(Request $request, Response $response): Response
     {
         try {
-            $res = $this->getAllUser(); // Faz o pedido ao banco de dados
+            $users = $this->repository->getAllUser(); // Faz o pedido ao banco de dados
 
-            // Verifica se houve retorno
-            if (empty($res)) {
-                return $response->code(404)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum usuario encontrado']));
-            }
-            // Sanitiza os dados
-            \is_array($res['message']) ?
-                $res['message'] = \array_map(function ($user) {
-                    $user = $this->helper->sanitizeArray($user);
-                    foreach (['id', 'password'] as $chave) {
-                        unset($user[$chave]);
-                    }
-                    return $user;
-                },  $res['message'])
-                : null;
-
-            // Envia uma resposta ao front
-            return $response->code($res['status'])->header('Content-Type', 'application/json')->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [
+                'data' => \array_map(fn($data) => $data->jsonSerialize(), $users), // Converte os dados para JSON
+                'message' => 'Usuários encontrados',
+            ]); // Retorna os dados ao front
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao buscar os usuários',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
         }
     }
 
     // Verifica se o usuario tem uma conta
-    public function login(Request $request, Response $response): Response # Atualmente está dando erro
+    public function login(Request $request, Response $response): void # Atualmente está dando erro
     {
         try {
-            $body = \json_decode($request->body(), true); // Recebe os dados do front
-
-            // Verifica se todos os campos foram enviados
-            $this->helper->arrayValidate($body, [
-                'email',
-                'password'
-            ]);
-            // Converte os tipos dos dados
-            $body = $this->helper->convertType($body, ['string', 'string']);
-
-            // Sanitiza os dados
-            $user = [
-                'email' => filter_var($body['email'], FILTER_SANITIZE_EMAIL),
-                'password' => filter_var($body['password'], FILTER_SANITIZE_SPECIAL_CHARS)
-            ];
+            $Payload = \json_decode($request->body(), true); // Recebe os dados do front
+            $userDto = UserDto::make($Payload);
 
             // Valida o usúario
-            $res = $this->validateLogin($body);
-
-            // Dá um retorno ao front
-            return $response->code($res['status'])
-                ->header('Content-Type', 'application/json')
-                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            $this->validateLogin($userDto, $response);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -430,43 +406,26 @@ class UserController extends UsersModel
      * @param array $user {email: string, password: string}
      * @return array {message: array|string, token: string}
      */
-    private function validateLogin(array $user): array
+    private function validateLogin(UserDto $userDto, Response $response): Response
     {
-        // Faz o pedido ao banco de dados e recebe sua resposta
-        $response = $this->getUser($user['email']);
+        try {
+            $user = $this->repository->getUser($userDto->email); // Faz o pedido ao banco de dados e recebe sua resposta
 
-        if ($response['status'] !== 200) {
-            return ['message' => 'Usuário não encontrado', 'status' => $response['status'], 'error' => $response['error'] ?? []];
+
+            return $this->successRequest(response: $response, payload: [
+                'message' => 'Usuário encontrado',
+                'user' => $user->userHash,
+                'token' => $this->jwtHelper->generate(time: (60 * 60 * 2)), // Cria o token
+            ]); // Retorna os dados ao front
+        } catch (Exception $e) {
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao validar o login',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
         }
-
-        // Verifica se houve retorno
-        if (empty($response) || isset($response['error']) || !\is_array($response['message'])) {
-            return ['message' => 'Usuário não encontrado', 'status' => 404, 'error' => $response['error']];
-        }
-
-        // Verifica se o usuário está ativo
-        if (!$response['message']['emailverify']) {
-            return (array) ['message' => 'Usuário não está ativo', 'status' => 403];
-        }
-
-        // Verifica se a senha está correta
-        if (!password_verify($user['password'], $response['message']['password'])) {
-            return ['message' => 'Senha ou usuário incorreta', 'status' => 401];
-        }
-
-        // Verifica se o retorno tem status 200 e se é um array
-        if ($response['status'] == 200 && is_array($response['message'])) {
-            $response['message'] = $this->helper->sanitizeArray($response['message']);
-        }
-
-        return [
-            'message' => [
-                'user' => $response['message']['userhash'] ?? $response['message'],
-                'token' => ($response['status'] == 200) ? $this->jwt->generate(60 * 60 * 7) : null
-            ],
-            'status' => $response['status'],
-            'error' => $response['error'] ?? []
-        ];
     }
 
 

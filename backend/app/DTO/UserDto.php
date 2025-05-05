@@ -9,12 +9,13 @@ class UserDto
         public string $userhash,
         public string $name,
         public string $email,
-        public string $password,
+        public ?string $password = null,
         public string $cpf,
         public string $dateofbirth,
         public string $gender,
         public string $phone,
-        public ?string $position = null
+        public ?string $company = null,
+        public string $position = 'funcionario'
     ) {}
 
     public static function make(array $userPayload): self
@@ -23,12 +24,13 @@ class UserDto
             userhash: $userPayload['userhash'],
             name: $userPayload['name'],
             email: $userPayload['email'],
-            password: $userPayload['password'],
+            password: $userPayload['password'] ?? null,
             cpf: $userPayload['cpf'],
             gender: $userPayload['gender'],
-            position: $userPayload['position'] ?? null,
             phone: $userPayload['phone'],
             dateofbirth: $userPayload['dateofbirth'] ?? date('Y-m-d', strtotime($userPayload['dateofbirth'])),
+            company: $userPayload['company'] ?? null,
+            position: $userPayload['position'] ?? 'funcionario',
         );
     }
 }

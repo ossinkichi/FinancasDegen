@@ -62,6 +62,7 @@ class ConnectModel
             dateofbirth DATE,
             gender VARCHAR(10),
             phone VARCHAR(20),
+            deleted BOOLEAN DEFAULT false,
             company VARCHAR(14),
             FOREIGN KEY (company)  REFERENCES companies(cnpj) ON DELETE CASCADE
             );');
