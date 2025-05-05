@@ -414,7 +414,7 @@ class UserController extends BaseController
 
             return $this->successRequest(response: $response, payload: [
                 'message' => 'Usuário encontrado',
-                'user' => $user->userHash,
+                'data' => '',
                 'token' => $this->jwtHelper->generate(time: (60 * 60 * 2)), // Cria o token
             ]); // Retorna os dados ao front
         } catch (Exception $e) {

@@ -26,14 +26,14 @@ class UsersRepository
     /**
      * @return array {status: number, message: array|string}
      */
-    public function getUser(string $user): array
+    public function getUser(string $user): UserEntity
     {
 
         $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
         $sql->bindValue(':user', $user);
         $sql->execute();
 
-        return \array_map(fn($model) => UserEntity::make($model), $sql->fetch(PDO::FETCH_ASSOC));
+        return UserEntity::make($sql->fetch(PDO::FETCH_ASSOC));
     }
 
     /**
