@@ -1,14 +1,15 @@
 <?php
 
-namespace app\models;
+namespace App\Entities;
 
 use \PDO;
 use \PDOException;
-use \app\models\ConnectModel;
+use App\Concern\InteractsWithDatabase;
+use App\DTO\UserDto;
 
-
-class UsersModel extends ConnectModel
+class UsersEntity
 {
+    use InteractsWithDatabase;
 
     /**
      * @return array {status: number, message: array|string}
