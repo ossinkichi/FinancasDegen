@@ -379,6 +379,12 @@ class UserController extends BaseController
         try {
             $user = $this->userExist(user: $userDto->email, response: $response); // Faz o pedido ao banco de dados e recebe sua resposta
 
+            if ($user->deleted) {
+                return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                    'message' => 'Email ou senha incorreto',
+                ])->code(401); // Retorna o erro ao front
+            }
+
             if (!\password_verify(password: $userDto->password, hash: $user->password)) {
                 return $this->errorRequest(response: $response, throwable: new Exception(), context: [
                     'message' => 'Email ou senha incorreto',
