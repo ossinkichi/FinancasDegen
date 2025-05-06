@@ -23,13 +23,9 @@ class UsersRepository
         return \array_map(fn($model) => UserEntity::make($model), $sql->fetchAll(PDO::FETCH_ASSOC));
     }
 
-    /**
-     * @return array {status: number, message: array|string}
-     */
-    public function getUser(string $user): UserEntity
+    public function getUser(string $user): object
     {
-
-        $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
+        $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user AND deleted = false');
         $sql->bindValue(':user', $user);
         $sql->execute();
 

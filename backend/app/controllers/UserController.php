@@ -48,61 +48,32 @@ class UserController extends BaseController
     // Verifica se o usuario tem uma conta
     public function login(Request $request, Response $response): void # Atualmente está dando erro
     {
-        try {
-            $Payload = \json_decode($request->body(), true); // Recebe os dados do front
-            $userDto = UserDto::make($Payload);
+        $Payload = \json_decode($request->body(), true); // Recebe os dados do front
+        $userDto = UserDto::make($Payload);
 
-            // Valida o usúario
-            $this->validateLogin($userDto, $response);
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
-        }
+        // Valida o usúario
+        $this->validateLogin(userDto: $userDto, response: $response);
     }
 
     // Registra um novo usuário
     public function create(Request $request, Response $response): Response
     {
         try {
-            $body = \json_decode($request->body(), true); // Recebe os dados do front
+            $playload = \json_decode($request->body(), true); // Recebe os dados do front
+            $userDto = UserDto::make($playload); // Cria um novo objeto UserDto com os dados recebidos
 
             // Verifica se todos os dados necessários foram enviados
-            $this->helper->arrayValidate($body, [
-                'name',
-                'email',
-                'password',
-                'cpf',
-                'dateofbirth',
-                'gender',
-                'phone',
-                'position'
-            ]);
+            $user['hash'] = $this->createHash(hash: $userDto->cpf); // Cria um hash para o usuário
 
-            // Busca se o usúario já existe
-            $userExist = $this->userExist($body['email']);
-
-            // Verifica se o usúario já está cadastrado
-            if ($userExist) {
-                return $response->code(401)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Usuário já cadastrado']));
-            }
-
-            // Sanitiza os dados
-            $user = $this->helper->sanitizeArray($body);
-            $user['email'] = filter_var($body['email'], FILTER_SANITIZE_EMAIL);
-            $user['hash'] = $this->createHash($user['cpf']); // Cria um hash para o usuário
-
-            // Converte os tipos dos dados
-            $user = $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
 
             // Faz o pedido ao banco e recebe sua resposta
-            $res = $this->setNewUser($user['hash'], $user['name'], $user['email'], $user['password'], $user['cpf'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['position']);
+            $this->repository->setNewUser(userDto: $userDto); // Faz o pedido ao banco de dados e recebe sua resposta
 
-            // Dá um retorno ao front
-            return $response->code($res['status'])
-                ->header('Content-Type', 'application/json')
-                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
 
             // Envia um email ao usuário cadastrado
-            /*if ($res['status'] == 201) {
+            /*
+            if ($res['status'] == 201) {
                 $this->sendEmail([
                     'from' => 'exampleemail@gmail.com',
                     'to' => $user['email'],
@@ -111,13 +82,20 @@ class UserController extends BaseController
                     'subject' => 'Resgistro de novo usuário',
                     'message' => 'Olá ' . $user['name'] . ', Seja bem vindo.'
                 ]);
-            }*/
+            }
+            */
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao cadastrar o usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
         }
     }
 
-    // Busca um usuário pelo hash
+    /*/ Busca um usuário pelo hash
     public function get(Request $request, Response $response): Response
     {
         try {
@@ -228,7 +206,7 @@ class UserController extends BaseController
             throw new Exception('Erro ao deletar: ' . $e->getMessage());
         }
     }
-
+    /*
     public function forgoatPassword(Request $request, Response $response): Response
     {
         try {
@@ -260,7 +238,7 @@ class UserController extends BaseController
             throw new Exception($e->getMessage());
         }
     }
-
+    /*
     public function inviteFromCompany(Request $request, Response $response): Response
     {
 
@@ -339,13 +317,14 @@ class UserController extends BaseController
             throw new Exception($e->getMessage());
         }
     }
-
+    */
     // Cria um hash para o usuario
     private function createHash(string $hash): string
     {
         return hash('sha256', $hash);
     }
 
+    /*
     // Configura o email
     private function emailConfig()
     {
@@ -372,11 +351,6 @@ class UserController extends BaseController
         }
     }
 
-    /**
-     * Envia um email para um usuário
-     *
-     * @param array $emailData {from: string, to: string, fromName: string, toName: string, subject: string, message: string}
-     */
     private function sendEmail(array $emailData): void
     {
         try {
@@ -399,22 +373,27 @@ class UserController extends BaseController
             // $this->helper->message(['message' => 'Não foi possivel enviar o email'], 403);
         }
     }
-
-    /**
-     * Validação do login do usuário
-     *
-     * @param array $user {email: string, password: string}
-     * @return array {message: array|string, token: string}
-     */
+    */
     private function validateLogin(UserDto $userDto, Response $response): Response
     {
         try {
-            $user = $this->repository->getUser($userDto->email); // Faz o pedido ao banco de dados e recebe sua resposta
+            $user = $this->userExist(user: $userDto->email, response: $response); // Faz o pedido ao banco de dados e recebe sua resposta
 
+            if (!\password_verify(password: $userDto->password, hash: $user->password)) {
+                return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                    'message' => 'Email ou senha incorreto',
+                ])->code(401); // Retorna o erro ao front
+            }
+
+            if (!$user->emailverify) {
+                return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                    'message' => 'Email não verificado',
+                ])->code(401); // Retorna o erro ao front
+            }
 
             return $this->successRequest(response: $response, payload: [
                 'message' => 'Usuário encontrado',
-                'data' => '',
+                'data' => $user->jsonSerialize(), // Converte os dados para JSON
                 'token' => $this->jwtHelper->generate(time: (60 * 60 * 2)), // Cria o token
             ]); // Retorna os dados ao front
         } catch (Exception $e) {
@@ -428,36 +407,32 @@ class UserController extends BaseController
         }
     }
 
-
-    /**
-     * Verifica se o usuário já existe no banco de dados
-     *
-     * @param array $user {email: string, hash: string}
-     * @return void
-     */
-    private function userExist(string $user): array
+    private function userExist(string $user, Response $response): object
     {
         try {
-            // Verifica se o usuário foi enviado
-            if (empty($user)) {
-                return [];
-            }
-
             // Faz o pedido ao banco de dados e recebe sua resposta
-            $userData = $this->getUser((string) $user);
+            $userData = $this->repository->getUser(user: $user);
 
-            // Verifica se houve retorno
-            if (empty($userData) || !\is_array($userData) || !\is_array($userData['message'])) {
-                return [];
+            if (empty($userData)) {
+                return $this->errorRequest(response: $response, throwable: new Exception, context: [
+                    'message' => 'Usuário não encontrado',
+                    'error' => 'Usuário não encontrado',
+                ])->code(401); // Retorna o erro ao front
             }
 
-            // Retorna os dados do usuário
-            return $userData['message'];
+            return $userData;
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao buscar o usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
         }
     }
 
+    /*
     // Envia um email para o usuário com o link para alterar a senha
     public function sendMessageForForgoatPassword(Request $request, Response $response): void
     {
@@ -493,4 +468,5 @@ class UserController extends BaseController
         //     }
         // }
     }
+        */
 }
