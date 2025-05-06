@@ -6,7 +6,7 @@ class UserDto
 {
 
     public function __construct(
-        public string $userhash,
+        public ?string $userhash,
         public string $name,
         public string $email,
         public ?string $password = null,
@@ -21,7 +21,7 @@ class UserDto
     public static function make(array $userPayload): self
     {
         return new self(
-            userhash: $userPayload['userhash'],
+            userhash: $userPayload['userhash'] = null,
             name: $userPayload['name'],
             email: $userPayload['email'],
             password: $userPayload['password'] ?? null,

@@ -138,85 +138,56 @@ class UserController extends BaseController
             throw new Exception($e->getMessage());
         }
     }
-
+    */
     // Atualiza os dados do usuário
     public function update(Request $request, Response $response): Response
     {
-        $this->jwt->validate(); // Verifica se o token é valido
+        $this->jwtHelper->validate($response); // Verifica se o token é valido
+        try {
+            $payload = \json_decode($request->body(), true); // Recebe os dados do front
+            $userDto = UserDto::make($payload); // Cria um novo objeto UserDto com os dados recebidos
 
-        $data = \json_decode($request->body(), true); // Recebe os dados do front
-        // Verifica se todos os dados necessários foram enviados
-        $this->helper->arrayValidate($data, [
-            'hash',
-            'name',
-            'email',
-            'password',
-            'dateofbirth',
-            'gender',
-            'phone'
-        ]);
+            $this->repository->updateDataUser(userDto: $userDto); // Faz o pedido ao banco de dados e recebe sua resposta
 
-        // Sanitiza os dados
-        $user = $this->helper->sanitizeArray($data);
-        $user['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-        // Converte os tipos dos dados
-        $user =  $this->helper->convertType($user, ['string', 'string', 'string', 'string', 'string', 'string', 'string', 'string']);
-        // Verifica se o usúario existe
-        $userExist = $this->userExist($user['hash']);
-
-        if ($userExist) {
-            return $response->code(401)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'Usuário não encontrado']));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
+        } catch (Exception $e) {
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao atualizar o usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
         }
-
-        // Faz o pedido ao banco e recebe sua resposta
-        $res = $this->updateDataUser($user['name'], $user['email'], $user['password'], $user['dateofbirth'], $user['gender'], $user['phone'], $user['hash']);
-
-        // Dá um retorno ao front
-        return $response
-            ->code($res['status'])
-            ->header('Content-Type', 'application/json')
-            ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
     }
 
     // Delete um usuario
     public function delete(Request $request, Response $response): Response
     {
 
+        $this->jwtHelper->validate($response); // Verifica se o token é valido
         try {
-            $this->jwt->validate(); // Verifica se o token é valido
-
             $hash = $request->param('hash'); // Recebe o hash do usuario
-            $this->helper->arrayValidate([$hash], ['0']); // Verifica se o dado foi enviado
-            $hash = $this->helper->sanitizeArray([$hash])[0]; // Sanitiza o dado
-            $hash = $this->helper->convertType([$hash], ['string'])[0]; // Converte o tipo do dado
 
-            $res = $this->deleteUser($hash); // Faz o pedido ao banco de dados e recebe sua resposta
+            $this->repository->deleteUser(hash: $hash); // Faz o pedido ao banco de dados e recebe sua resposta
 
-            // Verifica se houve retorno
-            if (empty($res)) {
-                return $response->code(404)->header('Content-Type', 'application/json')->body(\json_encode(['message' => 'nenhum usuario encontrado']));
-            }
-
-            // Dá um retorno ao front
-            return $response
-                ->code($res['status'])
-                ->header('Content-Type', 'application/json')
-                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201);
         } catch (Exception $e) {
-            throw new Exception('Erro ao deletar: ' . $e->getMessage());
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao deletar o usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
         }
     }
+
     /*
     public function forgoatPassword(Request $request, Response $response): Response
     {
         try {
             $body = \json_decode($request->body(), true);  // Recebe os dados do front
-
-            $this->helper->arrayValidate($body, ['user', 'password']); // Verifica se todos os dados necessários foram enviados
-            $body = $this->helper->sanitizeArray($body); // Sanitiza os dados
-            $body = $this->helper->convertType($body, ['string', 'string']); // Converte os tipos dos dados
-
-            $userExist = $this->userExist($body['user']); // Verifica se o usúario já está cadastrado
 
             if (!$userExist) {
                 return $response->code(401)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Usuário não encontrado']));
