@@ -286,7 +286,7 @@ class UserController extends BaseController
         if (password_verify($password, $newPassword)) {
             return $this->errorRequest(response: $response, throwable: new Exception(), context: [
                 'message' => 'A senha não pode ser igual a anterior',
-            ])->code(401); // Retorna o erro ao front
+            ]); // Retorna o erro ao front
         }
     }
     /*
@@ -309,12 +309,12 @@ class UserController extends BaseController
         ]);
         return $response->code($res['status'])->header('Content-Type', 'aplication/json')->body([]);
     }
-
-    // Ingresa o usuário a uma empresa
+    */
+    /*/ Ingresa o usuário a uma empresa
     public function join(Request $request, Response $response): Response
     {
         try {
-            $this->jwt->validate(); // Verifica se o token é valido
+            $this->jwtHelper->validate($response); // Verifica se o token é valido
             $data = $request->params(['company', 'user']); // Recebe os dados do front
 
             $this->helper->arrayValidate($data, ['user', 'company']); // Verifica se todos os dados necessários foram enviados
@@ -339,36 +339,28 @@ class UserController extends BaseController
         }
     }
 
-    // Ativa a conta do usuário
+    /*/
     public function active(Request $request, Response $response): Response
     {
         try {
-            $data = $request->param('hash'); // Recebe o hash do usuario
-            $this->helper->arrayValidate([$data], ['0']); // Verifica se o dado foi enviado
-            $data = $this->helper->convertType([$data], ['string'])[0]; // Converte o tipo do dado
-            $data = $this->helper->sanitizeArray([$data])[0]; // Sanitiza o dado
+            $param = $request->param('hash'); // Recebe o hash do usuario
 
-            $res = $this->activateAccount($data); // Faz o pedido ao banco de dados e recebe sua resposta
+            $this->userExist(user: $param, response: $response);
 
-            // Verifica se houve retorno
-            if (empty($res)) {
-                // Se não houver retorno, retorna um erro 404
-                return $response
-                    ->code(404)
-                    ->header('Content-Type', 'application/json')
-                    ->body(\json_encode(['message' => 'nenhum usuario encontrado']));
-            }
+            $this->repository->activateAccount(hash: $param); // Faz o pedido ao banco de dados e recebe sua resposta
 
-            // Se houver retorno, retorna o status e a mensagem
-            return $response
-                ->code($res['status'])
-                ->header('Content-Type', 'application/json')
-                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            return $this->successRequest(response: $response, payload: [], statusCode: 201);
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            return $this->errorRequest(response: $response, throwable: $e, context: [
+                'message' => 'Não foi possivel ativar a conta',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ],);
         }
     }
-    */
+
     // Cria um hash para o usuario
     private function createHash(string $hash): string
     {
@@ -488,42 +480,4 @@ class UserController extends BaseController
             ])->code(500); // Retorna o erro ao front
         }
     }
-
-    /*
-    // Envia um email para o usuário com o link para alterar a senha
-    public function sendMessageForForgoatPassword(Request $request, Response $response): void
-    {
-        $user = \json_decode($request->body(), true); // Recebe os dados do front
-        $this->helper->arrayValidate($user, ['user', 'message']); // Verifica se todos os dados necessários foram enviados
-        $user = $this->helper->sanitizeArray($user); // Sanitiza os dados
-        $user = $this->helper->convertType($user, ['string']); // Converte os tipos dos dados
-
-        $this->userExist($user['user']); // Verifica se o usúario já está cadastrado
-
-        // Faz o pedido ao banco de dados e recebe sua resposta
-        $response = $this->getUser($user['user']);
-
-        //     // Verifica se houve retorno
-        //     if (empty($response))
-        // {
-        //     return;
-        //     if (!isset($user['password'])) {
-        //         $response = $this->getUser($user['user']);
-        //         if ($response['status'] == 200) {
-        //             $this->sendEmail([
-        //                 'from' => 'exampleemail@gmail.com',
-        //                 'to' => $response['message']['email'],
-        //                 'fromName' => 'Example Name',
-        //                 'toName' => $response['message']['name'],
-        //                 'subject' => 'Alterar senha do usuario',
-        //                 'message' => 'Olá ' . $response['name'] . ', você solicitou uma troca de senha? Caso tenha sido você, clique no link a seguir <b>youtube.com</b>. caso não, ignore!.'
-        //             ]);
-        //         } else {
-        //             $this->helper->message(['message' => $response['message']], $response['status']);
-        //             die();
-        //         }
-        //     }
-        // }
-    }
-        */
 }
