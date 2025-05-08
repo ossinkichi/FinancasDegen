@@ -124,15 +124,15 @@ class UsersRepository
     /**
      * @return array {status: number, message: string|void}
      */
-    public function setNewPassword(UserDto $userDto): void
+    public function setNewPassword(string $user, string $password): void
     {
-        $sql = $this->connect()->prepare('UPDATE users SET password = :password WHERE userhash = :hash');
-        $sql->bindValue(':password', password_hash($userDto->password, PASSWORD_DEFAULT));
-        $sql->bindValue(':hash', $userDto->userhash);
+        $sql = $this->connect()->prepare('UPDATE users SET password = :password WHERE userhash = :hash OR email = :user');
+        $sql->bindValue(':password', password_hash($password, PASSWORD_DEFAULT));
+        $sql->bindValue(':user', $user);
         $sql->execute();
 
         if ($sql->rowCount() === 0) {
-            throw RepositoryException::entityNotFound('users', $userDto->name);
+            throw RepositoryException::entityNotFound('users', $user);
         }
     }
 }

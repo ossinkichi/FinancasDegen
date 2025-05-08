@@ -11,6 +11,7 @@ use App\Controllers\BaseController;
 use App\DTO\UserDto;
 use App\Repositories\UserRepository;
 use App\Repositories\UsersRepository;
+use LDAP\Result;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class UserController extends BaseController
@@ -183,30 +184,77 @@ class UserController extends BaseController
         }
     }
 
-    /*
+    public function forgoatPasswordSendEmail(Request $request, Response $response): Response
+    {
+        try {
+            $body = \json_decode($request->body(), true);  // Recebe os dados do front
+
+            $userExist = $this->userExist(user: $body['user'], response: $response); // Verifica se o usúario já está cadastrado
+
+            if ($userExist['deleted']) {
+                return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                    'message' => 'Email ou senha incorreto',
+                ])->code(401); // Retorna o erro ao front
+            }
+
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
+        } catch (Exception $e) {
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao cadastrar o usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
+        }
+    }
+
+
     public function forgoatPassword(Request $request, Response $response): Response
     {
         try {
             $body = \json_decode($request->body(), true);  // Recebe os dados do front
 
-            if (!$userExist) {
-                return $response->code(401)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'Usuário não encontrado']));
+            $userExist = $this->userExist(user: $body['user'], response: $response); // Verifica se o usúario já está cadastrado
+
+            if ($userExist->deleted) {
+                return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                    'message' => 'Email ou senha incorreto',
+                ])->code(401); // Retorna o erro ao front
             }
 
+            $this->forgoatPasswordVerify(
+                password: $userExist->password,
+                newPassword: $body['password'],
+                newPasswordConfirm: $body['passwordConfirm'],
+                response: $response
+            ); // Verifica se as senhas são iguais
 
-            // Verifica se A senha é igual a anterior
-            if (password_verify($body['password'], $userExist['password'])) {
-                return $response->code(401)->header('Content-Type', 'aplication/json')->body(\json_encode(['message' => 'A nova senha não pode ser igual a anterior']));
-            }
-
-            $res = $this->setNewPassword($body['user'], $body['password']);
-            // \dd($body);
-            return $response
-                ->code($res['status'])
-                ->header('Content-Type', 'application/json')
-                ->body(\json_encode(['message' => $res['message'], 'error' => $res['error'] ?? []]));
+            $this->repository->setNewPassword(user: $body['user'], password: $body['password']);
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao cadastrar o usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
+        }
+    }
+
+    private function forgoatPasswordVerify(string $password, string $newPassword, string $newPasswordConfirm, Response $response)
+    {
+        if ($newPassword !== $newPasswordConfirm) {
+            return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                'message' => 'As senhas não conferem',
+            ])->code(401); // Retorna o erro ao front
+        }
+
+        if (password_verify($password, $newPassword)) {
+            return $this->errorRequest(response: $response, throwable: new Exception(), context: [
+                'message' => 'A senha não pode ser igual a anterior',
+            ])->code(401); // Retorna o erro ao front
         }
     }
     /*
@@ -397,7 +445,7 @@ class UserController extends BaseController
                 ])->code(401); // Retorna o erro ao front
             }
 
-            return $userData;
+            return $userData; // Converte os dados para JSON
         } catch (Exception $e) {
             return $this->errorRequest($response, throwable: $e, context: [
                 'message' => 'Erro ao buscar o usuário',

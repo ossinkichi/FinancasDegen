@@ -15,6 +15,7 @@ class UserEntity
         public string $gender,
         public string $phone,
         public ?string $company = null,
+        public string $deleted = 'false',
         public ?string $position = 'funcionario'
     ) {}
 
@@ -30,6 +31,7 @@ class UserEntity
             gender: $model['gender'],
             phone: $model['phone'],
             company: $model['company'] ?? null,
+            deleted: $model['deleted'] ?? 'false',
             position: $model['position'] ?? 'funcionario'
         );
     }
@@ -46,6 +48,7 @@ class UserEntity
             'gender' => $this->gender,
             'phone' => $this->phone,
             'company' => $this->company,
+            'deleted' => $this->deleted,
             'position' => $this->position
         ];
     }
