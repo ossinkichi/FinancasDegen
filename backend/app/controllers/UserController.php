@@ -197,10 +197,14 @@ class UserController extends BaseController
                 ])->code(401); // Retorna o erro ao front
             }
 
-            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
+            return $this->successRequest(response: $response, payload: [
+                'message' => 'Email enviado com sucesso, por favor verifique sua caixa de entrada!',
+                'data' => $userExist->userhash, // Converte os dados para JSON,
+                'token' => $this->jwtHelper->generate(time: (60 * 30)), // Cria o token
+            ], statusCode: 200); // Retorna os dados ao front
         } catch (Exception $e) {
             return $this->errorRequest($response, throwable: $e, context: [
-                'message' => 'Erro ao cadastrar o usuário',
+                'message' => 'Erro ao enviar o email',
                 'error' => $e->getMessage(),
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),
@@ -223,7 +227,7 @@ class UserController extends BaseController
                 ])->code(401); // Retorna o erro ao front
             }
 
-            $this->forgoatPasswordVerify(
+            $this->passwordChangeVerification(
                 password: $userExist->password,
                 newPassword: $body['password'],
                 newPasswordConfirm: $body['passwordConfirm'],
@@ -234,7 +238,7 @@ class UserController extends BaseController
             return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
         } catch (Exception $e) {
             return $this->errorRequest($response, throwable: $e, context: [
-                'message' => 'Erro ao cadastrar o usuário',
+                'message' => 'Erro ao recuperar a senha do usuário',
                 'error' => $e->getMessage(),
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),
@@ -243,7 +247,35 @@ class UserController extends BaseController
         }
     }
 
-    private function forgoatPasswordVerify(string $password, string $newPassword, string $newPasswordConfirm, Response $response)
+    public function createNewPassword(Request $request, Response $response): Response
+    {
+        try {
+            $payload = \json_decode($request->body(), true);  // Recebe os dados do front
+
+            $userExist = $this->userExist(user: $payload['user'], response: $response); // Verifica se o usúario já está cadastrado
+
+            $this->passwordChangeVerification(
+                password: $userExist->password,
+                newPassword: $payload['password'],
+                newPasswordConfirm: $payload['passwordConfirm'],
+                response: $response
+            ); // Verifica se as senhas são iguais
+
+            $this->repository->setNewPassword(user: $payload['user'], password: $payload['password']);
+
+            return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
+        } catch (Exception $e) {
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao trocar a senha do usuário',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
+        }
+    }
+
+    private function passwordChangeVerification(string $password, string $newPassword, string $newPasswordConfirm, Response $response)
     {
         if ($newPassword !== $newPasswordConfirm) {
             return $this->errorRequest(response: $response, throwable: new Exception(), context: [
