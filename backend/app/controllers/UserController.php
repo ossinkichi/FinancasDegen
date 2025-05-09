@@ -247,7 +247,7 @@ class UserController extends BaseController
         }
     }
 
-    public function createNewPassword(Request $request, Response $response): Response
+    public function ChangePassword(Request $request, Response $response): Response
     {
         try {
             $payload = \json_decode($request->body(), true);  // Recebe os dados do front
