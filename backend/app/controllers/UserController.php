@@ -361,15 +361,32 @@ class UserController extends BaseController
         }
     }
 
+    public function sendEmailForVerification(Request $request, Response $response): Response
+    {
+        try {
+
+            return $this->successRequest(response: $response, payload: [
+                'message' => 'Email enviado com sucesso, por favor verifique sua caixa de entrada!',
+            ], statusCode: 200); // Retorna os dados ao front
+        } catch (Exception $e) {
+            return $this->errorRequest($response, throwable: $e, context: [
+                'message' => 'Erro ao enviar o email de verificação',
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ])->code(500); // Retorna o erro ao front
+        }
+    }
+
     // Cria um hash para o usuario
     private function createHash(string $hash): string
     {
         return hash('sha256', $hash);
     }
 
-    /*
     // Configura o email
-    private function emailConfig()
+    private function emailConfig(): PHPMailer
     {
         try {
             $dotenv = Dotenv::createImmutable(__DIR__ . '/../../');
@@ -387,10 +404,9 @@ class UserController extends BaseController
 
             return $phpmailer;
         } catch (PHPMailerException $pme) {
-            $this->helper->message(['message' => 'Erro ao configurar o email'], 403);
             throw new PHPMailerException($pme->errorMessage());
         } catch (Exception $e) {
-            $this->helper->message(['message' => 'Erro ao configurar o email'], 403);
+            throw new Exception($e->getMessage());
         }
     }
 
@@ -413,10 +429,9 @@ class UserController extends BaseController
             throw new PHPMailerException($pme->errorMessage());
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
-            // $this->helper->message(['message' => 'Não foi possivel enviar o email'], 403);
         }
     }
-    */
+
     private function validateLogin(UserDto $userDto, Response $response): Response
     {
         try {

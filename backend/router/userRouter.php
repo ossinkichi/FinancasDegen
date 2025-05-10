@@ -14,6 +14,6 @@ $klein->respond('PATCH', '/user/active/[h:hash]', [$users, 'active']);
 $klein->respond('POST', '/user/forgoat', [$users, 'forgoatPasswordSendEmail']);
 $klein->respond('PATCH', '/user/forgoat', [$users, 'forgoatPassword']);
 $klein->respond('PATCH', '/user/create/password', [$users, 'ChangePassword']);
-$klein->respond('PATCH', '/user/join/[i:company]/[h:user]', [$users, 'join']);
+// $klein->respond('PATCH', '/user/join/[i:company]/[h:user]', [$users, 'join']);
 
 // Adicionar rota de convite para a compania
