@@ -49,11 +49,10 @@ class UserController extends BaseController
     // Verifica se o usuario tem uma conta
     public function login(Request $request, Response $response): void # Atualmente está dando erro
     {
-        $Payload = \json_decode($request->body(), true); // Recebe os dados do front
-        $userDto = UserDto::make($Payload);
+        $payload = \json_decode($request->body(), true); // Recebe os dados do front
 
         // Valida o usúario
-        $this->validateLogin(userDto: $userDto, response: $response);
+        $this->validateLogin(userData: $payload, response: $response);
     }
 
     // Registra um novo usuário
@@ -64,7 +63,7 @@ class UserController extends BaseController
             $userDto = UserDto::make($playload); // Cria um novo objeto UserDto com os dados recebidos
 
             // Verifica se todos os dados necessários foram enviados
-            $user['hash'] = $this->createHash(hash: $userDto->cpf); // Cria um hash para o usuário
+            $userDto->userhash = $this->createHash(hash: $userDto->cpf); // Cria um hash para o usuário
 
 
             // Faz o pedido ao banco e recebe sua resposta
@@ -361,7 +360,7 @@ class UserController extends BaseController
         }
     }
 
-    public function sendEmailForVerification(Request $request, Response $response): Response
+    public function sendEmailForVerificationAccount(Request $request, Response $response): Response
     {
         try {
 
@@ -432,18 +431,18 @@ class UserController extends BaseController
         }
     }
 
-    private function validateLogin(UserDto $userDto, Response $response): Response
+    private function validateLogin(array $userData, Response $response): Response
     {
         try {
-            $user = $this->userExist(user: $userDto->email, response: $response); // Faz o pedido ao banco de dados e recebe sua resposta
+            $user = $this->userExist(user: $userData['email'], response: $response); // Faz o pedido ao banco de dados e recebe sua resposta
 
-            if ($user->deleted) {
+            if ($user->deleted == false) {
                 return $this->errorRequest(response: $response, throwable: new Exception(), context: [
                     'message' => 'Email ou senha incorreto',
                 ])->code(401); // Retorna o erro ao front
             }
 
-            if (!\password_verify(password: $userDto->password, hash: $user->password)) {
+            if (!password_verify(password: $userData['password'], hash: $user->password)) {
                 return $this->errorRequest(response: $response, throwable: new Exception(), context: [
                     'message' => 'Email ou senha incorreto',
                 ])->code(401); // Retorna o erro ao front
@@ -484,7 +483,7 @@ class UserController extends BaseController
                 ])->code(401); // Retorna o erro ao front
             }
 
-            return $userData; // Converte os dados para JSON
+            return $userData;
         } catch (Exception $e) {
             return $this->errorRequest($response, throwable: $e, context: [
                 'message' => 'Erro ao buscar o usuário',

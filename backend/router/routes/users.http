@@ -6,7 +6,7 @@ POST http://localhost:8000/user/login
 Content-Type: application/json
 
 {
-    "email": "catecea4@gmail.com",
+    "email": "cacetada@gmail.com",
     "password": "1121"
 }
 
@@ -17,9 +17,9 @@ Content-Type: application/json
 
 {
     "name": "Avocate",
-    "email": "catecea4@gmail.com",
+    "email": "cacetada@gmail.com",
     "password": "1121",
-    "cpf": "13232",
+    "cpf": "132332",
     "dateofbirth": "21/12/1910",
     "gender": "masc",
     "phone": "002001000",

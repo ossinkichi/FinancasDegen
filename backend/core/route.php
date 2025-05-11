@@ -31,8 +31,8 @@ $klein->respond('GET', '/', function ($request,  $response) {
 });
 
 require __DIR__ . '/../router/plansRouter.php';
-/*
 require __DIR__ . '/../router/userRouter.php';
+/*
 require __DIR__ . '/../router/companyRouter.php';
 require __DIR__ . '/../router/clientRouter.php';
 require __DIR__ . '/../router/requestRouter.php';
@@ -42,5 +42,5 @@ try {
     $klein->dispatch();
 } catch (Exception $e) {
     error_log("Erro na rota: " . $e->getMessage() . ', no arquivo: ' . $e->getFile() . ', na linha: ' . $e->getLine()); // Log do erro
-    echo json_encode(["error" => "Ocorreu um erro interno"]); // Retorno amigável
+    $klein->response()->body(["error" => "Ocorreu um erro interno"])->code(500)->header('Content-Type', 'application/json');
 }

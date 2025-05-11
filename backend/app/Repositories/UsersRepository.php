@@ -25,7 +25,7 @@ class UsersRepository
 
     public function getUser(string $user): object
     {
-        $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user AND deleted = false');
+        $sql = $this->connect()->prepare('SELECT * FROM users WHERE userhash = :user OR email = :user');
         $sql->bindValue(':user', $user);
         $sql->execute();
 
