@@ -63,17 +63,17 @@ class UsersRepository
     public function updateDataUser(UserDto $userDto): void
     {
 
-        $sql = $this->connect()->prepare('UPDATE users SET name = :name, email = :email, password = :password, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE userhash = :hash');
+        $sql = $this->connect()->prepare('UPDATE users SET name = :name, email = :email, password = :password, dateofbirth = :dateofbirth, gender = :gender, phone = :phone WHERE userhash = :hash OR email = :email');
+        $sql->bindValue(':hash', $userDto->userhash);
         $sql->bindValue(':name', $userDto->name);
         $sql->bindValue(':email', $userDto->email);
         $sql->bindValue(':dateofbirth', $userDto->dateofbirth);
         $sql->bindValue(':gender', $userDto->gender);
         $sql->bindValue(':phone', $userDto->phone);
-        $sql->bindValue(':hash', $userDto->userhash);
         $sql->execute();
 
         if ($sql->rowCount() === 0) {
-            throw RepositoryException::entityNotFound('users', $userDto->name);
+            throw RepositoryException::entityNotFound('users', $userDto->email);
         }
     }
 

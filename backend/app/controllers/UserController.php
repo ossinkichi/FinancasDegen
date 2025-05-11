@@ -448,15 +448,18 @@ class UserController extends BaseController
                 ])->code(401); // Retorna o erro ao front
             }
 
-            if (!$user->emailverify) {
+            if ($user->emailverify !== true) {
                 return $this->errorRequest(response: $response, throwable: new Exception(), context: [
                     'message' => 'Email não verificado',
                 ])->code(401); // Retorna o erro ao front
             }
 
+            $user = $user->jsonSerialize(); // Converte os dados para JSON
+            unset($user['password']); // Remove a senha do usuário
+
             return $this->successRequest(response: $response, payload: [
                 'message' => 'Usuário encontrado',
-                'data' => $user->jsonSerialize(), // Converte os dados para JSON
+                'data' => $user,
                 'token' => $this->jwtHelper->generate(time: (60 * 60 * 2)), // Cria o token
             ]); // Retorna os dados ao front
         } catch (Exception $e) {

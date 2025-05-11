@@ -25,7 +25,7 @@ class UserDto
             name: $userPayload['name'],
             email: $userPayload['email'],
             password: $userPayload['password'] ?? null,
-            cpf: $userPayload['cpf'],
+            cpf: $userPayload['cpf'] ??  '000.000.000-00',
             gender: $userPayload['gender'],
             phone: $userPayload['phone'],
             dateofbirth: $userPayload['dateofbirth'] ?? date('Y-m-d', strtotime($userPayload['dateofbirth'])),

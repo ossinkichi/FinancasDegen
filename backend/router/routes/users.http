@@ -29,20 +29,18 @@ Content-Type: application/json
 
 DELETE http://localhost:8000/user/delete/40668b33cba2eb66eaeda4f3fbe513b726b32ac99c007d65d6a331ee5d563507
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ2OTgwNDM3LCJleHAiOjE3NDY5ODc2MzcsImRhdGEiOltdfQ.Wf9qJIXRaq-ULFFjL-Xax4G3yp9bkdRSXTwPukhEEO8
 
 ###
 
 PUT http://localhost:8000/user/update
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ2OTgwNDM3LCJleHAiOjE3NDY5ODc2MzcsImRhdGEiOltdfQ.Wf9qJIXRaq-ULFFjL-Xax4G3yp9bkdRSXTwPukhEEO8
 
 {
-    "hash": "40668b33cba2eb66eaeda4f3fbe513b726b32ac99c007d65d6a331ee5d563507",
+    "userhash": "050117ff4506e3933daaeca07e9490f7f66187171a0498db932279ff8500698a",
     "name": "ba2cate",
     "email": "cat2ea@gmail.com",
-    "password": "1211",
-    "cpf": "12122",
     "dateofbirth": "21/12/1910",
     "gender": "masc",
     "phone": "000000000"
@@ -68,7 +66,7 @@ Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIs
 
 GET http://localhost:8000/user/40668b33cba2eb66eaeda4f3fbe513b726b32ac99c007d65d6a331ee5d563507
 Content-Type: application/json
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQzOTQyNjc2LCJleHAiOjE3NDM5Njc4NzYsImRhdGEiOltdfQ.JZ6ccrwcVzyJIt8GopgOyxKCrkkfV1vgC8Dy0cO7ln0
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJleGFtcGxlLmNvbSIsImF1ZCI6ImV4YW1wbGUuY29tIiwiaWF0IjoxNzQ2OTgwNDM3LCJleHAiOjE3NDY5ODc2MzcsImRhdGEiOltdfQ.Wf9qJIXRaq-ULFFjL-Xax4G3yp9bkdRSXTwPukhEEO8
 
 ###
 
