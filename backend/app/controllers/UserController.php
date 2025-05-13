@@ -9,9 +9,7 @@ use Klein\Response;
 use PHPMailer\PHPMailer\PHPMailer;
 use App\Controllers\BaseController;
 use App\DTO\UserDto;
-use App\Repositories\UserRepository;
 use App\Repositories\UsersRepository;
-use LDAP\Result;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class UserController extends BaseController
@@ -145,9 +143,9 @@ class UserController extends BaseController
         $this->jwtHelper->validate($response); // Verifica se o token é valido
         try {
             $payload = \json_decode($request->body(), true); // Recebe os dados do front
-            $userDto = UserDto::make($payload); // Cria um novo objeto UserDto com os dados recebidos
+            // $userDto = UserDto::make($payload); // Cria um novo objeto UserDto com os dados recebidos
 
-            $this->repository->updateDataUser(userDto: $userDto); // Faz o pedido ao banco de dados e recebe sua resposta
+            $this->repository->updateDataUser($payload); // Faz o pedido ao banco de dados e recebe sua resposta
 
             return $this->successRequest(response: $response, payload: [], statusCode: 201); // Retorna os dados ao front
         } catch (Exception $e) {
